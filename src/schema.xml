@@ -1,0 +1,809 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<irods:irods xmlns:irods="http://irods.jyu.fi/schema">
+  <irods:schema name="jyu-test">
+
+    <irods:namespace prefix="fi.jyu.irods." label="University of Jyväskylä">
+
+      <irods:attribute name="identifier" unit="false" editable="false">
+	<irods:label>Persistent ID</irods:label>
+	<irods:displayFilter type="regExp">
+	  <irods:regExpRule>urn:uuid:</irods:regExpRule>
+	  <irods:regExpFilter></irods:regExpFilter>
+	</irods:displayFilter>
+      </irods:attribute>
+
+      <irods:attribute name="version" unit="false" editable="false">
+	<irods:label>Version Information</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="currentversion" unit="false" editable="false">
+	<irods:label>Current Data Version</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="metadata.identifier" unit="false" editable="false">
+	<irods:label>Metadata Identifier</irods:label>
+	<irods:displayFilter type="regExp">
+	  <irods:regExpRule>urn:uuid:</irods:regExpRule>
+	  <irods:regExpFilter></irods:regExpFilter>
+	</irods:displayFilter>
+      </irods:attribute>
+
+      <irods:attribute name="metadata.modified" unit="false" editable="false">
+	<irods:label>Metadata Modification Time</irods:label>
+	<irods:displayFilter type="regExp">
+	  <irods:regExpRule>(\d+)-(\d+)-(\d+).(\d+):(\d+):(\d+)</irods:regExpRule>
+	  <irods:regExpFilter>\3.\2.\1 \4:\5:\6</irods:regExpFilter>
+	</irods:displayFilter>
+      </irods:attribute>
+
+      <irods:attribute name="metadata.modifiedby" unit="false" editable="false">
+	<irods:label>Metadata Modifier</irods:label>
+	<irods:displayFilter type="genquery">
+	  <irods:genquery valueStr="__ATTR_VALUE__">SELECT USER_INFO WHERE USER_NAME = '__ATTR_VALUE__'</irods:genquery>
+	</irods:displayFilter>
+      </irods:attribute>
+
+      <irods:attribute name="metadata.generator" unit="false" editable="false">
+	<irods:label>Metadata Generator</irods:label>
+      </irods:attribute>
+     
+      <irods:attribute name="modified" unit="false" editable="true">
+	<irods:label>Modification Time</irods:label>
+	<irods:displayFilter type="regExp">
+	  <irods:regExpRule>(\d+)-(\d+)-(\d+).(\d+):(\d+):(\d+)</irods:regExpRule>
+	  <irods:regExpFilter>\3.\2.\1 \4:\5:\6</irods:regExpFilter>
+	</irods:displayFilter>
+      </irods:attribute>
+
+      <irods:attribute name="title" unit="false" editable="true">
+	<irods:label>Title</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="subject" unit="false" editable="true">
+	<irods:label>Subject</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="rights.license" unit="false" editable="true">
+	<irods:label>License</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="rights.declaration" unit="false" editable="true">
+	<irods:label>Rights Declaration</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="rights.category" unit="false" editable="true">
+	<irods:label>Rights Category</irods:label>
+	<irods:values strict="true">
+	  <irods:value name="AUTHORIZED_USE_ONLY">
+	    <irods:label>Authorized Use Only</irods:label>
+	  </irods:value>
+	  <irods:value name="COPYRIGHTED">
+	    <irods:label>Copyrighted</irods:label>
+	  </irods:value>
+	  <irods:value name="LICENSED">
+	    <irods:label>Licensed</irods:label>
+	  </irods:value>
+	  <irods:value name="CONTRACTUAL">
+	    <irods:label>Contractual</irods:label>
+	  </irods:value>
+	  <irods:value name="PUBLIC_DOMAIN">
+	    <irods:label>Public Domain</irods:label>
+	  </irods:value>
+	  <irods:value name="OTHER">
+	    <irods:label>Other</irods:label>
+	  </irods:value>
+	</irods:values>
+	<irods:defaultValue>AUTHORIZED_USE_ONLY</irods:defaultValue>
+      </irods:attribute>
+
+      <irods:attribute name="project.name" unit="false" editable="true">
+	<irods:label>Project Name</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="project.funder" unit="false" editable="true">
+	<irods:label>Project Funder</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="project.funder_grant_number" unit="false" editable="true">
+	<irods:label>Grant Number</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="owner" unit="false" editable="true">
+	<irods:label>Rights Owner</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="language" unit="false" editable="true">
+	<irods:label>Language</irods:label>
+	<irods:values strict="true">
+	  <irods:value name="ISO6392:FIN">
+	    <irods:label>Finnish</irods:label>
+	  </irods:value>
+	  <irods:value name="ISO6392:ENG">
+	    <irods:label>English</irods:label>
+	  </irods:value>
+	  <irods:value name="ISO6392:EST">
+	    <irods:label>Estonian</irods:label>
+	  </irods:value>
+	  <irods:value name="ISO6392:SWE">
+	    <irods:label>Swedish</irods:label>
+	  </irods:value>
+	  <irods:value name="ISO6392:SWA">
+	    <irods:label>Swahili</irods:label>
+	  </irods:value>
+	  <irods:defaultValue>ISO6392:ENG</irods:defaultValue>
+	</irods:values>
+      </irods:attribute>
+
+      <irods:attribute name="contact.project" unit="false" editable="true">
+	<irods:label>Contact (Project)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="contact.person" unit="false" editable="true">
+	<irods:label>Contact (Person)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="contact.organization" unit="false" editable="true">
+	<irods:label>Contact (Organization)</irods:label>
+      </irods:attribute>
+
+    </irods:namespace>
+
+    <irods:namespace prefix="DICOM." label="DICOM (Medical Imaging)">
+
+      <irods:attribute name="AcquisitionMatrix" unit="false" editable="false">
+	<irods:label>Acquisition Matrix</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="AcquisitionNumber" unit="false" editable="false">
+	<irods:label>Acquisition Number</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="BitsAllocated" unit="false" editable="false">
+	<irods:label>Bits Allocated</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="BitsStored" unit="false" editable="false">
+	<irods:label>Bits Stored</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Columns" unit="false" editable="false">
+	<irods:label>Columns (Data Matrix)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="DeviceSerialNumber" unit="false" editable="false">
+	<irods:label>Device Serial Number</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="EchoNumbers" unit="false" editable="false">
+	<irods:label>Echo Numbers</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="EchoTime" unit="false" editable="false">
+	<irods:label>Echo Time</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="EchoTrainLength" unit="false" editable="false">
+	<irods:label>Echo Train Length</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="FlipAngle" unit="false" editable="false">
+	<irods:label>Flip Angle</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="HighBit" unit="false" editable="false">
+	<irods:label>High Bit</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="HighR-RValue" unit="false" editable="false">
+	<irods:label>High R-R Value</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="ImageOrientationPatient" unit="false" editable="false">
+	<irods:label>Image Orientation (Patient)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="ImagePositionPatient" unit="false" editable="false">
+	<irods:label>Image Position (Patient)</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="ImagedNucleus" unit="false" editable="false">
+	<irods:label>Imaged Nucleus</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="ImagingFrequency" unit="false" editable="false">
+	<irods:label>Imaging Frequency</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="ImplementationVersionName" unit="false" editable="false">
+	<irods:label>DICOM Implementation</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="In-planePhaseEncodingDirection" unit="false" editable="false">
+	<irods:label>In-plane Phase Encoding Direction</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="InstanceNumber" unit="false" editable="false">
+	<irods:label>Instance Number</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="InstitutionName" unit="false" editable="false">
+	<irods:label>Institution Name</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="InstitutionalDepartmentName" unit="false" editable="false">
+	<irods:label>Department Name</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="IntervalsAcquired" unit="false" editable="false">
+	<irods:label>Intervals Acquired</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="IntervalsRejected" unit="false" editable="false">
+	<irods:label>Intervals Rejected</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="LossyImageCompression" unit="false" editable="false">
+	<irods:label>Lossy Image Compression</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="LowR-RValue" unit="false" editable="false">
+	<irods:label>Low R-R Value</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="MagneticFieldStrength" unit="false" editable="false">
+	<irods:label>Magnetic Field Strength</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Manufacturer" unit="false" editable="false">
+	<irods:label>Device Manufacturer</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="ManufacturersModelName" unit="false" editable="false">
+	<irods:label>Device Model</irods:label>
+      </irods:attribute>
+	
+      <irods:attribute name="Modality" unit="false" editable="false">
+	<irods:label>Imaging Modality</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="NumberofAverages" unit="false" editable="false">
+	<irods:label>Number of Averages</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="NumberofPhaseEncodingSteps" unit="false" editable="false">
+	<irods:label>Number of Phase Encoding Steps</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="NumberofTemporalPositions" unit="false" editable="false">
+	<irods:label>Number of Temporal Positions</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="PatientID" unit="false" editable="false">
+	<irods:label>Patient ID</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="PatientPosition" unit="false" editable="false">
+	<irods:label>Patient Position</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="PatientsName" unit="false" editable="false">
+	<irods:label>Patient Name</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="PercentPhaseFieldofView" unit="false" editable="false">
+	<irods:label>Percent Phase Field of View</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="PercentSampling" unit="false" editable="false">
+	<irods:label>Percent Sampling</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="PerformedProcedureStepDescription" unit="false" editable="false">
+	<irods:label>Performed Procedure Step Description</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="PerformedProcedureStepID" unit="false" editable="false">
+	<irods:label>Performed Procedure Step ID</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="PerformedStationAETitle" unit="false" editable="false">
+	<irods:label>Perfomed Station AE Title</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="PhotometricInterpretation" unit="false" editable="false">
+	<irods:label>Photometric Interpretation</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="PixelAspectRatio" unit="false" editable="false">
+	<irods:label>Pixel Aspect Ratio</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="PixelRepresentation" unit="false" editable="false">
+	<irods:label>Pixel Representation</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="PixelSpacing" unit="false" editable="false">
+	<irods:label>Pixel Spacing</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="PresentationLUTShape" unit="false" editable="false">
+	<irods:label>Presentation LUT Shape</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="ProtocolName" unit="false" editable="false">
+	<irods:label>Protocol Name</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="ReceiveCoilName" unit="false" editable="false">
+	<irods:label>Receive Coil Name</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="ReconstructionDiameter" unit="false" editable="false">
+	<irods:label>Reconstruction Diameter</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="ReferringPhysiciansName" unit="false" editable="false">
+	<irods:label>Referring Physician</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="RepetitionTime" unit="false" editable="false">
+	<irods:label>Repetition Time</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="RequestedProcedureDescription" unit="false" editable="false">
+	<irods:label>Requested Procedure Description</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="RequestedProcedureID" unit="false" editable="false">
+	<irods:label>Requested Procedure ID</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="RequestingService" unit="false" editable="false">
+	<irods:label>Requesting Service</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Rows" unit="false" editable="false">
+	<irods:label>Rows (Data Matrix)</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="SamplesperPixel" unit="false" editable="false">
+	<irods:label>Samples Per Pixel</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="ScanOptions" unit="false" editable="false">
+	<irods:label>Scan Options</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="ScanningSequence" unit="false" editable="false">
+	<irods:label>Scanning Sequence</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="SequenceVariant" unit="false" editable="false">
+	<irods:label>Sequence Variant</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="SeriesDescription" unit="false" editable="false">
+	<irods:label>Series Description</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="SeriesNumber" unit="false" editable="false">
+	<irods:label>Series Number</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="SliceLocation" unit="false" editable="false">
+	<irods:label>Slice Location</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="SliceThickness" unit="false" editable="false">
+	<irods:label>Slice Thickness</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="SoftwareVersions" unit="false" editable="false">
+	<irods:label>Software Versions</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="SourceApplicationEntityTitle" unit="false" editable="false">
+	<irods:label>Source Application</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="SpacingBetweenSlices" unit="false" editable="false">
+	<irods:label>Spacing Between Slices</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="StationName" unit="false" editable="false">
+	<irods:label>Station Name</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="StudyDescription" unit="false" editable="false">
+	<irods:label>Study Description</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="StudyID" unit="false" editable="false">
+	<irods:label>Study ID</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="TemporalPositionIdentifier" unit="false" editable="false">
+	<irods:label>Temporal Position Identifier</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="TransmitCoilName" unit="false" editable="false">
+	<irods:label>Transmit Coil Name</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="WindowCenter" unit="false" editable="false">
+	<irods:label>Window Center</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="WindowWidth" unit="false" editable="false">
+	<irods:label>Window Width</irods:label>
+      </irods:attribute>
+
+    </irods:namespace>
+
+    <irods:namespace prefix="Exif." label="EXIF (Photography)">
+
+      <irods:attribute name="Image.DateTime" unit="false" editable="false">
+	<irods:label>Date and Time</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.ExifTag" unit="false" editable="false">
+	<irods:label>EXIF Tag</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.Make" unit="false" editable="false">
+	<irods:label>Camera Make</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.Model" unit="false" editable="false">
+	<irods:label>Camera Model</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.Orientation" unit="false" editable="false">
+	<irods:label>Image Orientation</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.ResolutionUnit" unit="false" editable="false">
+	<irods:label>Resolution Unit</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.Software" unit="false" editable="false">
+	<irods:label>Imaging Software</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.Copyright" unit="false" editable="false">
+	<irods:label>Copyright</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.ImageDescription" unit="false" editable="false">
+	<irods:label>Image Description</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.Artist" unit="false" editable="false">
+	<irods:label>Artist</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.GPSTag" unit="false" editable="false">
+	<irods:label>GPS Tag</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.PrimaryChromaticities" unit="false" editable="false">
+	<irods:label>Primary Chromaticities</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.WhitePoint" unit="false" editable="false">
+	<irods:label>White Point</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.XResolution" unit="false" editable="false">
+	<irods:label>X Resolution (DPI)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.YResolution" unit="false" editable="false">
+	<irods:label>Y Resolution (DPI)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Image.PhotometricInterpretation" unit="false" editable="false">
+	<irods:label>Photometric Interpretation</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.ApertureValue" unit="false" editable="false">
+	<irods:label>Aperture Value</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.ColorSpace" unit="false" editable="false">
+	<irods:label>Color Space</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.PixelXDimension" unit="false" editable="false">
+	<irods:label>Pixel X Dimension</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.PixelYDimension" unit="false" editable="false">
+	<irods:label>Pixel Y Dimension</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.ComponentsConfiguration" unit="false" editable="false">
+	<irods:label>Components Configuration</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.CompressedBitsPerPixel" unit="false" editable="false">
+	<irods:label>Compressed Bits Per Pixel</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.ImageUniqueID" unit="false" editable="false">
+	<irods:label>Image Unique ID</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.Contrast" unit="false" editable="false">
+	<irods:label>Contrast</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.BrightnessValue" unit="false" editable="false">
+	<irods:label>Brightness Value</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.CustomRendered" unit="false" editable="false">
+	<irods:label>Custom Rendered</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.DateTimeDigitized" unit="false" editable="false">
+	<irods:label>Date and Time (Digitized)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.DateTimeOriginal" unit="false" editable="false">
+	<irods:label>Date and Time (Original)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.DigitalZoomRatio" unit="false" editable="false">
+	<irods:label>Digital Zoom Ratio</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.ExifVersion" unit="false" editable="false">
+	<irods:label>EXIF Version</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.ExposureBiasValue" unit="false" editable="false">
+	<irods:label>Exposure Bias Value</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.ExposureMode" unit="false" editable="false">
+	<irods:label>Exposure Mode</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.ExposureProgram" unit="false" editable="false">
+	<irods:label>Exposure Program</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.ExposureTime" unit="false" editable="false">
+	<irods:label>Exposure Time</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.ExposureIndex" unit="false" editable="false">
+	<irods:label>Exposure Index</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.FNumber" unit="false" editable="false">
+	<irods:label>F-number</irods:label>
+      </irods:attribute>
+     
+      <irods:attribute name="Photo.FileSource" unit="false" editable="false">
+	<irods:label>File Source</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.Flash" unit="false" editable="false">
+	<irods:label>Flash</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.FlashpixVersion" unit="false" editable="false">
+	<irods:label>Flashpix Version</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.FocalLength" unit="false" editable="false">
+	<irods:label>Focal Length</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.FocalLengthIn35mmFilm" unit="false" editable="false">
+	<irods:label>Focal Length (35mm Equiv.)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.FocalPlaneResolutionUnit" unit="false" editable="false">
+	<irods:label>Focal Plane Resolution Unit</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.FocalPlaneXResolution" unit="false" editable="false">
+	<irods:label>Focal Plane X Resolution</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.FocalPlaneYResolution" unit="false" editable="false">
+	<irods:label>Focal Plane Y Resolution</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.GainControl" unit="false" editable="false">
+	<irods:label>Gain Control</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.ISOSpeedRatings" unit="false" editable="false">
+	<irods:label>ISO Sensitivity</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.LightSource" unit="false" editable="false">
+	<irods:label>Light Source</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.MaxApertureValue" unit="false" editable="false">
+	<irods:label>Max Aperture Value</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.MeteringMode" unit="false" editable="false">
+	<irods:label>Metering Mode</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.SceneCaptureMode" unit="false" editable="false">
+	<irods:label>Scene Capture Mode</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.SceneCaptureType" unit="false" editable="false">
+	<irods:label>Scene Capture Type</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.SceneType" unit="false" editable="false">
+	<irods:label>Scene Type</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.Saturation" unit="false" editable="true">
+	<irods:label>Saturation</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.Sharpness" unit="false" editable="true">
+	<irods:label>Sharpness</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.SensingMethod" unit="false" editable="false">
+	<irods:label>Sensing Method</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.ShutterSpeedValue" unit="false" editable="false">
+	<irods:label>Shutter Speed Value</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.WhiteBalance" unit="false" editable="false">
+	<irods:label>White Balance</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.SubSecTime" unit="false" editable="false">
+	<irods:label>Sub-Second Time</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.SubSecTimeDigitized" unit="false" editable="false">
+	<irods:label>Sub-Second Time (Digitized)</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Photo.SubSecTimeOriginal" unit="false" editable="false">
+	<irods:label>Sub-Second Time (Original)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.SubjectDistanceRange" unit="false" editable="false">
+	<irods:label>Subject Distance Range</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.SubjectDistance" unit="false" editable="false">
+	<irods:label>Subject Distance</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Photo.UserComment" unit="false" editable="false">
+	<irods:label>User Comment</irods:label>
+      </irods:attribute>
+
+    </irods:namespace>
+
+    <irods:namespace prefix="Iptc." label="IPTC (Press)">
+
+      <irods:attribute name="Application2.Caption" unit="false" editable="false">
+	<irods:label>Caption</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Application2.Byline" unit="false" editable="false">
+	<irods:label>Byline</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Application2.BylineTitle" unit="false" editable="false">
+	<irods:label>Byline Title</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Application2.Copyright" unit="false" editable="false">
+	<irods:label>Copyright</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Application2.Credit" unit="false" editable="false">
+	<irods:label>Credit</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Application2.Headline" unit="false" editable="false">
+	<irods:label>Headline</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Application2.Keywords" unit="false" editable="false">
+	<irods:label>Keywords</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Application2.ObjectName" unit="false" editable="false">
+	<irods:label>Object Name</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Application2.Source" unit="false" editable="false">
+	<irods:label>Source</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Application2.SpecialInstructions" unit="false" editable="false">
+	<irods:label>Special Instructions</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Application2.Writer" unit="false" editable="false">
+	<irods:label>Writer</irods:label>
+      </irods:attribute>
+            
+      <irods:attribute name="Application2.DateCreated" unit="false" editable="false">
+	<irods:label>Date (Created)</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Application2.DigitizationTime" unit="false" editable="false">
+	<irods:label>Time (Digitized)</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="Application2.DigitizationDate" unit="false" editable="false">
+	<irods:label>Date (Digitized)</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Application2.RecordVersion" unit="false" editable="false">
+	<irods:label>Record Version</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Application2.TimeCreated" unit="false" editable="false">
+	<irods:label>Time (Created)</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="Envelope.CharacterSet" unit="false" editable="false">
+	<irods:label>Envelope Character Set</irods:label>
+      </irods:attribute>
+
+    </irods:namespace>
+
+    <irods:namespace prefix="FIFF." label="FIFF (Elekta Neuromag)">
+
+      <irods:attribute name="Channels" unit="false" editable="false">
+        <irods:label>Number of Channels</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="CoordinateFrame" unit="false" editable="false">
+	<irods:label>Coordinate Frame</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="CoordinateTransformation" unit="false" editable="false">
+	<irods:label>Coordinate Transformation</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="DataBlockType" unit="false" editable="false">
+	<irods:label>Data Block Type</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="DataTimeSpan" unit="false" editable="false">
+	<irods:label>Data Time Span</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="EventCount" unit="false" editable="false">
+	<irods:label>Event Count</irods:label>
+      </irods:attribute>
+      
+      <irods:attribute name="SamplingRate" unit="false" editable="false">
+	<irods:label>Sampling Rate</irods:label>
+      </irods:attribute>
+
+      <irods:attribute name="SessionStartTime" unit="false" editable="false">
+	<irods:label>Session Start Time</irods:label>
+      </irods:attribute>
+      
+    </irods:namespace>
+
+  </irods:schema>
+</irods:irods>

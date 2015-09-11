@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/tango">
+        <file>icons/network-server.svg</file>
+        <file>icons/network-wired.svg</file>
+        <file>icons/system-log-out.svg</file>
+        <file>icons/folder-new.svg</file>
+        <file>icons/view-refresh.svg</file>
+        <file>icons/system-search.svg</file>
+        <file>icons/edit-delete.svg</file>
+        <file>icons/user-trash.svg</file>
+        <file>icons/folder-remote.svg</file>
+        <file>icons/weather-overcast.svg</file>
+        <file>icons/user-home.svg</file>
+        <file>icons/document-save.svg</file>
+        <file>icons/document-properties.svg</file>
+        <file>icons/utilities-terminal.svg</file>
+        <file>icons/utilities-system-monitor.svg</file>
+        <file>icons/folder.png</file>
+        <file>icons/folder-remote.png</file>
+        <file>icons/text-x-generic.png</file>
+    </qresource>
+</RCC>

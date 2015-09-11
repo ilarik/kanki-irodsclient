@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>LSEnvironment</key>
+  <dict>
+    <key>irodsSSLCACertificateFile</key>
+    <string>/Applications/iRODS.app/Contents/Resources/server.crt</string>
+    <key>DYLD_LIBRARY_PATH</key>
+    <string>/Applications/iRODS.app/Contents/Frameworks</string>
+  </dict>
+  <key>NSPrincipalClass</key>
+  <string>NSApplication</string>
+  <key>CFBundleIconFile</key>
+  <string>irods.icns</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleGetInfoString</key>
+  <string>Created by Qt/QMake</string>
+  <key>CFBundleSignature</key>
+  <string>????</string>
+  <key>CFBundleExecutable</key>
+  <string>iRODS</string>
+  <key>CFBundleIdentifier</key>
+  <string>jyu.irods-jyu-desktop</string>
+  <key>NOTE</key>
+  <string>(C) 2014-2015 University of Jyväskylä</string>
+</dict>
+</plist>
