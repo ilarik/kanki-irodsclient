@@ -43,7 +43,7 @@ public:
     void addQueryAttribute(int rodsAttr);
 
     // Adds a query condition to the GenQuery with a string value.
-    void addQueryCondition(int rodsAttr, RodsGenQuery::CondOpr rodsCondOpr, std::string valStr);
+    void addQueryCondition(int rodsAttr, RodsGenQuery::CondOpr rodsCondOpr, const std::string &valStr);
 
     // Adds a query condition to the GenQuery with an integer value (converted to string).
     void addQueryCondition(int rodsAttr, RodsGenQuery::CondOpr rodsCondOpr, int val);

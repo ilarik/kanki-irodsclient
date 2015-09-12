@@ -32,7 +32,7 @@ void RodsGenQuery::addQueryAttribute(int rodsAttr)
     }
 }
 
-void RodsGenQuery::addQueryCondition(int rodsAttr, RodsGenQuery::CondOpr rodsCondOpr, std::string valStr)
+void RodsGenQuery::addQueryCondition(int rodsAttr, RodsGenQuery::CondOpr rodsCondOpr, const std::string &valStr)
 {
     // make new condition struct and push back of vector
     this->queryConds.push_back(RodsGenQuery::Condition(rodsAttr, rodsCondOpr, valStr));
@@ -81,19 +81,19 @@ int RodsGenQuery::execute()
         std::string condStr;
 
         // build conditions string depending on condition operator
-        if (cond.condOpr == isEqual)
+        if (cond.condOpr == RodsGenQuery::isEqual)
             condStr += "=";
-        else if (cond.condOpr == isNotEqual)
+        else if (cond.condOpr == RodsGenQuery::isNotEqual)
             condStr += "!=";
-        else if (cond.condOpr == isLess)
+        else if (cond.condOpr == RodsGenQuery::isLess)
             condStr += "<";
-        else if (cond.condOpr == isLessOrEqual)
+        else if (cond.condOpr == RodsGenQuery::isLessOrEqual)
             condStr += "<=";
-        else if (cond.condOpr == isGreater)
+        else if (cond.condOpr == RodsGenQuery::isGreater)
             condStr += ">";
-        else if (cond.condOpr == isGreaterOrEqual)
+        else if (cond.condOpr == RodsGenQuery::isGreaterOrEqual)
             condStr += ">=";
-        else if (cond.condOpr == isLike)
+        else if (cond.condOpr == RodsGenQuery::isLike)
             condStr += "like ";
 
         // append condition value into expression
