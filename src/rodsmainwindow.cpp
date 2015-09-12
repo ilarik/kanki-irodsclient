@@ -435,26 +435,27 @@ void RodsMainWindow::doRefreshTreeView()
     QModelIndex curIndex = this->ui->rodsObjTree->currentIndex();
     RodsObjTreeModel *model = static_cast<RodsObjTreeModel*>(this->ui->rodsObjTree->model());
 
-    if (curIndex.isValid())
+    // if no valid index (no selection), assume initial mount point
+    if (!curIndex.isValid())
+        curIndex = model->index(0, 0, QModelIndex());
+
+    // get object pointers for selected item and tree view model
+    RodsObjTreeItem *selection = static_cast<RodsObjTreeItem*>(curIndex.internalPointer());
+
+    // if item is a proper item
+    if (selection->getObjEntryPtr())
     {
-        // get object pointers for selected item and tree view model
-        RodsObjTreeItem *selection = static_cast<RodsObjTreeItem*>(curIndex.internalPointer());
-
-        // if item is a proper item
-        if (selection->getObjEntryPtr())
-        {
-            // if a collection was selected, refresh it
-            if (selection->getObjEntryPtr()->objType == COLL_OBJ_T)
-                model->refreshChildren(curIndex);
-
-            // if a data object was selected, refresh parent collection
-            else if (selection->getObjEntryPtr()->objType == DATA_OBJ_T)
-                model->refreshChildren(model->parent(curIndex));
-        }
-
-        else
+        // if a collection was selected, refresh it
+        if (selection->getObjEntryPtr()->objType == COLL_OBJ_T)
             model->refreshChildren(curIndex);
+
+        // if a data object was selected, refresh parent collection
+        else if (selection->getObjEntryPtr()->objType == DATA_OBJ_T)
+            model->refreshChildren(model->parent(curIndex));
     }
+
+    else
+        model->refreshChildren(curIndex);
 }
 
 void RodsMainWindow::doRodsConnect()
