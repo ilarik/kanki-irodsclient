@@ -11,7 +11,7 @@ The following instructions should work on CentOS/RHEL 6 and 7 and probably on Fe
 
     yum -y groupinstall "Development Tools"
     yum -y install epel-release
-    yum -y install openssl-devel libcurl-devel qt5-qtsvg-devel qt5-qtbase-devel tar
+    yum -y install openssl-devel libcurl-devel qt5-qtsvg-devel qt5-qtbase-devel
 
     # for CentOS/RHEL 6
     yum -y install ftp://ftp.renci.org/pub/irods/releases/4.1.5/centos6/irods-runtime-4.1.5-centos6-x86_64.rpm
