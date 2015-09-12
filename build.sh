@@ -2,7 +2,7 @@
 
 # initialize parameters with defaults
 PLATFORM=`uname`
-VERSION=1.0.0
+VERSION=1.0.1
 OSRELEASE=unknown
 
 # reset POSIX option index variable
