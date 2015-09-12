@@ -12,7 +12,7 @@
  */
 
 // application class RodsUploadThread header
-#include "rodsuplodadthread.h"
+#include "rodsuploadthread.h"
 
 RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths, std::string destColl)
     : QThread()

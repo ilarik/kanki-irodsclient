@@ -48,7 +48,7 @@ public:
     void appendChild(RodsObjTreeItem *child);
 
     // Sets iRODS mount point for the item.
-    void setMountPoint (std::string path);
+    void setMountPoint (const std::string &path);
 
     // Interface for accessing a child item pointer at a given row index.
     RodsObjTreeItem* child(int row);

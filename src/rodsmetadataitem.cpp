@@ -71,32 +71,32 @@ void RodsMetadataItem::appendChild(RodsMetadataItem *child)
     children.append(child);
 }
 
-QString RodsMetadataItem::getName() const
+const QString& RodsMetadataItem::getName() const
 {
     return (this->itemName);
 }
 
-QString RodsMetadataItem::getValue() const
+const QString& RodsMetadataItem::getValue() const
 {
     return (this->itemValue);
 }
 
-QString RodsMetadataItem::getUnit() const
+const QString& RodsMetadataItem::getUnit() const
 {
     return (this->itemUnit);
 }
 
-void RodsMetadataItem::setName(QString newName)
+void RodsMetadataItem::setName(const QString &newName)
 {
     this->itemName = newName;
 }
 
-void RodsMetadataItem::setValue(QString newValue)
+void RodsMetadataItem::setValue(const QString &newValue)
 {
     this->itemValue = newValue;
 }
 
-void RodsMetadataItem::setUnit(QString newUnit)
+void RodsMetadataItem::setUnit(const QString &newUnit)
 {
     this->itemUnit = newUnit;
 }

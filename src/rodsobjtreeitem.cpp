@@ -57,7 +57,7 @@ void RodsObjTreeItem::appendChild(RodsObjTreeItem *item)
     childItems.append(item);
 }
 
-void RodsObjTreeItem::setMountPoint(std::string path)
+void RodsObjTreeItem::setMountPoint(const std::string &path)
 {
     this->mountPointPath = path;
 }
