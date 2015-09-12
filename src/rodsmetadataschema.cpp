@@ -93,7 +93,7 @@ RodsMetadataSchema::RodsMetadataSchema(QString filePath)
     }
 }
 
-std::string RodsMetadataSchema::translateName(std::string name) const
+std::string RodsMetadataSchema::translateName(const std::string &name) const
 {
     // try to find conversion from translate table for namespaces
     if (this->nsConv.find(name) != this->nsConv.end())
@@ -107,7 +107,7 @@ std::string RodsMetadataSchema::translateName(std::string name) const
     return (name);
 }
 
-std::string RodsMetadataSchema::filterValue(std::string name, std::string value) const
+std::string RodsMetadataSchema::filterValue(const std::string &name, const std::string &value) const
 {
     QString valueStr = value.c_str();
 

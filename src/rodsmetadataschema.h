@@ -53,10 +53,10 @@ public:
     QStringList getAttributeList() const;
 
     // Interface for schema name translation, for both attributes and namespaces.
-    std::string translateName(std::string name) const;
+    std::string translateName(const std::string &name) const;
 
     // Interface for filtering metadata attribute values per schema.
-    std::string filterValue(std::string name, std::string value) const;
+    std::string filterValue(const std::string &name, const std::string &value) const;
 
 private:
 
