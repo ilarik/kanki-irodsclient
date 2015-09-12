@@ -11,7 +11,7 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define VERSION     "1.0.0"
+#define VERSION     "1.0.1"
 
 #define LICENSE     "(C) 2014-2015 University of Jyväskylä. All rights reserved.\n\n" \
                     "Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n\n" \
