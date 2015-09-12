@@ -32,10 +32,10 @@ public:
     ~RodsMetadataItem();
 
     // Interface for accessing the pointer to a child item at requested child item index.
-    RodsMetadataItem *child(int index);
+    RodsMetadataItem* child(int index);
 
     // Interface for accessing the pointer to the parent item.
-    RodsMetadataItem *parent();
+    RodsMetadataItem* parent();
 
     // Interface for querying child item count.
     int childCount() const;
@@ -47,13 +47,13 @@ public:
     void appendChild(RodsMetadataItem *child);
 
     // Interface for querying the attribute name string.
-    QString getName() const;
+    const QString& getName() const;
 
     // Interface for querying the attribute value string.
-    QString getValue() const;
+    const QString& getValue() const;
 
     // Interface for querying the attribute unit string.
-    QString getUnit() const;
+    const QString& getUnit() const;
 
     // Interface for (re)setting the attribute name string.
     void setName(const QString &newName);

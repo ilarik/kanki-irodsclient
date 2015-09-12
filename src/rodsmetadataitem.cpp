@@ -71,17 +71,17 @@ void RodsMetadataItem::appendChild(RodsMetadataItem *child)
     children.append(child);
 }
 
-QString RodsMetadataItem::getName() const
+const QString& RodsMetadataItem::getName() const
 {
     return (this->itemName);
 }
 
-QString RodsMetadataItem::getValue() const
+const QString& RodsMetadataItem::getValue() const
 {
     return (this->itemValue);
 }
 
-QString RodsMetadataItem::getUnit() const
+const QString& RodsMetadataItem::getUnit() const
 {
     return (this->itemUnit);
 }
