@@ -32,8 +32,8 @@ public:
 
     // Constructor requires all the object properties as arguments and instantiates a fully defined
     // iRODS object entry container object.
-    RodsObjEntry(std::string theObjName, std::string theCollPath, std::string theCreateTime, std::string theModifyTime,
-                        objType_t theObjType, int theReplNum, int theReplStatus, rodsLong_t theObjSize);
+    RodsObjEntry(const std::string &theObjName, const std::string &theCollPath, const std::string &theCreateTime,
+                 const std::string &theModifyTime, objType_t theObjType, int theReplNum, int theReplStatus, rodsLong_t theObjSize);
 
     // Constructs a fully qualified path for the iRODS object.
     std::string getObjectFullPath();

@@ -18,8 +18,8 @@ namespace Kanki {
 const char *RodsObjEntry::DataObjType = "-d";
 const char *RodsObjEntry::CollObjType = "-C";
 
-RodsObjEntry::RodsObjEntry(std::string theObjName, std::string theCollPath, std::string theCreateTime, std::string theModifyTime,
-                           objType_t theObjType, int theReplNum, int theReplStatus, rodsLong_t theObjSize)
+RodsObjEntry::RodsObjEntry(const std::string &theObjName, const std::string &theCollPath, const std::string &theCreateTime,
+                           const std::string &theModifyTime, objType_t theObjType, int theReplNum, int theReplStatus, rodsLong_t theObjSize)
     : objName(theObjName), collPath(theCollPath), createTime(theCreateTime), modifyTime(theModifyTime), objType(theObjType),
       replNum(theReplNum), replStatus(theReplStatus), objSize(theObjSize)
 {
