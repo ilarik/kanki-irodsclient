@@ -34,9 +34,9 @@ SOURCES += main.cpp\
     rodsfindwindow.cpp \
     rodsmetadataschema.cpp \
     rodsconnectthread.cpp \
-    rodsuplodadthread.cpp \
     rodsdownloadthread.cpp \
-    rodsobjentry.cpp
+    rodsobjentry.cpp \
+    rodsuploadthread.cpp
 
 HEADERS  += rodsmainwindow.h \
     rodsconnection.h \
@@ -52,10 +52,10 @@ HEADERS  += rodsmainwindow.h \
     rodsfindwindow.h \
     rodsmetadataschema.h \
     rodsconnectthread.h \
-    rodsuplodadthread.h \
     rodsdownloadthread.h \
     rodsobjentry.h \
-    version.h
+    version.h \
+    rodsuploadthread.h
 
 FORMS    += rodsmainwindow.ui \
     rodsmetadatawindow.ui \

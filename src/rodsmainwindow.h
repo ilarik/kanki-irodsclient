@@ -46,7 +46,7 @@
 #include "rodsmetadatawindow.h"
 #include "rodsqueuewindow.h"
 #include "rodsconnectthread.h"
-#include "rodsuplodadthread.h"
+#include "rodsuploadthread.h"
 #include "rodsdownloadthread.h"
 #include "rodsobjtreemodel.h"
 #include "version.h"
