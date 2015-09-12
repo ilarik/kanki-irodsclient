@@ -49,6 +49,7 @@
 #include "rodsuplodadthread.h"
 #include "rodsdownloadthread.h"
 #include "rodsobjtreemodel.h"
+#include "version.h"
 
 // Qt UI compiler namespace for generated classes
 namespace Ui {
@@ -190,7 +191,6 @@ private slots:
     void on_actionAbout_triggered();
 
 private:
-    static const char *license;
 
     // instance of Qt UI compiler generated UI
     Ui::RodsMainWindow *ui;

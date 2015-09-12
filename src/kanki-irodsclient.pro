@@ -54,7 +54,8 @@ HEADERS  += rodsmainwindow.h \
     rodsconnectthread.h \
     rodsuplodadthread.h \
     rodsdownloadthread.h \
-    rodsobjentry.h
+    rodsobjentry.h \
+    version.h
 
 FORMS    += rodsmainwindow.ui \
     rodsmetadatawindow.ui \
