@@ -86,17 +86,17 @@ QString RodsMetadataItem::getUnit() const
     return (this->itemUnit);
 }
 
-void RodsMetadataItem::setName(QString newName)
+void RodsMetadataItem::setName(const QString &newName)
 {
     this->itemName = newName;
 }
 
-void RodsMetadataItem::setValue(QString newValue)
+void RodsMetadataItem::setValue(const QString &newValue)
 {
     this->itemValue = newValue;
 }
 
-void RodsMetadataItem::setUnit(QString newUnit)
+void RodsMetadataItem::setUnit(const QString &newUnit)
 {
     this->itemUnit = newUnit;
 }

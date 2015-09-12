@@ -56,13 +56,13 @@ public:
     QString getUnit() const;
 
     // Interface for (re)setting the attribute name string.
-    void setName(QString newName);
+    void setName(const QString &newName);
 
     // Interface for (re)setting the attribute value string.
-    void setValue(QString newValue);
+    void setValue(const QString &newValue);
 
     // Interface for (re)setting the attribute unit string.
-    void setUnit(QString newUnit);
+    void setUnit(const QString &newUnit);
 
 private:
 
