@@ -669,7 +669,7 @@ std::string RodsMainWindow::getCurrentRodsCollPath()
             currentCollPath = parent->getObjEntryPtr()->objName;
 
         else
-            currentCollPath = this->conn->rodsHome();
+            currentCollPath = selection->mountPoint();
     }
 
     return (currentCollPath);
