@@ -127,7 +127,7 @@ public slots:
     void doMetadataEditorOpen();
 
     // Qt slot for invoking the upload gui operation.
-    void doUpload();
+    void doUpload(bool uploadDirectory = false);
 
     // Qt slot for invoking the refresh gui operation.
     void doRefreshTreeView();
@@ -189,6 +189,8 @@ private slots:
     void on_allowOverwrite_toggled(bool checked);
 
     void on_actionAbout_triggered();
+
+    void on_actionUploadDirectory_triggered();
 
 private:
 
