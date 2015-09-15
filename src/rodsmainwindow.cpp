@@ -65,7 +65,8 @@ RodsMainWindow::~RodsMainWindow()
         delete (this->queueWindow);
 
     // delete all metadata editors
-    for (std::map<std::string, RodsMetadataWindow*>::iterator i = this->metaEditors.begin(); i != this->metaEditors.end(); i++)
+    for (std::map<std::string, RodsMetadataWindow*>::iterator i = this->metaEditors.begin();
+         i != this->metaEditors.end(); i++)
     {
         RodsMetadataWindow *window = i->second;
 
@@ -130,7 +131,8 @@ void RodsMainWindow::enterConnectedState()
         if (cipher)
         {
             statusMsg += "encryption method: " + std::string(cipher->name) + " - ";
-            statusMsg += "cipher strength: " + QVariant(cipher->strength_bits).toString().toStdString() + " bits" + " - ";
+            statusMsg += "cipher strength: " + QVariant(cipher->strength_bits).toString().toStdString();
+            statusMsg += " bits - ";
         }
 
         // otherwise alert user that something's funky!
@@ -233,7 +235,8 @@ void RodsMainWindow::mountPath()
     bool ok = false;
 
     // make dialog for prompting user
-    QString path = QInputDialog::getText(this, "Mount Path", "iRODS path:", QLineEdit::Normal, "/", &ok);
+    QString path = QInputDialog::getText(this, "Mount Path", "iRODS path:",
+                                         QLineEdit::Normal, "/", &ok);
 
     // user decided to go ahead
     if (ok)
@@ -289,7 +292,9 @@ void RodsMainWindow::doQueueStatOpen()
     if (!this->queueWindow)
     {
         this->queueWindow = new RodsQueueWindow(this->conn);
-        connect(this->queueWindow, &RodsQueueWindow::unregister, this, &RodsMainWindow::unregisterQueueWindow);
+
+        connect(this->queueWindow, &RodsQueueWindow::unregister, this,
+                &RodsMainWindow::unregisterQueueWindow);
     }
 
     // show and raise queue window to front
@@ -326,7 +331,9 @@ void RodsMainWindow::doMetadataEditorOpen()
                 else {
                     metaWindow = new RodsMetadataWindow(conn, selection->getObjEntryPtr());
 
-                    connect(metaWindow, &RodsMetadataWindow::unregister, this, &RodsMainWindow::unregisterMetadataWindow);
+                    connect(metaWindow, &RodsMetadataWindow::unregister, this,
+                            &RodsMainWindow::unregisterMetadataWindow);
+
                     this->metaEditors[objEntry->getObjectFullPath()] = metaWindow;
                 }
 
@@ -366,16 +373,31 @@ void RodsMainWindow::doDownload()
                 return;
 
             // create worker thread for downloading
-            RodsDownloadThread *downloadWorker = new RodsDownloadThread(this->conn, objEntry, destPathSelection.at(0).toStdString(),
-                                                                        this->verifyChecksum, this->allowOverwrite);
+            RodsDownloadThread *downloadWorker = new RodsDownloadThread(this->conn,
+                                                                        objEntry,
+                                                                        destPathSelection.at(0).toStdString(),
+                                                                        this->verifyChecksum,
+                                                                        this->allowOverwrite);
 
-            connect(downloadWorker, &RodsDownloadThread::setupProgressDisplay, this, &RodsMainWindow::startModalProgressDialog);
-            connect(downloadWorker, &RodsDownloadThread::progressUpdate, this, &RodsMainWindow::setProgress);
-            connect(downloadWorker, &RodsDownloadThread::progressMarquee, this, &RodsMainWindow::setProgressMarquee);
-            connect(downloadWorker, &RodsDownloadThread::done, this, &RodsMainWindow::endModalProgressDialog);
-            connect(downloadWorker, &RodsDownloadThread::reportError, this, &RodsMainWindow::doErrorMsg);
-            connect(downloadWorker, &RodsDownloadThread::finished, &QObject::deleteLater);
-            connect(this->progress, &QProgressDialog::canceled, downloadWorker, &QThread::terminate);
+            // connect worker thread signals to main window slots
+            connect(downloadWorker, &RodsDownloadThread::setupProgressDisplay, this,
+                    &RodsMainWindow::startModalProgressDialog);
+            connect(downloadWorker, &RodsDownloadThread::progressUpdate, this,
+                    &RodsMainWindow::setProgress);
+            connect(downloadWorker, &RodsDownloadThread::progressMarquee, this,
+                    &RodsMainWindow::setProgressMarquee);
+            connect(downloadWorker, &RodsDownloadThread::done, this,
+                    &RodsMainWindow::endModalProgressDialog);
+            connect(downloadWorker, &RodsDownloadThread::reportError, this,
+                    &RodsMainWindow::doErrorMsg);
+
+            // connect thread finished signal to a Qt deletion mechanism
+            connect(downloadWorker, &RodsDownloadThread::finished,
+                    &QObject::deleteLater);
+
+            // we use a brute force terminate signal
+            connect(this->progress, &QProgressDialog::canceled, downloadWorker,
+                    &QThread::terminate);
 
             // start worker thread
             downloadWorker->start();
@@ -419,8 +441,8 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
     RodsUploadThread *uploadWorker = NULL;
 
     if (uploadDirectory)
-        uploadWorker = new RodsUploadThread(this->conn, fileNames.at(0).toStdString(), destCollPath);
-
+        uploadWorker = new RodsUploadThread(this->conn, fileNames.at(0).toStdString(),
+                                            destCollPath);
     else
         uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath);
 
@@ -536,8 +558,8 @@ void RodsMainWindow::doCreateCollection()
     bool ok = false;
 
     // make dialog for prompting user
-    QString collName = QInputDialog::getText(this, "New Collection", "Collection name:", QLineEdit::Normal,
-                                             "New Collection", &ok);
+    QString collName = QInputDialog::getText(this, "New Collection", "Collection name:",
+                                             QLineEdit::Normal, "New Collection", &ok);
 
     // if user pressed cancel, do nothing
     if (!ok)
@@ -600,7 +622,10 @@ void RodsMainWindow::doDelete()
             if (itemData->objType == COLL_OBJ_T)
             {
                 confirm.setText("Delete iRODS Collection");
-                std::string confirmText = "Are you sure you want to recursively delete '" + itemData->getObjectFullPath() + "' ?";
+
+                std::string confirmText = "Are you sure you want to recursively delete '" +
+                        itemData->getObjectFullPath() + "' ?";
+
                 confirm.setInformativeText(confirmText.c_str());
                 confirm.exec();
 
@@ -620,7 +645,10 @@ void RodsMainWindow::doDelete()
             else if (itemData->objType == DATA_OBJ_T)
             {
                 confirm.setText("Delete iRODS Data Object");
-                std::string confirmText = "Are you sure you want to delete '" + itemData->getObjectName() + "' ?";
+
+                std::string confirmText = "Are you sure you want to delete '" +
+                        itemData->getObjectName() + "' ?";
+
                 confirm.setInformativeText(confirmText.c_str());
                 confirm.exec();
 
@@ -695,7 +723,8 @@ std::string RodsMainWindow::getCurrentRodsCollPath()
 
 void RodsMainWindow::showAbout()
 {
-    QMessageBox::about(this, "About Kanki irodsclient", QString("Version: " VERSION) + QString("\n\n") + QString(LICENSE));
+    QMessageBox::about(this, "About Kanki irodsclient",
+                       QString("Version: " VERSION) + QString("\n\n") + QString(LICENSE));
 }
 
 void RodsMainWindow::on_actionConnect_triggered()
