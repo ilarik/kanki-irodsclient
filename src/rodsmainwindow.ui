@@ -240,6 +240,7 @@
    <addaction name="separator"/>
    <addaction name="actionNewColl"/>
    <addaction name="actionUpload"/>
+   <addaction name="actionUploadDirectory"/>
    <addaction name="actionDownload"/>
    <addaction name="actionDelete"/>
   </widget>
@@ -395,10 +396,10 @@
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/tango/icons/weather-overcast.svg</normaloff>:/tango/icons/weather-overcast.svg</iconset>
+     <normaloff>:/tango/icons/applications-internet.svg</normaloff>:/tango/icons/applications-internet.svg</iconset>
    </property>
    <property name="text">
-    <string>Upload</string>
+    <string>Upload Files</string>
    </property>
    <property name="toolTip">
     <string>Upload file into the iRODS cloud</string>
@@ -461,6 +462,18 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionUploadDirectory">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/tango/icons/applications-internet.svg</normaloff>:/tango/icons/applications-internet.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Upload Directory</string>
    </property>
   </action>
  </widget>

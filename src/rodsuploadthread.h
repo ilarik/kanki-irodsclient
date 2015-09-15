@@ -20,6 +20,7 @@
 #include <QStringList>
 #include <QProgressDialog>
 #include <QFileInfo>
+#include <QDir>
 
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
@@ -34,9 +35,13 @@ class RodsUploadThread : public QThread
 
 public:
 
-    // Constructor initializes the download worker thread and sets its parameters for execution,
+    // Constructor initializes the upload worker thread and sets its parameters for execution,
     // requires a rods conn pointer, file paths list and dest coll path.
     RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths, std::string destColl);
+
+    // Constructor initializes the upload worker thread and sets its parameters for execution,
+    // requires a rods conn pointer, base path for recursive upload and dest coll path.
+    RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath, std::string destColl);
 
 signals:
 
@@ -48,9 +53,9 @@ signals:
     // the current message text and current progress value.
     void progressUpdate(QString text, int progress);
 
-    // Qt signal for signaling out that the upload operation is complete
-    // and the view may now be refreshed.
-    void done();
+    // Qt signal for setting the progress bar display in marquee mode,
+    // it signals out the current text message.
+    void progressMarquee(QString text);
 
     // Qt signal for reporting errors to ui, it signals out a message,
     // an error string and an error code.
@@ -62,6 +67,10 @@ private:
     // work in a thread instantiated with the thread object.
     void run() Q_DECL_OVERRIDE;
 
+    // Makes a bill of materials list for the upload, i.e recursively reads
+    // the local directory for files and directories paths.
+    void makeBillOfMaterials(const QString &dirPath, QStringList *filePaths);
+
     // pointer to the rods connection object
     Kanki::RodsConnection *conn;
 
@@ -69,6 +78,6 @@ private:
     QStringList filePathList;
 
     // destination rods collection path
-    std::string destCollPath;
+    std::string destCollPath, basePath;
 };
 #endif // RODSUPLODADTHREAD_H

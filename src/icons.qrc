@@ -18,5 +18,6 @@
         <file>icons/folder.png</file>
         <file>icons/folder-remote.png</file>
         <file>icons/text-x-generic.png</file>
+        <file>icons/applications-internet.svg</file>
     </qresource>
 </RCC>

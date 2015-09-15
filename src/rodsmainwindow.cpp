@@ -172,6 +172,7 @@ void RodsMainWindow::enterConnectedState()
     this->ui->actionNewColl->setDisabled(false);
     this->ui->actionDelete->setDisabled(false);
     this->ui->actionUpload->setDisabled(false);
+    this->ui->actionUploadDirectory->setDisabled(false);
     this->ui->actionDownload->setDisabled(false);
     this->ui->rodsObjTree->setDisabled(false);
     this->ui->viewSize->setDisabled(false);
@@ -194,6 +195,7 @@ void RodsMainWindow::enterDisconnectedState()
     this->ui->actionNewColl->setDisabled(true);
     this->ui->actionDelete->setDisabled(true);
     this->ui->actionUpload->setDisabled(true);
+    this->ui->actionUploadDirectory->setDisabled(true);
     this->ui->actionDownload->setDisabled(true);
 
     // display disconnected message
@@ -381,7 +383,7 @@ void RodsMainWindow::doDownload()
     }
 }
 
-void RodsMainWindow::doUpload()
+void RodsMainWindow::doUpload(bool uploadDirectory)
 {
     QStringList fileNames;
     std::string destCollPath;
@@ -390,10 +392,20 @@ void RodsMainWindow::doUpload()
     destCollPath = getCurrentRodsCollPath();
 
     // get system file selection dialog trough qt
-    QFileDialog fileSelection(this, "Select file(s) to upload");
-    fileSelection.setFileMode(QFileDialog::ExistingFiles);
+    QFileDialog fileSelection(this, "Select items to upload");
+
+    if (uploadDirectory)
+    {
+        fileSelection.setFileMode(QFileDialog::Directory);
+        fileSelection.setLabelText(QFileDialog::Accept, "Upload directory");
+    }
+
+    else {
+        fileSelection.setFileMode(QFileDialog::ExistingFiles);
+        fileSelection.setLabelText(QFileDialog::Accept, "Upload file(s)");
+    }
+
     fileSelection.setViewMode(QFileDialog::Detail);
-    fileSelection.setLabelText(QFileDialog::Accept, "Upload file(s)");
 
     // get file names from dialog
     if (fileSelection.exec())
@@ -404,19 +416,25 @@ void RodsMainWindow::doUpload()
         return;
 
     // create a worker thread for the upload
-    RodsUploadThread *uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath);
+    RodsUploadThread *uploadWorker = NULL;
+
+    if (uploadDirectory)
+        uploadWorker = new RodsUploadThread(this->conn, fileNames.at(0).toStdString(), destCollPath);
+
+    else
+        uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath);
 
     // connect signals to slots
     connect(uploadWorker, &RodsUploadThread::setupProgressDisplay, this,
             &RodsMainWindow::startModalProgressDialog);
     connect(uploadWorker, &RodsUploadThread::progressUpdate, this,
             &RodsMainWindow::setProgress);
-    connect(uploadWorker, &RodsUploadThread::done, this,
-            &RodsMainWindow::endModalProgressDialog);
     connect(uploadWorker, &RodsUploadThread::reportError, this,
             &RodsMainWindow::doErrorMsg);
 
     connect(uploadWorker, &RodsUploadThread::finished, &QObject::deleteLater);
+    connect(uploadWorker, &RodsUploadThread::finished, this,
+            &RodsMainWindow::endModalProgressDialog);
     connect(uploadWorker, &RodsUploadThread::finished, this,
             &RodsMainWindow::doRefreshTreeView);
 
@@ -669,7 +687,7 @@ std::string RodsMainWindow::getCurrentRodsCollPath()
             currentCollPath = parent->getObjEntryPtr()->objName;
 
         else
-            currentCollPath = this->conn->rodsHome();
+            currentCollPath = selection->mountPoint();
     }
 
     return (currentCollPath);
@@ -748,4 +766,9 @@ void RodsMainWindow::on_allowOverwrite_toggled(bool checked)
 void RodsMainWindow::on_actionAbout_triggered()
 {
     this->showAbout();
+}
+
+void RodsMainWindow::on_actionUploadDirectory_triggered()
+{
+    this->doUpload(true);
 }

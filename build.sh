@@ -2,7 +2,7 @@
 
 # initialize parameters with defaults
 PLATFORM=`uname`
-VERSION=1.0.1
+VERSION=1.0.2
 OSRELEASE=unknown
 
 # reset POSIX option index variable
@@ -38,7 +38,8 @@ if [ "$PLATFORM" = "Darwin" ]; then
     QTROOT=~/Qt/5.3/clang_64
     QTDEPLOY=$QTROOT/bin/macdeployqt
 
-    APPBUNDLE=./src/iRODS.app
+    APPBUNDLE=iRODS.app
+    APPBUNDLE_SRC=./src/$APPBUNDLE
     PKGROOT=./pkgroot
 
     PKG_PLIST=iRODS.app.pkg.plist
@@ -59,7 +60,7 @@ if [ "$PLATFORM" = "Darwin" ]; then
     # setup package root with app bundle
     echo "staging package root..."
     mkdir -p $PKGROOT
-    cp -R $APPBUNDLE $PKGROOT/
+    cp -R $APPBUNDLE_SRC $PKGROOT/
 
     # deploy Qt libraries
     echo "deploying Qt libaries to app bundle..."
