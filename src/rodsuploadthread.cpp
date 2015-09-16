@@ -25,7 +25,7 @@ RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList f
 RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath, std::string destColl)
     : QThread()
 {
-    this->conn = theConn;
+    this->conn = new Kanki::RodsConnection(theConn);
     this->basePath = baseDirPath;
     this->destCollPath = destColl;
 }
