@@ -49,6 +49,7 @@
 #include "rodsuploadthread.h"
 #include "rodsdownloadthread.h"
 #include "rodsobjtreemodel.h"
+#include "rodstransferwindow.h"
 #include "version.h"
 
 // Qt UI compiler namespace for generated classes

@@ -18,7 +18,7 @@ RodsDownloadThread::RodsDownloadThread(Kanki::RodsConnection *theConn, Kanki::Ro
                                        bool verifyChecksum, bool allowOverwrite)
     : QThread()
 {
-    this->conn = theConn;
+    this->conn = new Kanki::RodsConnection(theConn);
     this->objEntry = theObj;
     this->destPath = theDestPath;
 
@@ -32,8 +32,20 @@ void RodsDownloadThread::run() Q_DECL_OVERRIDE
     QString statusStr = "Initializing...";
 
     // signal ui to setup progress display
-    setupProgressDisplay(statusStr, 0, 1);
     progressMarquee(statusStr);
+
+    // open the parallel connection for transfer and authenticate
+    if ((status = this->conn->connect()) < 0)
+    {
+        reportError("Download failed", "Open parallel connection failed", status);
+        return;
+    }
+
+    else if ((status = this->conn->login()) < 0)
+    {
+        reportError("Download failed", "Authentication failed", status);
+        return;
+    }
 
     // in the case of downloading a collection, do it recursively
     if (this->objEntry->objType == COLL_OBJ_T)
@@ -77,18 +89,19 @@ void RodsDownloadThread::run() Q_DECL_OVERRIDE
                 // for collection objects we create the corresponding directory
                 else if (curObj->objType == COLL_OBJ_T)
                 {
+                    // get directory name for ui
+                    std::string dirName = dstPath.substr(dstPath.find_last_of('/') + 1);
+
                     // notify ui
                     statusStr = "Creating directory ";
-                    statusStr += dstPath.c_str();
+                    statusStr += dirName.c_str();
                     progressUpdate(statusStr, i);
 
                     // check if directory exists and if not, make it
                     QDir dstDir(dstPath.c_str());
 
                     if (!dstDir.exists())
-                    {
                         dstDir.mkpath(dstPath.c_str());
-                    }
                 }
             }
         }
@@ -100,16 +113,16 @@ void RodsDownloadThread::run() Q_DECL_OVERRIDE
         QString statusStr = "Downloading file: ";
 
         statusStr += this->objEntry->getObjectName().c_str();
-        progressMarquee(statusStr);
-
         std::string dstPath = this->destPath + "/" + this->objEntry->getObjectName();
+        progressMarquee(statusStr);
 
         // try to do a rods get operation
         if ((status = this->conn->getFile(dstPath, this->objEntry->getObjectFullPath(), this->verify, this->overwrite)) < 0)
             reportError("iRODS get file error", "Get failed", status);
     }
 
-    done();
+    this->conn->disconnect();
+    delete(this->conn);
 }
 
 int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs)
