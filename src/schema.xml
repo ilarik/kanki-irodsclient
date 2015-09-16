@@ -13,6 +13,14 @@
 	</irods:displayFilter>
       </irods:attribute>
 
+      <irods:attribute name="references" unit="false" editable="true">
+	<irods:label>References Object ID</irods:label>
+	<irods:displayFilter type="regExp">
+	  <irods:regExpRule>urn:uuid:</irods:regExpRule>
+	  <irods:regExpFilter></irods:regExpFilter>
+	</irods:displayFilter>
+      </irods:attribute>
+
       <irods:attribute name="version" unit="false" editable="false">
 	<irods:label>Version Information</irods:label>
       </irods:attribute>

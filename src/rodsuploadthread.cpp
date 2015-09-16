@@ -17,7 +17,7 @@
 RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths, std::string destColl)
     : QThread()
 {
-    this->conn = theConn;
+    this->conn = new Kanki::RodsConnection(theConn);
     this->filePathList = filePaths;
     this->destCollPath = destColl;
 }
@@ -25,7 +25,7 @@ RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList f
 RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath, std::string destColl)
     : QThread()
 {
-    this->conn = theConn;
+    this->conn = new Kanki::RodsConnection(theConn);
     this->basePath = baseDirPath;
     this->destCollPath = destColl;
 }
@@ -37,7 +37,20 @@ void RodsUploadThread::run() Q_DECL_OVERRIDE
     int c = 0;
 
     // signal ui to setup progress display
-    setupProgressDisplay(statusStr, 0, 1);
+    progressMarquee(statusStr);
+
+    // open a parallel connection for the transfer and authenticate
+    if ((status = this->conn->connect()) < 0)
+    {
+        reportError("Download failed", "Open parallel connection failed", status);
+        return;
+    }
+
+    else if ((status = this->conn->login()) < 0)
+    {
+        reportError("Download failed", "Authentication failed", status);
+        return;
+    }
 
     // if we have no path list, we are uploading from a base path
     if (!this->filePathList.size())
@@ -81,9 +94,10 @@ void RodsUploadThread::run() Q_DECL_OVERRIDE
 
         // the file is a directory, make rods collection
         if (fileInfo.isDir())
-        {
+        {          
+            // notify ui
             statusStr = "Creating collection '";
-            statusStr += objPath.c_str();
+            statusStr += name.c_str();
             progressUpdate(statusStr, c);
 
             if ((status = this->conn->makeColl(objPath, false)) < 0)
@@ -103,6 +117,9 @@ void RodsUploadThread::run() Q_DECL_OVERRIDE
 
         c++;
     }
+
+    this->conn->disconnect();
+    delete(this->conn);
 }
 
 void RodsUploadThread::makeBillOfMaterials(const QString &dirPath, QStringList *filePaths)

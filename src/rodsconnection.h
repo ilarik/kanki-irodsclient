@@ -43,9 +43,9 @@ class RodsConnection
 
 public:
 
-    // Default constructor, accepts no arguments. Constructs an empty connection object
-    // ready to be configured for an iRODS connection.
-    RodsConnection();
+    // Constructor for instantiating a new connection object, optionally identical with
+    // respect to the parameters of the conn object pointed by argument connPtr.
+    RodsConnection(RodsConnection *connPtr = NULL);
 
     // Establishes an iRODS protocol connection to an iRODS server. Also configures the
     // connection object for connection parameters from the iRODS user environment if
@@ -133,6 +133,10 @@ public:
     int renameObj(Kanki::RodsObjEntryPtr objEntry, const std::string &newName);
 
 private:
+
+    // we deny assignments and copying of the object
+    RodsConnection(RodsConnection &conn);
+    RodsConnection& operator=(RodsConnection &conn);
 
     // a boost mutex to provide locking for the TCP connection data stream
     boost::mutex commMutex;

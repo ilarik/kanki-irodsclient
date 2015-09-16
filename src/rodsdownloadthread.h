@@ -50,9 +50,6 @@ signals:
     // it signals out the current text message.
     void progressMarquee(QString text);
 
-    // Qt signal for signaling out that download operation is complete.
-    void done();
-
     // Qt signal for reporting errors to ui, it signals out a message,
     // an error string and an error code.
     void reportError(QString msgStr, QString errorStr, int errorCode);

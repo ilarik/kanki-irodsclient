@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     rodsconnectthread.cpp \
     rodsdownloadthread.cpp \
     rodsobjentry.cpp \
-    rodsuploadthread.cpp
+    rodsuploadthread.cpp \
+    rodstransferwindow.cpp
 
 HEADERS  += rodsmainwindow.h \
     rodsconnection.h \
@@ -55,7 +56,8 @@ HEADERS  += rodsmainwindow.h \
     rodsdownloadthread.h \
     rodsobjentry.h \
     version.h \
-    rodsuploadthread.h
+    rodsuploadthread.h \
+    rodstransferwindow.h
 
 FORMS    += rodsmainwindow.ui \
     rodsmetadatawindow.ui \

@@ -49,6 +49,7 @@
 #include "rodsuploadthread.h"
 #include "rodsdownloadthread.h"
 #include "rodsobjtreemodel.h"
+#include "rodstransferwindow.h"
 #include "version.h"
 
 // Qt UI compiler namespace for generated classes
@@ -188,8 +189,10 @@ private slots:
     // qt slot which connects to allow overwrite checkbox toggled signal
     void on_allowOverwrite_toggled(bool checked);
 
+    // qt slot which connects to about action triggered signal
     void on_actionAbout_triggered();
 
+    // qt slot which connects to upload directory triggered signal
     void on_actionUploadDirectory_triggered();
 
 private:
