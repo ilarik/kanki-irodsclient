@@ -16,7 +16,7 @@
 
 namespace Kanki {
 
-RodsConnection::RodsConnection()
+RodsConnection::RodsConnection(RodsConnection *connPtr)
 {
     // initially we have no comm ptr
     this->rodsCommPtr = NULL;
@@ -30,6 +30,12 @@ RodsConnection::RodsConnection()
     irods::pack_entry_table &pack_table = irods::get_pack_table();
 
     init_api_table(api_table, pack_table);
+
+    // if we have a 'parent' connection pointer
+    if (connPtr)
+    {
+        // TODO: copy connection parameters
+    }
 }
 
 int RodsConnection::connect()
