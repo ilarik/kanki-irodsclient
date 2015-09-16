@@ -40,16 +40,19 @@ signals:
 
 public slots:
 
-    //
+    // Qt slot for configuring the transfer window main progress bar
+    // for its initial message, initial value and maxValue.
     void setupMainProgressBar(QString initialMsg, int value, int maxValue);
 
-    //
+    // Qt slot for updating the transfer window main progress bar
+    // for current message and current value.
     void updateMainProgress(QString currentMsg, int value);
 
-    //
+    // Qt slot for entering the transfer window progress bars into
+    // marquee mode.
     void progressMarquee(QString currentMsg);
 
-    //
+    // Qt slot for UI cancel action invoking cancel requested signal.
     void invokeCancel();
 
 private:
