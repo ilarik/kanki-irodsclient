@@ -1,12 +1,12 @@
 Name:		kanki-irodsclient
 Version:	1.0.3
 Release:	1.el6
-Summary:	iRODS GUI Client 
+Summary:	Kanki iRODS GUI Client 
 
 Group:		Applications
 License:	BSD
-URL:		http://www.irods.org
-Source0:	kanki-irodsclient-%{version}-linux-el6.tar.gz
+URL:		https://github.com/ilarik/kanki-irodsclient
+Source0:	https://github.com/ilarik/kanki-irodsclient/archive/%{version}.tar.gz
 
 Requires:	irods-runtime >= 4.1.3
 Requires:	irods-icommands >= 4.1.3
@@ -21,11 +21,14 @@ iRODS GUI client
 %prep
 %setup -q -c 
 
+%build
+(cd kanki-irodsclient-%{version}; ./build.sh -r el6)
+
 %install
 mkdir -p %{buildroot}/etc/irods
 mkdir -p %{buildroot}/usr/bin
-cp irodsclient %{buildroot}/usr/bin
-cp schema.xml %{buildroot}/etc/irods
+cp kanki-irodsclient-%{version}/src/irodsclient %{buildroot}/usr/bin
+cp kanki-irodsclient-%{version}/src/schema.xml %{buildroot}/etc/irods
 
 %clean
 rm -rf %{buildroot}
@@ -36,5 +39,5 @@ rm -rf %{buildroot}
 %attr(644, root, root) /etc/irods/schema.xml
 
 %changelog
-* Wed Aug 12 2015 Ilari Korhonen <ilari.korhonen@jyu.fi>
-* initial version 0.1.0
+* Fri Sep 18 2015 Ilari Korhonen <ilari.korhonen@jyu.fi>
+* initial rpm release version 1.0.3
