@@ -84,5 +84,5 @@ else
     
     # create tar package
     echo "creating install package..."
-    (cd src; tar cvzf ../irods-jyu-client-$VERSION-linux-$OSRELEASE.tar.gz irodsclient schema.xml)
+    (cd src; tar cvzf ../kanki-irodsclient-$VERSION-linux-$OSRELEASE.tar.gz irodsclient schema.xml)
 fi
