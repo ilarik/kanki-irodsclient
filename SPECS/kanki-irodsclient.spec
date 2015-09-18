@@ -23,13 +23,13 @@ iRODS GUI client
 
 
 %build
-./build.sh -r el6)
+(cd %{name}-%{version}; ./build.sh -r el6)
 
 %install
 mkdir -p %{buildroot}/etc/irods
 mkdir -p %{buildroot}/usr/bin
-cp src/irodsclient %{buildroot}/usr/bin
-cp src/schema.xml %{buildroot}/etc/irods
+cp %{name}-%{version}/src/irodsclient %{buildroot}/usr/bin
+cp %{name}-%{version}/src/schema.xml %{buildroot}/etc/irods
 
 %clean
 rm -rf %{buildroot}
