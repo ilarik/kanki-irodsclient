@@ -21,14 +21,15 @@ iRODS GUI client
 %prep
 %setup -q -c 
 
+
 %build
-(cd kanki-irodsclient-%{version}; ./build.sh -r el6)
+./build.sh -r el6)
 
 %install
 mkdir -p %{buildroot}/etc/irods
 mkdir -p %{buildroot}/usr/bin
-cp kanki-irodsclient-%{version}/src/irodsclient %{buildroot}/usr/bin
-cp kanki-irodsclient-%{version}/src/schema.xml %{buildroot}/etc/irods
+cp src/irodsclient %{buildroot}/usr/bin
+cp src/schema.xml %{buildroot}/etc/irods
 
 %clean
 rm -rf %{buildroot}
