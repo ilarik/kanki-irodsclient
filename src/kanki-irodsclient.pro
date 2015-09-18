@@ -102,16 +102,27 @@ macx {
 INCLUDEPATH += /usr/include/openssl
 
 macx {
-    INCLUDEPATH += /var/lib/irods/build/external/boost_1_55_0z
-    INCLUDEPATH += /var/lib/irods/build/iRODS/lib/core/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/server/core/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/server/icat/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/server/drivers/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/server/re/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/lib/api/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/lib/md5/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/lib/sha1/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/lib/rbudp/include
+    IRODS_BUILD = $$(IRODS_BUILD)
+    IRODS_BOOST = $$(IRODS_BOOST)
+
+    isEmpty($$IRODS_BUILD) {
+        IRODS_BUILD = /var/lib/irods/build
+    }
+
+    isEmpty($$IRODS_BOOST) {
+        IRODS_BOOST = boost_1_55_0z
+    }
+
+    INCLUDEPATH += $$IRODS_BUILD/external/$$IRODS_BOOST
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/core/include
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/server/core/include
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/server/icat/include
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/server/drivers/include
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/server/re/include
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/api/include
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/md5/include
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/sha1/include
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/rbudp/include
 }
 
 else {
@@ -122,11 +133,24 @@ else {
 LIBS += -ldl -lm -lpthread -lcurl -lssl -lcrypto
 
 macx {
-    LIBS += /var/lib/irods/build/iRODS/lib/core/obj/libRodsAPIs.a
-    LIBS += /var/lib/irods/build/external/boost_1_55_0z/stage/lib/libboost_filesystem.a
-    LIBS += /var/lib/irods/build/external/boost_1_55_0z/stage/lib/libboost_regex.a
-    LIBS += /var/lib/irods/build/external/boost_1_55_0z/stage/lib/libboost_system.a
-    LIBS += /var/lib/irods/build/external/boost_1_55_0z/stage/lib/libboost_thread.a
+    IRODS_VERSION = $$(IRODS_VERSION)
+
+    isEmpty($$IRODS_VERSION) {
+        IRODS_VERSION = 4.0
+    }
+
+    LIBS += $$IRODS_BUILD/iRODS/lib/core/obj/libRodsAPIs.a
+    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_filesystem.a
+    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_regex.a
+    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_system.a
+    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_thread.a
+
+    contains($$IRODS_VERSION, 4.1) {
+        LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_chrono.a
+        LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_date_time.a
+        LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_iostreams.a
+        LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_program_options.a
+    }
 } 
 
 else {
