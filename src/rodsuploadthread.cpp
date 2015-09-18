@@ -38,7 +38,7 @@ void RodsUploadThread::run() Q_DECL_OVERRIDE
 {
     QString statusStr = "Initializing...";
     int status = 0;
-    int c = 0;
+    int c = 1;
 
     // signal ui to setup progress display
     progressMarquee(statusStr);

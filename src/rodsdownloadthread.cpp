@@ -79,7 +79,7 @@ void RodsDownloadThread::run() Q_DECL_OVERRIDE
                     // notify ui of current operation and progress
                     statusStr = "Downloading file ";
                     statusStr += curObj->getObjectName().c_str();
-                    progressUpdate(statusStr, i);
+                    progressUpdate(statusStr, i+1);
 
                     // try to do a rods get operation
                     if ((status = this->conn->getFile(dstPath, curObj->getObjectFullPath(), this->verify, this->overwrite)) < 0)
@@ -95,7 +95,7 @@ void RodsDownloadThread::run() Q_DECL_OVERRIDE
                     // notify ui
                     statusStr = "Creating directory ";
                     statusStr += dirName.c_str();
-                    progressUpdate(statusStr, i);
+                    progressUpdate(statusStr, i+1);
 
                     // check if directory exists and if not, make it
                     QDir dstDir(dstPath.c_str());
@@ -114,7 +114,7 @@ void RodsDownloadThread::run() Q_DECL_OVERRIDE
 
         statusStr += this->objEntry->getObjectName().c_str();
         std::string dstPath = this->destPath + "/" + this->objEntry->getObjectName();
-        progressMarquee(statusStr);
+        setupProgressDisplay(statusStr, 1, 1);
 
         // try to do a rods get operation
         if ((status = this->conn->getFile(dstPath, this->objEntry->getObjectFullPath(), this->verify, this->overwrite)) < 0)
