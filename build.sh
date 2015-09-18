@@ -83,6 +83,7 @@ else
     (cd src; $QTROOT/bin/qmake && make)
     
     # create tar package
-    echo "creating install package..."
-    (cd src; tar cvzf ../kanki-irodsclient-$VERSION-linux-$OSRELEASE.tar.gz irodsclient schema.xml)
+    echo "creating rpmbuild 'source'  package..."
+    mkdir SOURCES
+    (cd src; tar cvzf ../SOURCES/kanki-irodsclient-$VERSION-linux-$OSRELEASE.tar.gz irodsclient schema.xml)
 fi
