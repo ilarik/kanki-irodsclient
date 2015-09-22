@@ -31,9 +31,21 @@ public:
     // for reading.
     int openDataObj();
 
-    // Interface for reading from the iRODS data stream to buffer at extBuf
+    //
+    int initGetOpr();
+
+    // Interface for reading from the iRODS data stream to buffer at bufPtr
     // for a block of len bytes.
-    int read(void *extBuf, size_t len);
+    int read(void *bufPtr, size_t len);
+
+    //
+    void getOprDone();
+
+    //
+    const std::string& checksumStr() const;
+
+    //
+    const char* checksum() const;
 
 private:
 
@@ -41,8 +53,14 @@ private:
     RodsDataInStream(RodsDataInStream &inStream);
     RodsDataInStream& operator=(RodsDataInStream &inStream);
 
+    //
+    int read(size_t len);
+
     // managed pointer to a Kanki object entry
-    RodsObjEntryPtr entPtr;    
+    RodsObjEntryPtr entPtr;
+
+    //
+    std::string objChecksum;
 };
 
 } // namespace Kanki

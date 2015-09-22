@@ -19,7 +19,10 @@ namespace Kanki {
 RodsDataStream::RodsDataStream(Kanki::RodsConnection *theConn)
 {
     this->connPtr = theConn;
-    this->memBuffer = std::malloc(__KANKI_INIT_BUFSIZE);
+
+    this->memBuffer = std::malloc(TRANS_BUF_SZ);
+    this->bufSize = TRANS_BUF_SZ;
+    memset(this->memBuffer, 0, this->bufSize);
 }
 
 RodsDataStream::~RodsDataStream()
@@ -66,7 +69,9 @@ size_t RodsDataStream::growBuffer(size_t newSize)
         newSize = __KANKI_MAX_BUFSIZE;
 
     if (!(this->memBuffer = std::realloc(this->memBuffer, newSize)))
-        return (0);
+        newSize = 0;
+
+    this->bufSize = newSize;
 
     return (newSize);
 }

@@ -82,7 +82,7 @@ void RodsDownloadThread::run() Q_DECL_OVERRIDE
                     progressUpdate(statusStr, i+1);
 
                     // try to do a rods get operation
-                    if ((status = this->conn->getFile(dstPath, curObj->getObjectFullPath(), this->verify, this->overwrite)) < 0)
+                    if ((status = this->downloadFile(curObj, dstPath, this->verify, this->overwrite)) < 0)
                         reportError("iRODS get file error", "Get failed", status);
                 }
 
@@ -117,8 +117,8 @@ void RodsDownloadThread::run() Q_DECL_OVERRIDE
         setupProgressDisplay(statusStr, 1, 1);
 
         // try to do a rods get operation
-        if ((status = this->conn->getFile(dstPath, this->objEntry->getObjectFullPath(), this->verify, this->overwrite)) < 0)
-            reportError("iRODS get file error", "Get failed", status);
+        if ((status = this->downloadFile(objEntry, dstPath, this->verify, this->overwrite)) < 0)
+            reportError("Download failed", "Kanki data stream error", status);
     }
 
     this->conn->disconnect();
@@ -160,6 +160,68 @@ int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<
             }
         }
     }
+
+    return (status);
+}
+
+int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string localPath,
+                                     bool verifyChecksum, bool allowOverwrite)
+{
+    Kanki::RodsDataInStream inStream(this->conn, obj);
+    long int status = 0, lastRead = 0, lastWrite = 0, totalRead = 0, totalWritten = 0;
+    QFile localFile(localPath.c_str());
+    void *buffer = std::malloc(65536);
+
+    // check if we're allowed to proceed
+    if (localFile.exists() && !allowOverwrite)
+        return (OVERWRITE_WITHOUT_FORCE_FLAG);
+
+    // try to open local file and the rods data stream
+    if (!localFile.open(QIODevice::WriteOnly))
+        return (-1);
+
+    if ((status = inStream.initGetOpr()) < 0)
+        return (status);
+
+    if ((status = inStream.openDataObj()) < 0)
+        return (status);
+
+    // on success we transfer
+    else
+    {
+        if (obj->objSize > 1048576)
+            setupSubProgressDisplay("Transferring...", 0, 100);
+
+        while ((lastRead = inStream.read(buffer, 65536)) > 0)
+        {
+            totalRead += lastRead;
+
+            if ((lastWrite = localFile.write((const char*)buffer, lastRead)) > 0)
+            {
+                totalWritten += lastWrite;
+
+                double percentage = ceil(((double)totalRead / (double)obj->objSize) * 100);
+                QString statusStr = "Transferring... " + QVariant((int)percentage).toString() + "%";
+
+                if (obj->objSize > 1048576)
+                    subProgressUpdate(statusStr, (int)percentage);
+            }
+
+            else {
+                status = -1;
+                break;
+            }
+        }
+    }
+
+    // close local file and rods data stream
+    localFile.close();
+    status = inStream.closeDataObj();
+    inStream.getOprDone();
+
+    // if verify checksum was required
+    if (verifyChecksum && strlen(inStream.checksum()))
+        status = verifyChksumLocFile((char*)localPath.c_str(), (char*)inStream.checksum(), NULL);
 
     return (status);
 }

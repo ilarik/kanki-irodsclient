@@ -44,12 +44,78 @@ int RodsDataInStream::openDataObj()
     return (openResult);
 }
 
-int RodsDataInStream::read(void *extBuf, size_t len)
+int RodsDataInStream::initGetOpr()
+{
+    dataObjInp_t getParam;
+    bytesBuf_t getBuffer;
+    portalOprOut_t *portalOpr = NULL;
+    int status = 0;
+
+    // zero rods api params
+    memset(&getParam, 0, sizeof (getParam));
+    memset(&getBuffer, 0, sizeof (getBuffer));
+
+    // set rods api params for a get api operation
+    getParam.oprType = GET_OPR;
+    getParam.numThreads = NO_THREADING;
+    rstrcpy(getParam.objPath, this->entPtr->getObjectFullPath().c_str(), MAX_NAME_LEN);
+
+    // we always ask for the checksum and deny para oprs
+    addKeyVal(&getParam.condInput, VERIFY_CHKSUM_KW, "");
+
+#ifndef PARA_OPR
+    addKeyVal(&getParam.condInput, NO_PARA_OP_KW, "");
+#endif
+
+    // try to initiate a get api request
+    if ((status = procApiRequest(this->connPtr->commPtr(), DATA_OBJ_GET_AN, &getParam,
+                                 NULL, (void**)&portalOpr, &getBuffer)) < 0)
+        return (status);
+
+    // in case we got object data
+    if (portalOpr)
+    {
+        this->rodsL1Inx = portalOpr->l1descInx;
+        this->objChecksum = portalOpr->chksum;
+
+        std::free(portalOpr);
+    }
+
+    // free possibly allocated buffer
+    if (getBuffer.buf)
+        std::free(getBuffer.buf);
+
+    return (status);
+}
+
+int RodsDataInStream::read(void *bufPtr, size_t len)
 {
     openedDataObjInp_t readParam;
     bytesBuf_t readBuf;
     int readResult = 0;
 
+    // set read params, level 1 index and read length
+    std::memset(&readParam, 0, sizeof (readParam));
+    readParam.l1descInx = this->rodsL1Inx;
+    readParam.len = len;
+
+    // we use the provided buffer
+    std::memset(&readBuf, 0, sizeof (readBuf));
+
+    // try to read from the rods data object
+    if ((readResult = rcDataObjRead(this->connPtr->commPtr(), &readParam, &readBuf)))
+    {
+        std::memcpy(bufPtr, readBuf.buf, len);
+        std::free(readBuf.buf);
+
+        this->lastOprSize = readResult;
+    }
+
+    return (readResult);
+}
+
+int RodsDataInStream::read(size_t len)
+{
     // if our buffer is too small, try to grow it
     if (this->bufSize < len)
     {
@@ -58,23 +124,23 @@ int RodsDataInStream::read(void *extBuf, size_t len)
             return (-1);
     }
 
-    // set read params, level 1 index and read length
-    std::memset(&readParam, 0, sizeof (readParam));
-    readParam.l1descInx = this->rodsL1Inx;
-    readParam.len = len;
+    return (this->read(this->memBuffer, len));
+}
 
-    // we use the stream buffer
-    readBuf.len = this->bufSize;
-    readBuf.buf = this->memBuffer;
+void RodsDataInStream::getOprDone()
+{
+    // complete client rods api get request
+    rcOprComplete(this->connPtr->commPtr(), this->rodsL1Inx);
+}
 
-    // try read, on success we copy to external buffer
-    if ((readResult = rcDataObjRead(this->connPtr->commPtr(), &readParam, &readBuf)))
-    {
-        this->lastOprSize = len;
-        std::memcpy(extBuf, this->memBuffer, len);
-    }
+const std::string& RodsDataInStream::checksumStr() const
+{
+    return (this->objChecksum);
+}
 
-    return (readResult);
+const char* RodsDataInStream::checksum() const
+{
+    return (this->objChecksum.c_str());
 }
 
 } // namespace Kanki
