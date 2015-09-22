@@ -17,6 +17,7 @@
 RodsTransferWindow::RodsTransferWindow(QString title) :
     QWidget(NULL)
 {
+    this->progressMax = this->subProgressMax = 0;
     this->setWindowTitle(title);
 
     this->layout = new QVBoxLayout(this);
@@ -52,10 +53,25 @@ void RodsTransferWindow::updateMainProgress(QString currentMsg, int value)
 {
     QString progMsg = "Processing item " + QVariant(value).toString();
     progMsg += " of " + QVariant(this->progressMax).toString();
+    progMsg += " (" + currentMsg + ")";
 
     this->mainProgressMsg->setText(progMsg);
     this->subProgressMsg->setText(currentMsg);
     this->mainProgressBar->setValue(value);
+}
+
+void RodsTransferWindow::setupSubProgressBar(QString initialMsg, int value, int maxValue)
+{
+    this->subProgressMax = maxValue;
+
+    this->subProgressBar->setMaximum(maxValue);
+    this->updateSubProgress(initialMsg, value);
+}
+
+void RodsTransferWindow::updateSubProgress(QString currentMsg, int value)
+{
+    this->subProgressMsg->setText(currentMsg);
+    this->subProgressBar->setValue(value);
 }
 
 void RodsTransferWindow::progressMarquee(QString currentMsg)
