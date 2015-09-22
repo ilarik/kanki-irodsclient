@@ -223,5 +223,7 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     if (verifyChecksum && strlen(inStream.checksum()))
         status = verifyChksumLocFile((char*)localPath.c_str(), (char*)inStream.checksum(), NULL);
 
+    std::free(buffer);
+
     return (status);
 }
