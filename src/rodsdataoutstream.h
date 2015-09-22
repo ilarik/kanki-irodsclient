@@ -24,10 +24,17 @@ class RodsDataOutStream : public RodsDataStream
 
 public:
 
-    RodsDataOutStream();
+    RodsDataOutStream(Kanki::RodsConnection *theConn);
+
+    // Overrides superclass pure virtual function, opens the iRODS data
+    // object for writing.
+    int openDataObj();
 
 private:
 
+    // we deny copying and substitution
+    RodsDataOutStream(RodsDataOutStream &outStream);
+    RodsDataOutStream& operator=(RodsDataOutStream &outStream);
 };
 
 } // namespace Kanki

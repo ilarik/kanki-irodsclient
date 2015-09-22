@@ -19,6 +19,7 @@
 #include "rodsconnection.h"
 
 #define __KANKI_INIT_BUFSIZE    4096
+#define __KANKI_MAX_BUFSIZE     1677216
 
 namespace Kanki {
 
@@ -27,13 +28,36 @@ class RodsDataStream
 
 public:
 
-    RodsDataStream();
+    RodsDataStream(Kanki::RodsConnection *theConn);
+
     ~RodsDataStream();
+
+    // Pure virtual function to provide an interface to open an iRODS
+    // data stream to a data object.
+    virtual int openDataObj() = 0;
+
+    //
+    int seek(size_t offset, int whence);
+
+    //
+    int closeDataObj();
 
 protected:
 
+    //
+    size_t growBuffer(size_t newSize);
+
+    //
+    RodsConnection *connPtr;
+
+    //
     void *memBuffer;
-    unsigned int bufSize;
+
+    //
+    size_t bufSize, lastOprSize;
+
+    // rods api first class object index (object handle)
+    int rodsL1Inx;
 };
 
 } // namespace Kanki

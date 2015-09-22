@@ -16,10 +16,15 @@
 
 namespace Kanki {
 
-RodsDataOutStream::RodsDataOutStream()
-    : RodsDataStream()
+RodsDataOutStream::RodsDataOutStream(RodsConnection *theConn)
+    : RodsDataStream(theConn)
 {
 
+}
+
+int RodsDataOutStream::openDataObj()
+{
+    return (0);
 }
 
 } // namespace Kanki

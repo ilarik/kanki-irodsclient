@@ -16,14 +16,59 @@
 
 namespace Kanki {
 
-RodsDataStream::RodsDataStream()
+RodsDataStream::RodsDataStream(Kanki::RodsConnection *theConn)
 {
+    this->connPtr = theConn;
     this->memBuffer = std::malloc(__KANKI_INIT_BUFSIZE);
 }
 
 RodsDataStream::~RodsDataStream()
 {
-    free(this->memBuffer);
+    std::free(this->memBuffer);
+}
+
+int RodsDataStream::seek(size_t offset, int whence)
+{
+    openedDataObjInp_t seekParam;
+    fileLseekOut_t *seekResult = NULL;
+
+    // zero param and results structs
+    memset(&seekParam, 0, sizeof (seekParam));
+    memset(&seekResult, 0, sizeof (seekResult));
+
+    // set rods api seek parameters
+    seekParam.offset = offset;
+    seekParam.whence = whence;
+
+    // try to seek and return status
+    return (rcDataObjLseek(this->connPtr->commPtr(), &seekParam, &seekResult));
+}
+
+int RodsDataStream::closeDataObj()
+{
+    openedDataObjInp_t closeParam;
+    int status = 0;
+
+    // set first class object index to be closed
+    std::memset(&closeParam, 0, sizeof (closeParam));
+    closeParam.l1descInx = this->rodsL1Inx;
+
+    // try to close, on success reset index
+    if ((status = rcDataObjClose(this->connPtr->commPtr(), &closeParam)) >= 0)
+        this->rodsL1Inx = 0;
+
+    return (status);
+}
+
+size_t RodsDataStream::growBuffer(size_t newSize)
+{
+    if (newSize > __KANKI_MAX_BUFSIZE)
+        newSize = __KANKI_MAX_BUFSIZE;
+
+    if (!(this->memBuffer = std::realloc(this->memBuffer, newSize)))
+        return (0);
+
+    return (newSize);
 }
 
 } // namespace Kanki
