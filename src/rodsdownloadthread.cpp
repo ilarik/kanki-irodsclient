@@ -77,7 +77,7 @@ void RodsDownloadThread::run() Q_DECL_OVERRIDE
                 if (curObj->objType == DATA_OBJ_T)
                 {
                     // notify ui of current operation and progress
-                    statusStr = "Downloading file ";
+                    statusStr = "Downloading ";
                     statusStr += curObj->getObjectName().c_str();
                     progressUpdate(statusStr, i+1);
 

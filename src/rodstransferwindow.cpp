@@ -51,12 +51,12 @@ void RodsTransferWindow::setupMainProgressBar(QString initialMsg, int value, int
 
 void RodsTransferWindow::updateMainProgress(QString currentMsg, int value)
 {
-    QString progMsg = "Processing item " + QVariant(value).toString();
-    progMsg += " of " + QVariant(this->progressMax).toString();
-    progMsg += " (" + currentMsg + ")";
+    QString progMsg = currentMsg;
+    progMsg +=  " (object " + QVariant(value).toString();
+    progMsg += " of " + QVariant(this->progressMax).toString() + ")";
 
     this->mainProgressMsg->setText(progMsg);
-    this->subProgressMsg->setText(currentMsg);
+    this->subProgressMsg->setText("In progress...");
     this->mainProgressBar->setValue(value);
 }
 
