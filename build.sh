@@ -35,7 +35,7 @@ show_help() {
 if [ "$PLATFORM" = "Darwin" ]; then
     echo "Building for OS X"
 
-    QTROOT=~/Qt/5.3/clang_64
+    QTROOT=~/Qt/5.5/clang_64
     QTDEPLOY=$QTROOT/bin/macdeployqt
 
     APPBUNDLE=iRODS.app
@@ -50,7 +50,7 @@ if [ "$PLATFORM" = "Darwin" ]; then
 
     # compile executable and build app bundle
     echo "compiling executable and building osx app bundle..."
-    (cd src; $QTROOT/bin/qmake -spec macx-g++49-fsf && make)
+    (cd src; $QTROOT/bin/qmake && make)
 
     # continue build only if make is successful
     if [ $? -ne "0" ]; then
