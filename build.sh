@@ -1,5 +1,14 @@
 #!/bin/sh
 
+show_help() {
+echo "build.sh - build irodsclient package for OS X and Linux"
+echo "usage: ./build.sh [-h] [-v] [-r os-release-label] [-q qt-root-dir]"
+echo "-h prints help"
+echo "-v sets verbose mode on"
+echo "-r sets os release label in build package"
+echo "-q sets Qt root directory path"
+}
+
 # initialize parameters with defaults
 PLATFORM=`uname`
 VERSION=1.0.3
@@ -26,14 +35,6 @@ while getopts "hvr:q:" opt; do
 	    ;;
     esac
 done
-
-show_help() {
-    echo "build.sh - build irods-client package for OS X and Linux"
-    echo "usage: ./build.sh [-h] [-v] [-r os-release-label]"
-    echo "-h prints help"
-    echo "-v sets verbose mode on"
-    echo "-r sets os release label in build package"
-}
 
 if [ "$PLATFORM" = "Darwin" ]; then
     echo "Building for OS X"
