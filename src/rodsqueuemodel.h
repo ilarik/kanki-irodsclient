@@ -25,7 +25,7 @@
 
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
-#include "rodsgenquery.h"
+#include "_rodsgenquery.h"
 
 class RodsQueueModel : public QAbstractTableModel
 {

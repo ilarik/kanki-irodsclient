@@ -20,8 +20,8 @@
 #include "boost/shared_ptr.hpp"
 
 // iRODS client library headers
-#include "rodsClient.hpp"
-#include "rodsPath.hpp"
+#include "rodsClient.h"
+#include "rodsPath.h"
 
 namespace Kanki {
 
