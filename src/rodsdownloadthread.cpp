@@ -170,7 +170,7 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     Kanki::RodsDataInStream inStream(this->conn, obj);
     long int status = 0, lastRead = 0, lastWrite = 0, totalRead = 0, totalWritten = 0;
     QFile localFile(localPath.c_str());
-    void *buffer = std::malloc(65536);
+    void *buffer = std::malloc(TRANS_BUF_SZ);
 
     // check if we're allowed to proceed
     if (localFile.exists() && !allowOverwrite)
@@ -180,15 +180,16 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     if (!localFile.open(QIODevice::WriteOnly))
         return (-1);
 
+    // try to initiate get operation and open data stream
     if ((status = inStream.initGetOpr()) < 0)
         return (status);
 
     if ((status = inStream.openDataObj()) < 0)
         return (status);
 
-    // on success we transfer
     else
     {
+        // update status display only on large enough objects
         if (obj->objSize > 1048576)
             setupSubProgressDisplay("Transferring...", 0, 100);
 
