@@ -3,6 +3,8 @@
 # (C) 2014-2015 University of Jyväskylä. All rights reserved.
 # See LICENSE file for more information.
 
+include(../config/build.pri)
+
 QT       += core gui svg xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -94,12 +96,12 @@ macx {
 }
 
 macx {
-    QMAKE_CXXFLAGS += -Dosx_platform 
+    QMAKE_CXXFLAGS += -Dosx_platform #-DHIGH_DPI
 }
 
 QMAKE_CXXFLAGS += -Wno-write-strings -fPIC -Wno-deprecated -D_FILE_OFFSET_BITS=64 -DPARA_OPR=1 -D_REENTRANT
 QMAKE_CXXFLAGS += -DTAR_STRUCT_FILE -DGNU_TAR -DTAR_EXEC_PATH="/bin/tar" -DZIP_EXEC_PATH="/usr/bin/zip" -DUNZIP_EXEC_PATH="/usr/bin/unzip"
-QMAKE_CXXFLAGS += -DPAM_AUTH -DUSE_BOOST #-DHIGH_DPI
+QMAKE_CXXFLAGS += -DPAM_AUTH -DUSE_BOOST
 
 macx {
     QMAKE_INFO_PLIST = AppConfig.plist
@@ -108,22 +110,6 @@ macx {
 INCLUDEPATH += /usr/include/openssl
 
 macx {
-    IRODS_BUILD = $$(IRODS_BUILD)
-    IRODS_BOOST = $$(IRODS_BOOST)
-    IRODS_JANSSON = $$(IRODS_JANSSON)
-
-    isEmpty($$IRODS_BUILD) {
-        IRODS_BUILD = /var/lib/irods/build
-    }
-
-    isEmpty($$IRODS_BOOST) {
-        IRODS_BOOST = boost_1_58_0z
-    }
-
-    isEmpty($$IRODS_JANSSON) {
-        IRODS_JANSSON = jansson-2.7
-    }
-
     INCLUDEPATH += $$IRODS_BUILD/external/$$IRODS_BOOST
     INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/core/include
     INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/api/include
