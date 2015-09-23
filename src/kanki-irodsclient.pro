@@ -112,18 +112,18 @@ INCLUDEPATH += /usr/include/openssl
 macx {
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
 
-    INCLUDEPATH += $$IRODS_BUILD/external/$$IRODS_BOOST
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/core/include
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/api/include
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/hasher/include
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/server/core/include
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/server/icat/include
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/server/drivers/include
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/server/re/include
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/api/include
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/md5/include
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/sha1/include
-    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/rbudp/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/core/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/api/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/hasher/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/server/core/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/server/icat/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/server/drivers/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/server/re/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/api/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/md5/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/sha1/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/rbudp/include
 }
 
 else {
@@ -143,16 +143,16 @@ else {
 
 macx {
     LIBS += -lc++
-    LIBS += $$IRODS_BUILD/iRODS/lib/core/obj/libRodsAPIs.a
-    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_filesystem.a
-    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_regex.a
-    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_system.a
-    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_thread.a
-    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_chrono.a
-    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_date_time.a
-    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_iostreams.a
-    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_program_options.a
-    LIBS += $$IRODS_BUILD/external/$$IRODS_JANSSON/src/.libs/libjansson.a
+    LIBS += $$OSX_IRODS_BUILD/iRODS/lib/core/obj/libRodsAPIs.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_filesystem.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_regex.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_system.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_thread.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_chrono.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_date_time.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_iostreams.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_program_options.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_JANSSON/src/.libs/libjansson.a
 } 
 
 else {
