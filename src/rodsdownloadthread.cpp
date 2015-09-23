@@ -170,7 +170,7 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     Kanki::RodsDataInStream inStream(this->conn, obj);
     long int status = 0, lastRead = 0, lastWrite = 0, totalRead = 0, totalWritten = 0;
     QFile localFile(localPath.c_str());
-    void *buffer = std::malloc(TRANS_BUF_SZ);
+    void *buffer = std::malloc(65536);
 
     // check if we're allowed to proceed
     if (localFile.exists() && !allowOverwrite)

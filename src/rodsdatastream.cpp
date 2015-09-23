@@ -20,8 +20,8 @@ RodsDataStream::RodsDataStream(Kanki::RodsConnection *theConn)
 {
     this->connPtr = theConn;
 
-    this->memBuffer = std::malloc(TRANS_BUF_SZ);
-    this->bufSize = TRANS_BUF_SZ;
+    this->memBuffer = std::malloc(__KANKI_INIT_BUFSIZE);
+    this->bufSize = __KANKI_INIT_BUFSIZE;
     memset(this->memBuffer, 0, this->bufSize);
 }
 
