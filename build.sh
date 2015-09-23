@@ -9,7 +9,7 @@ OSRELEASE=unknown
 OPTIND=1
 
 # parse command line arguments
-while getopts "hvr:" opt; do
+while getopts "hvr:q:" opt; do
     case "$opt" in
 	h)
 	    show_help
@@ -20,6 +20,9 @@ while getopts "hvr:" opt; do
 	    ;;
 	r)
 	    OSRELEASE=$OPTARG
+	    ;;
+	q)
+	    QTROOT=$OPTARG
 	    ;;
     esac
 done
@@ -35,7 +38,11 @@ show_help() {
 if [ "$PLATFORM" = "Darwin" ]; then
     echo "Building for OS X"
 
-    QTROOT=~/Qt/5.5/clang_64
+    # if no Qt path was provided, set to default
+    if [ "$QTROOT" == "" ]; then
+	QTROOT=~/Qt/5.5/clang_64
+    fi
+
     QTDEPLOY=$QTROOT/bin/macdeployqt
 
     APPBUNDLE=iRODS.app
@@ -50,7 +57,7 @@ if [ "$PLATFORM" = "Darwin" ]; then
 
     # compile executable and build app bundle
     echo "compiling executable and building osx app bundle..."
-    (cd src; $QTROOT/bin/qmake && make)
+    (cd src; $QTROOT/bin/qmake -spec macx-clang CONFIG+=x86_64 && make)
 
     # continue build only if make is successful
     if [ $? -ne "0" ]; then
@@ -75,13 +82,22 @@ if [ "$PLATFORM" = "Darwin" ]; then
 	--install-location $PKG_INSTALL \
 	$PKG_FILE
 else
-    QTROOT=/usr/lib64/qt5
     echo "Building for Linux:"
     
+    # if no Qt path was provided, set to default
+    if [ "$QTROOT" == "" ]; then
+	QTROOT=/usr/lib64/qt5
+    fi
+
     # build a makefile and make
     echo "building executable..."
     (cd src; $QTROOT/bin/qmake && make)
-    
+
+   # continue build only if make was successful
+    if [ $? -ne "0" ]; then
+        exit
+    fi
+
     # create tar package
     echo "creating rpmbuild dist tarball package..."
     (cd src; tar cvzf ../kanki-irodsclient-$VERSION-linux-$OSRELEASE.tar.gz irodsclient schema.xml)
