@@ -113,7 +113,7 @@ macx {
     IRODS_JANSSON = $$(IRODS_JANSSON)
 
     isEmpty($$IRODS_BUILD) {
-        IRODS_BUILD = /Users/tiilkorh/irods-build/irods
+        IRODS_BUILD = /var/lib/irods/build
     }
 
     isEmpty($$IRODS_BOOST) {
@@ -146,12 +146,6 @@ else {
 LIBS += -ldl -lm -lpthread -lcurl -lssl -lcrypto
 
 macx {
-    IRODS_VERSION = $$(IRODS_VERSION)
-
-    isEmpty($$IRODS_VERSION) {
-        IRODS_VERSION = 4.1
-    }
-
     LIBS += -lc++
     LIBS += $$IRODS_BUILD/iRODS/lib/core/obj/libRodsAPIs.a
     LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_filesystem.a
