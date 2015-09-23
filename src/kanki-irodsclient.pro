@@ -143,7 +143,15 @@ else {
     INCLUDEPATH += /usr/include/irods/boost
 }
    
-LIBS += -ldl -lm -lpthread -lcurl -lssl -lcrypto
+LIBS += -ldl -lm -lpthread -lcurl
+
+macx {
+    LIBS += -L/usr/local/opt/openssl/lib -lssl -lcrypto
+}
+
+else {
+    LIBS += -lssl -lcrypto
+}
 
 macx {
     LIBS += -lc++
