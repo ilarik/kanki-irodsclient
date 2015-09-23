@@ -46,7 +46,6 @@ HEADERS  += rodsmainwindow.h \
     rodsconnection.h \
     rodsobjtreeitem.h \
     rodsobjtreemodel.h \
-    rodsgenquery.h \
     rodsmetadatawindow.h \
     rodsqueuewindow.h \
     rodsqueuemodel.h \
@@ -63,7 +62,8 @@ HEADERS  += rodsmainwindow.h \
     rodstransferwindow.h \
     rodsdatastream.h \
     rodsdatainstream.h \
-    rodsdataoutstream.h
+    rodsdataoutstream.h \
+    _rodsgenquery.h
 
 FORMS    += rodsmainwindow.ui \
     rodsmetadatawindow.ui \
@@ -110,17 +110,24 @@ INCLUDEPATH += /usr/include/openssl
 macx {
     IRODS_BUILD = $$(IRODS_BUILD)
     IRODS_BOOST = $$(IRODS_BOOST)
+    IRODS_JANSSON = $$(IRODS_JANSSON)
 
     isEmpty($$IRODS_BUILD) {
-        IRODS_BUILD = /var/lib/irods/build
+        IRODS_BUILD = /Users/tiilkorh/irods-build/irods
     }
 
     isEmpty($$IRODS_BOOST) {
-        IRODS_BOOST = boost_1_55_0z
+        IRODS_BOOST = boost_1_58_0z
+    }
+
+    isEmpty($$IRODS_JANSSON) {
+        IRODS_JANSSON = jansson-2.7
     }
 
     INCLUDEPATH += $$IRODS_BUILD/external/$$IRODS_BOOST
     INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/core/include
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/api/include
+    INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/hasher/include
     INCLUDEPATH += $$IRODS_BUILD/iRODS/server/core/include
     INCLUDEPATH += $$IRODS_BUILD/iRODS/server/icat/include
     INCLUDEPATH += $$IRODS_BUILD/iRODS/server/drivers/include
@@ -142,21 +149,20 @@ macx {
     IRODS_VERSION = $$(IRODS_VERSION)
 
     isEmpty($$IRODS_VERSION) {
-        IRODS_VERSION = 4.0
+        IRODS_VERSION = 4.1
     }
 
+    LIBS += -lc++
     LIBS += $$IRODS_BUILD/iRODS/lib/core/obj/libRodsAPIs.a
     LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_filesystem.a
     LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_regex.a
     LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_system.a
     LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_thread.a
-
-    contains($$IRODS_VERSION, 4.1) {
-        LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_chrono.a
-        LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_date_time.a
-        LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_iostreams.a
-        LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_program_options.a
-    }
+    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_chrono.a
+    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_date_time.a
+    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_iostreams.a
+    LIBS += $$IRODS_BUILD/external/$$IRODS_BOOST/stage/lib/libboost_program_options.a
+    LIBS += $$IRODS_BUILD/external/$$IRODS_JANSSON/src/.libs/libjansson.a
 } 
 
 else {
