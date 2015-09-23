@@ -110,6 +110,8 @@ macx {
 INCLUDEPATH += /usr/include/openssl
 
 macx {
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
+
     INCLUDEPATH += $$IRODS_BUILD/external/$$IRODS_BOOST
     INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/core/include
     INCLUDEPATH += $$IRODS_BUILD/iRODS/lib/api/include
