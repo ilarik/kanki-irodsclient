@@ -21,8 +21,8 @@
 #include <map>
 
 // iRODS client library headers
-#include "rodsClient.hpp"
-#include "rodsPath.hpp"
+#include "rodsClient.h"
+#include "rodsPath.h"
 
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"

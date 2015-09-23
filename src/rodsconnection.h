@@ -28,10 +28,11 @@
 #include <boost/thread/mutex.hpp>
 
 // iRODS client library headers
-#include "rodsClient.hpp"
-#include "rodsPath.hpp"
+#include "rodsClient.h"
+#include "rodsPath.h"
 #include "irods_client_api_table.hpp"
 #include "irods_pack_table.hpp"
+#include "checksum.hpp"
 
 // Kanki iRODS C++ class library headers
 #include "rodsobjentry.h"
