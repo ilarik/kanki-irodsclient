@@ -105,7 +105,7 @@ int RodsDataInStream::read(void *bufPtr, size_t len)
     // try to read from the rods data object
     if ((readResult = rcDataObjRead(this->connPtr->commPtr(), &readParam, &readBuf)))
     {
-        std::memcpy(bufPtr, readBuf.buf, len);
+        std::memcpy(bufPtr, readBuf.buf, readResult);
         std::free(readBuf.buf);
 
         this->lastOprSize = readResult;
