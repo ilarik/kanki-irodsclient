@@ -197,14 +197,14 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
 
         while ((lastRead = inStream.read(buffer, 16777216)) > 0)
         {
+            std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+            std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+
             totalRead += lastRead;
 
             if ((lastWrite = localFile.write((const char*)buffer, lastRead)) > 0)
             {
                 totalWritten += lastWrite;
-
-                std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-                std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
 
                 double speed = ((double)totalRead / 1048576) / ((double)diff.count() / 1000);
                 double percentage = ceil(((double)totalRead / (double)obj->objSize) * 100);
