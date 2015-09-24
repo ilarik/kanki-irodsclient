@@ -14,6 +14,9 @@
 #ifndef RODSDOWNLOADTHREAD_H
 #define RODSDOWNLOADTHREAD_H
 
+// C++ standard library headers
+#include <chrono>
+
 // Qt framework headers
 #include <QThread>
 #include <QString>

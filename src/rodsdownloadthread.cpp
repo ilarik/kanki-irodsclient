@@ -170,7 +170,7 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     Kanki::RodsDataInStream inStream(this->conn, obj);
     long int status = 0, lastRead = 0, lastWrite = 0, totalRead = 0, totalWritten = 0;
     QFile localFile(localPath.c_str());
-    void *buffer = std::malloc(1048576);
+    void *buffer = std::malloc(16777216);
 
     // check if we're allowed to proceed
     if (localFile.exists() && !allowOverwrite)
@@ -193,7 +193,9 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
         if (obj->objSize > 1048576)
             setupSubProgressDisplay("Transferring...", 0, 100);
 
-        while ((lastRead = inStream.read(buffer, 1048576)) > 0)
+        std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+
+        while ((lastRead = inStream.read(buffer, 16777216)) > 0)
         {
             totalRead += lastRead;
 
@@ -201,8 +203,14 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
             {
                 totalWritten += lastWrite;
 
+                std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+                std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+
+                double speed = ((double)totalRead / 1048576) / ((double)diff.count() / 1000);
                 double percentage = ceil(((double)totalRead / (double)obj->objSize) * 100);
+
                 QString statusStr = "Transferring... " + QVariant((int)percentage).toString() + "%";
+                statusStr += " at " + QVariant(ceil(speed)).toString() + " MB/s";
 
                 if (obj->objSize > 1048576)
                     subProgressUpdate(statusStr, (int)percentage);
@@ -222,7 +230,10 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
 
     // if verify checksum was required
     if (verifyChecksum && strlen(inStream.checksum()))
+    {
+        subProgressUpdate("Verifying Checksum...", 100);
         status = verifyChksumLocFile((char*)localPath.c_str(), (char*)inStream.checksum(), NULL);
+    }
 
     std::free(buffer);
 
