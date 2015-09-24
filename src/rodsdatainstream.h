@@ -14,9 +14,13 @@
 #ifndef RODSDATAINSTREAM_H
 #define RODSDATAINSTREAM_H
 
+#include <chrono>
+
 #include "rodsconnection.h"
 #include "rodsobjentry.h"
 #include "rodsdatastream.h"
+
+#define __KANKI_ADAPTIVE_INT    10
 
 namespace Kanki {
 
@@ -37,6 +41,9 @@ public:
     // Interface for reading from the iRODS data stream to buffer at bufPtr
     // for a block of len bytes.
     int read(void *bufPtr, size_t len);
+
+    //
+    int readAdaptive(void *bufPtr, size_t maxLen);
 
     //
     void getOprDone();
@@ -61,6 +68,13 @@ private:
 
     //
     std::string objChecksum;
+
+    // testing adaptive read size tuning algorithm
+    size_t adaptiveSize;
+    std::vector<std::chrono::milliseconds> dt_;
+    std::vector<size_t> bytes_;
+    std::vector<long int> speed_;
+    std::vector<long int> diff_;
 };
 
 } // namespace Kanki

@@ -18,8 +18,9 @@
 
 #include "rodsconnection.h"
 
-#define __KANKI_INIT_BUFSIZE    4096
-#define __KANKI_MAX_BUFSIZE     1677216
+#define __KANKI_BUFSIZE_INIT    262144
+#define __KANKI_BUFSIZE_INCR    262144
+#define __KANKI_BUFSIZE_MAX     33554432
 
 namespace Kanki {
 

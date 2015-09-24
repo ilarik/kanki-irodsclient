@@ -20,8 +20,8 @@ RodsDataStream::RodsDataStream(Kanki::RodsConnection *theConn)
 {
     this->connPtr = theConn;
 
-    this->memBuffer = std::malloc(__KANKI_INIT_BUFSIZE);
-    this->bufSize = __KANKI_INIT_BUFSIZE;
+    this->memBuffer = std::malloc(__KANKI_BUFSIZE_INIT);
+    this->bufSize = __KANKI_BUFSIZE_INIT;
     memset(this->memBuffer, 0, this->bufSize);
 }
 
@@ -65,8 +65,8 @@ int RodsDataStream::closeDataObj()
 
 size_t RodsDataStream::growBuffer(size_t newSize)
 {
-    if (newSize > __KANKI_MAX_BUFSIZE)
-        newSize = __KANKI_MAX_BUFSIZE;
+    if (newSize > __KANKI_BUFSIZE_MAX)
+        newSize = __KANKI_BUFSIZE_MAX;
 
     if (!(this->memBuffer = std::realloc(this->memBuffer, newSize)))
         newSize = 0;
