@@ -134,6 +134,7 @@ else {
 LIBS += -ldl -lm -lpthread -lcurl
 
 macx {
+    INCLUDEPATH += /usr/local/opt/openssl/include
     LIBS += -L/usr/local/opt/openssl/lib -lssl -lcrypto
 }
 
