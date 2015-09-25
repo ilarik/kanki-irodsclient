@@ -170,7 +170,8 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     Kanki::RodsDataInStream inStream(this->conn, obj);
     long int status = 0, lastRead = 0, lastWrite = 0, totalRead = 0, totalWritten = 0;
     QFile localFile(localPath.c_str());
-    void *buffer = std::malloc(16777216);
+    long int readSize = 33554432;
+    void *buffer = std::malloc(readSize);
 
     // check if we're allowed to proceed
     if (localFile.exists() && !allowOverwrite)
@@ -187,15 +188,14 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     if ((status = inStream.openDataObj()) < 0)
         return (status);
 
-    else
-    {
+    else {
         // update status display only on large enough objects
-        if (obj->objSize > 1048576)
+        if (obj->objSize > readSize)
             setupSubProgressDisplay("Transferring...", 0, 100);
 
         std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
-        while ((lastRead = inStream.read(buffer, 16777216)) > 0)
+        while ((lastRead = inStream.read(buffer, readSize)) > 0)
         {
             std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
             std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
@@ -212,7 +212,7 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
                 QString statusStr = "Transferring... " + QVariant((int)percentage).toString() + "%";
                 statusStr += " at " + QVariant(ceil(speed)).toString() + " MB/s";
 
-                if (obj->objSize > 1048576)
+                if (obj->objSize > readSize)
                     subProgressUpdate(statusStr, (int)percentage);
             }
 
