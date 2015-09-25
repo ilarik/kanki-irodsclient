@@ -210,7 +210,7 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
                 double percentage = ceil(((double)totalRead / (double)obj->objSize) * 100);
 
                 QString statusStr = "Transferring... " + QVariant((int)percentage).toString() + "%";
-                statusStr += " at " + QVariant(ceil(speed)).toString() + " MB/s";
+                statusStr += " at " + QString::number(speed, 'f', 2) + " MB/s";
 
                 if (obj->objSize > readSize)
                     subProgressUpdate(statusStr, (int)percentage);
