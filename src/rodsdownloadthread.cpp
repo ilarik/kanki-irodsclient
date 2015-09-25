@@ -195,7 +195,7 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
 
         std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
-        while ((lastRead = inStream.read(buffer, readSize)) > 0)
+        while ((lastRead = inStream.readAdaptive(buffer, readSize)) > 0)
         {
             std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
             std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
