@@ -136,8 +136,8 @@ public:
 private:
 
     // we deny assignments and copying of the object
-    RodsConnection(RodsConnection &conn);
-    RodsConnection& operator=(RodsConnection &conn);
+    RodsConnection(RodsConnection &);
+    RodsConnection& operator=(RodsConnection &);
 
     // a boost mutex to provide locking for the TCP connection data stream
     boost::mutex commMutex;

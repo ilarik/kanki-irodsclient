@@ -33,8 +33,8 @@ public:
 private:
 
     // we deny copying and substitution
-    RodsDataOutStream(RodsDataOutStream &outStream);
-    RodsDataOutStream& operator=(RodsDataOutStream &outStream);
+    RodsDataOutStream(RodsDataOutStream &);
+    RodsDataOutStream& operator=(RodsDataOutStream &);
 };
 
 } // namespace Kanki

@@ -19,6 +19,7 @@ RodsTransferWindow::RodsTransferWindow(QString title) :
 {
     this->progressMax = this->subProgressMax = 0;
     this->setWindowTitle(title);
+    this->setFixedWidth(600);
 
     this->layout = new QVBoxLayout(this);
 

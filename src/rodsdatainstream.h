@@ -57,8 +57,8 @@ public:
 private:
 
     // we deny copying and the substitution operation
-    RodsDataInStream(RodsDataInStream &inStream);
-    RodsDataInStream& operator=(RodsDataInStream &inStream);
+    RodsDataInStream(RodsDataInStream &);
+    RodsDataInStream& operator=(RodsDataInStream &);
 
     //
     int read(size_t len);
