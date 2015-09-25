@@ -133,11 +133,15 @@ int RodsDataInStream::readAdaptive(void *bufPtr, size_t maxLen)
 {
     int readRequest = this->adaptiveSize, readResult = 0;
 
+    // execute a timed read at current request size
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     readResult = this->read(bufPtr, readRequest);
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
+    // get time differential in milliseconds
     std::chrono::milliseconds dt = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+
+    // compute read speed (troughput) and difference
     long int speed = floor((double)readResult / ((double)dt.count() / 1000));
 
     if (this->speed_.size())
@@ -146,6 +150,7 @@ int RodsDataInStream::readAdaptive(void *bufPtr, size_t maxLen)
         this->diff_.push_back(diff);
     }
 
+    // we store previous time points
     this->dt_.push_back(dt);
     this->bytes_.push_back(readResult);
     this->speed_.push_back(speed);
@@ -159,34 +164,40 @@ int RodsDataInStream::readAdaptive(void *bufPtr, size_t maxLen)
         this->diff_.erase(this->diff_.begin());
     }
 
-    // moving average
+    // compute moving average for time window
     double avg = 0;
+
     for (unsigned int i = 0; i < this->diff_.size(); i++)
         avg += this->diff_[i];
+
     avg /= this->diff_.size();
 
-    std::cout << __FUNCTION__ << ": moving average for speed diff is "
-              << avg << " bytes/sec" << std::endl << std::flush;
-
-    // of our moving average is positive, increase adaptive read size
-    if (avg > 0)
+    // of our moving average is at all positive, we increase adaptive read size
+    if ((avg > 0) && (abs(avg) > 1.0e3))
     {
         if (this->adaptiveSize + __KANKI_BUFSIZE_INCR < maxLen)
             this->adaptiveSize += __KANKI_BUFSIZE_INCR;
 
-        std::cout << __FUNCTION__ << ": increasing read size" << std::endl << std::flush;
+        std::cout << __FUNCTION__ << ": increasing read request size to "
+                  << this->adaptiveSize << std::endl << std::flush;
     }
 
-    // on a negative average, we decrease the transfer size parameter
-    else if (avg < 0)
+    // on a very negative average, we decrease the transfer size parameter
+    if ((avg < 0) && (abs(avg) > 1.0e6))
     {
-        if (this->adaptiveSize - __KANKI_BUFSIZE_INCR > 0)
+        if (this->adaptiveSize > __KANKI_BUFSIZE_INCR)
             this->adaptiveSize -= __KANKI_BUFSIZE_INCR;
 
-        std::cout << __FUNCTION__ << ": decreased read size" << std::endl << std::flush;
+        std::cout << __FUNCTION__ << ": decreased read request size to "
+                  << this->adaptiveSize << std::endl << std::flush;
     }
 
-    std::cout << __FUNCTION__ << ": current read size is " << readResult << " bytes" << std::endl << std::endl << std::flush;
+    else
+        std::cout << __FUNCTION__ << ": keeping read request size steady at "
+                  << this->adaptiveSize << std::endl << std::flush;
+
+    std::cout << __FUNCTION__ << ": current read size is "
+              << readResult << " bytes" << std::endl << std::endl << std::flush;
 
     return (readResult);
 }
