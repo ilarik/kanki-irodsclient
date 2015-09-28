@@ -246,6 +246,10 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
         status = verifyChksumLocFile((char*)localPath.c_str(), (char*)inStream.checksum(), NULL);
     }
 
+    // free everything we have allocated
+    if (writer)
+        delete (writer);
+
     std::free(buffer);
     std::free(buffer2);
 
