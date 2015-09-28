@@ -171,7 +171,8 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     long int status = 0, lastRead = 0, lastWrite = 0, totalRead = 0, totalWritten = 0;
     QFile localFile(localPath.c_str());
     long int readSize = 33554432;
-    void *buffer = std::malloc(readSize);
+    void *buffer = std::malloc(readSize), *buffer2 = std::malloc(readSize);
+    boost::thread *writer = NULL;
 
     // check if we're allowed to proceed
     if (localFile.exists() && !allowOverwrite)
@@ -202,24 +203,34 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
 
             totalRead += lastRead;
 
-            if ((lastWrite = localFile.write((const char*)buffer, lastRead)) > 0)
+            // if we had something to write, wait
+            if (writer)
+                writer->join();
+
+            // check for writing errors
+            if (localFile.error() == QFile::WriteError)
             {
-                totalWritten += lastWrite;
-
-                double speed = ((double)totalRead / 1048576) / ((double)diff.count() / 1000);
-                double percentage = ceil(((double)totalRead / (double)obj->objSize) * 100);
-
-                QString statusStr = "Transferring... " + QVariant((int)percentage).toString() + "%";
-                statusStr += " at " + QString::number(speed, 'f', 2) + " MB/s";
-
-                if (obj->objSize > readSize)
-                    subProgressUpdate(statusStr, (int)percentage);
+                // TODO: error reporting on write error
             }
 
-            else {
-                status = -1;
-                break;
-            }
+            // replace writer with a new one
+            delete (writer);
+            writer = new boost::thread(boost::bind(&QFile::write, &localFile, (const char*)buffer, lastRead));
+
+            // XOR swap buffer pointers
+            buffer = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
+            buffer2 = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
+            buffer = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
+
+            // compute and signal statistics to UI
+            double speed = ((double)totalRead / 1048576) / ((double)diff.count() / 1000);
+            double percentage = ceil(((double)totalRead / (double)obj->objSize) * 100);
+
+            QString statusStr = "Transferring... " + QVariant((int)percentage).toString() + "%";
+            statusStr += " at " + QString::number(speed, 'f', 2) + " MB/s";
+
+            if (obj->objSize > readSize)
+                subProgressUpdate(statusStr, (int)percentage);
         }
     }
 
@@ -236,6 +247,7 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     }
 
     std::free(buffer);
+    std::free(buffer2);
 
     return (status);
 }

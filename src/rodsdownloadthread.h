@@ -17,6 +17,8 @@
 // C++ standard library headers
 #include <chrono>
 
+#include <boost/thread/thread.hpp>
+
 // Qt framework headers
 #include <QThread>
 #include <QString>
