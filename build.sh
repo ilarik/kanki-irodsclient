@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 show_help() {
 echo "build.sh - build irodsclient package for OS X and Linux"
