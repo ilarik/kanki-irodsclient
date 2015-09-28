@@ -34,7 +34,7 @@ RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string b
     this->refreshIndex = refresh;
 }
 
-void RodsUploadThread::run() Q_DECL_OVERRIDE
+void RodsUploadThread::run()
 {
     QString statusStr = "Initializing...";
     int status = 0;

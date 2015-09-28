@@ -26,7 +26,7 @@ RodsDownloadThread::RodsDownloadThread(Kanki::RodsConnection *theConn, Kanki::Ro
     this->overwrite = allowOverwrite;
 }
 
-void RodsDownloadThread::run() Q_DECL_OVERRIDE
+void RodsDownloadThread::run()
 {
     int status = 0;
     QString statusStr = "Initializing...";
