@@ -179,7 +179,7 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
         return (OVERWRITE_WITHOUT_FORCE_FLAG);
 
     // try to open local file and the rods data stream
-    if (!localFile.open(QIODevice::WriteOnly))
+    if (!localFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
         return (-1);
 
     // try to initiate get operation and open data stream
