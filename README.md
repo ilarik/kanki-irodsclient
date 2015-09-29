@@ -2,7 +2,7 @@ kanki-irodsclient
 ==================
 
 This project builds an open-source cross-platform native client for iRODS (http://www.irods.org) with a graphical user interface.
-The software is implemented in C++ and builds currently against irods-4.0.x and irods-4.1.x on Linux and Mac OS X 10.8 and up.
+The software is implemented in C++ and builds currently against irods-4.1.x on Linux and Mac OS X 10.10 and up.
 
 Building from source
 --------------------
