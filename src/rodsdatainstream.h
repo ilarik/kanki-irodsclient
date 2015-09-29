@@ -35,23 +35,26 @@ public:
     // for reading.
     int openDataObj();
 
-    //
+    // Initiate iRODS API get operation for the data object to which the
+    // data stream is associated with.
     int getOprInit();
 
     // Interface for reading from the iRODS data stream to buffer at bufPtr
     // for a block of len bytes.
     int read(void *bufPtr, size_t len);
 
-    //
+    // Adaptive read wrapper to select read operation size depending on
+    // history of development of the transfer rate.
     int readAdaptive(void *bufPtr, size_t maxLen);
 
-    //
+    // End iRODS API get operation to signal iRODS that GET_OPR is completed.
     void getOprEnd();
 
-    //
+    // Interface for accessing the data object checksum string provided
+    // by the iRODS server.
     const std::string& checksumStr() const;
 
-    //
+    // Interface for accessing the bare C string of the checksum string data.
     const char* checksum() const;
 
 private:
@@ -72,16 +75,16 @@ private:
     // adaptive read size parameter
     size_t adaptiveSize;
 
-    //
+    // container for the last measured I/O operation durations
     std::vector<std::chrono::milliseconds> dt_;
 
-    //
+    // container for the last I/O operation sizes
     std::vector<size_t> bytes_;
 
-    //
+    // container for the last measured I/O throughputs
     std::vector<long int> speed_;
 
-    //
+    // container for the last computed differences in I/O throughputs
     std::vector<long int> diff_;
 };
 
