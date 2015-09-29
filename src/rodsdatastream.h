@@ -37,25 +37,29 @@ public:
     // data stream to a data object.
     virtual int openDataObj() = 0;
 
-    //
+    // Executes iRODS API seek operation on the data stream for offset
+    // bytes from whence.
     int seek(size_t offset, int whence);
 
-    //
+    // Closes iRODS data object handle.
     int closeDataObj();
 
 protected:
 
-    //
+    // tries to grow internal buffer for requested new size
     size_t growBuffer(size_t newSize);
 
-    //
+    // rods connection object pointer
     RodsConnection *connPtr;
 
-    //
+    // internal memory buffer for I/O
     void *memBuffer;
 
-    //
-    size_t bufSize, lastOprSize;
+    // current internal buffer size
+    size_t bufSize;
+
+    // last I/O operation size
+    size_t lastOprSize;
 
     // rods api first class object index (object handle)
     int rodsL1Inx;
