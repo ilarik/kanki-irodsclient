@@ -168,7 +168,7 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
                                      bool verifyChecksum, bool allowOverwrite)
 {
     Kanki::RodsDataInStream inStream(this->conn, obj);
-    long int status = 0, lastRead = 0, lastWrite = 0, totalRead = 0, totalWritten = 0;
+    long int status = 0, lastRead = 0, totalRead = 0;
     QFile localFile(localPath.c_str());
     long int readSize = __KANKI_BUFSIZE_MAX;
     void *buffer = std::malloc(readSize), *buffer2 = std::malloc(readSize);
