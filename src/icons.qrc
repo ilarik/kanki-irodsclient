@@ -20,4 +20,7 @@
         <file>icons/text-x-generic.png</file>
         <file>icons/applications-internet.svg</file>
     </qresource>
+    <qresource prefix="/">
+        <file>icons/irodsclient-appicon.png</file>
+    </qresource>
 </RCC>
