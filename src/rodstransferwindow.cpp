@@ -57,8 +57,10 @@ void RodsTransferWindow::updateMainProgress(QString currentMsg, int value)
     progMsg += " of " + QVariant(this->progressMax).toString() + ")";
 
     this->mainProgressMsg->setText(progMsg);
-    this->subProgressMsg->setText("In progress...");
     this->mainProgressBar->setValue(value);
+
+    // when main is updated, sub is set to marquee
+    this->setupSubProgressBar("In Progress...", 0, 0);
 }
 
 void RodsTransferWindow::setupSubProgressBar(QString initialMsg, int value, int maxValue)
