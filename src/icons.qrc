@@ -21,6 +21,6 @@
         <file>icons/applications-internet.svg</file>
     </qresource>
     <qresource prefix="/">
-        <file>icons/irodsclient-appicon.png</file>
+        <file>icons/irodsclient.png</file>
     </qresource>
 </RCC>
