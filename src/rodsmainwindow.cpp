@@ -387,6 +387,10 @@ void RodsMainWindow::doDownload()
                     &RodsTransferWindow::setupMainProgressBar);
             connect(downloadWorker, &RodsDownloadThread::progressUpdate, transferWindow,
                     &RodsTransferWindow::updateMainProgress);
+            connect(downloadWorker, &RodsDownloadThread::setupSubProgressDisplay, transferWindow,
+                    &RodsTransferWindow::setupSubProgressBar);
+            connect(downloadWorker, &RodsDownloadThread::subProgressUpdate, transferWindow,
+                    &RodsTransferWindow::updateSubProgress);
             connect(downloadWorker, &RodsDownloadThread::progressMarquee, transferWindow,
                     &RodsTransferWindow::progressMarquee);
 
@@ -451,9 +455,10 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
 
     if (uploadDirectory)
         uploadWorker = new RodsUploadThread(this->conn, fileNames.at(0).toStdString(),
-                                            destCollPath);
+                                            destCollPath, this->getCurrentRodsObjIndex());
     else
-        uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath);
+        uploadWorker = new RodsUploadThread(this->conn, fileNames,
+                                            destCollPath, this->getCurrentRodsObjIndex());
 
     QString title = QString("Uploading to '") + destCollPath.c_str() + "'";
     RodsTransferWindow *transferWindow = new RodsTransferWindow(title);
@@ -469,6 +474,8 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
     // error reporting signal connects to a main window slot
     connect(uploadWorker, &RodsUploadThread::reportError, this,
             &RodsMainWindow::doErrorMsg);
+    connect(uploadWorker, &RodsUploadThread::refreshObjectModel, this,
+            &RodsMainWindow::doRefreshTreeView);
 
     // connect thread finished signal to Qt object deletion mechanisms
     connect(uploadWorker, &RodsUploadThread::finished, &QObject::deleteLater);
@@ -486,13 +493,17 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
     uploadWorker->start();
 }
 
-void RodsMainWindow::doRefreshTreeView()
+void RodsMainWindow::doRefreshTreeView(QModelIndex atIndex)
 {
+    QModelIndex curIndex = atIndex;
+
     // first process pending Qt events
     qApp->processEvents();
 
     // get current index and pointer to model object
-    QModelIndex curIndex = this->ui->rodsObjTree->currentIndex();
+    if (!curIndex.isValid())
+        curIndex = this->ui->rodsObjTree->currentIndex();
+
     RodsObjTreeModel *model = static_cast<RodsObjTreeModel*>(this->ui->rodsObjTree->model());
 
     // if no valid index (no selection), assume initial mount point
@@ -739,6 +750,17 @@ std::string RodsMainWindow::getCurrentRodsCollPath()
     }
 
     return (currentCollPath);
+}
+
+QModelIndex RodsMainWindow::getCurrentRodsObjIndex()
+{
+    QModelIndex index = this->ui->rodsObjTree->currentIndex();
+
+    // in the case there's no valid selection, index at first mount
+    if (!index.isValid())
+        return (this->model->index(0, 0, QModelIndex()));
+
+    return (index);
 }
 
 void RodsMainWindow::showAbout()

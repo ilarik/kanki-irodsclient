@@ -37,11 +37,13 @@ public:
 
     // Constructor initializes the upload worker thread and sets its parameters for execution,
     // requires a rods conn pointer, file paths list and dest coll path.
-    RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths, std::string destColl);
+    RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths,
+                     std::string destColl, const QModelIndex &refresh);
 
     // Constructor initializes the upload worker thread and sets its parameters for execution,
     // requires a rods conn pointer, base path for recursive upload and dest coll path.
-    RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath, std::string destColl);
+    RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath,
+                     std::string destColl, const QModelIndex &refresh);
 
 signals:
 
@@ -61,6 +63,10 @@ signals:
     // an error string and an error code.
     void reportError(QString msgStr, QString errorStr, int errorCode);
 
+    // Qt signal for requesing a rods object tree model refresh,
+    // at a given index (after upload complete, signals ui).
+    void refreshObjectModel(QModelIndex index);
+
 private:
 
     // Overrides superclass virtual function, executes the upload
@@ -79,5 +85,8 @@ private:
 
     // destination rods collection path
     std::string destCollPath, basePath;
+
+    // reference rods object tree model index to refresh
+    QModelIndex refreshIndex;
 };
 #endif // RODSUPLODADTHREAD_H

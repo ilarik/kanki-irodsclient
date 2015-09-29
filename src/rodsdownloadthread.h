@@ -14,6 +14,11 @@
 #ifndef RODSDOWNLOADTHREAD_H
 #define RODSDOWNLOADTHREAD_H
 
+// C++ standard library headers
+#include <chrono>
+
+#include <boost/thread/thread.hpp>
+
 // Qt framework headers
 #include <QThread>
 #include <QString>
@@ -21,10 +26,12 @@
 #include <QProgressDialog>
 #include <QVariant>
 #include <QDir>
+#include <QFile>
 
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
 #include "rodsobjentry.h"
+#include "rodsdatainstream.h"
 
 class RodsDownloadThread : public QThread
 {
@@ -46,6 +53,14 @@ signals:
     // the current message text and current progress value.
     void progressUpdate(QString text, int progress);
 
+    // Qt signal for initializing the progress bar display subprogress
+    // display, signals out initial message, initial value and max value
+    void setupSubProgressDisplay(QString text, int value, int maxValue);
+
+    // Qt signal for updating the secondary progress bar display,
+    // it signals out the current secondary status msg and progress value
+    void subProgressUpdate(QString text, int progress);
+
     // Qt signal for setting the progress bar display in marquee mode,
     // it signals out the current text message.
     void progressMarquee(QString text);
@@ -62,6 +77,10 @@ private:
 
     // Constructs the list of objects to be downloaded in a recursive manner.
     int makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs);
+
+    //
+    int downloadFile(Kanki::RodsObjEntryPtr obj, std::string localPath,
+                     bool verifyChecksum = false, bool allowOverwrite = true);
 
     // pointer to the rods connection object
     Kanki::RodsConnection *conn;

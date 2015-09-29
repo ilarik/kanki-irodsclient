@@ -15,7 +15,7 @@
 // application class RodsConnectThread header
 #include "rodsconnectthread.h"
 
-void RodsConnectThread::run() Q_DECL_OVERRIDE
+void RodsConnectThread::run()
 {
     Kanki::RodsConnection *newConn = NULL;
     int status = 0;

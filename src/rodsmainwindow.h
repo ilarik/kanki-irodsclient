@@ -131,7 +131,7 @@ public slots:
     void doUpload(bool uploadDirectory = false);
 
     // Qt slot for invoking the refresh gui operation.
-    void doRefreshTreeView();
+    void doRefreshTreeView(QModelIndex atIndex = QModelIndex());
 
     // Qt slot for invoking the create collection gui operation.
     void doCreateCollection();
@@ -197,6 +197,12 @@ private slots:
 
 private:
 
+    // gets the current user selected rods path from the gui
+    std::string getCurrentRodsCollPath();
+
+    // gets the current rods object tree model index
+    QModelIndex getCurrentRodsObjIndex();
+
     // instance of Qt UI compiler generated UI
     Ui::RodsMainWindow *ui;
 
@@ -217,9 +223,6 @@ private:
 
     // settings from the gui
     bool verifyChecksum, allowOverwrite;
-
-    // gets the current user selected rods path from the gui
-    std::string getCurrentRodsCollPath();
 };
 
 #endif // RODSMAINWINDOW_H

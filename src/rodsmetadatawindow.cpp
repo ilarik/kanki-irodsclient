@@ -57,9 +57,13 @@ RodsMetadataWindow::RodsMetadataWindow(Kanki::RodsConnection *theConn, Kanki::Ro
 
 RodsMetadataWindow::~RodsMetadataWindow()
 {
+    // destroy mapper first, to prevent access
+    delete (this->metaMapper);
+    delete (this->ui);
+
+    // cleanup after everything else
     delete (this->metadata);
     delete (this->schema);
-    delete (this->ui);
 }
 
 void RodsMetadataWindow::closeEvent(QCloseEvent *event)

@@ -30,7 +30,7 @@
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
 #include "rodsobjentry.h"
-#include "rodsgenquery.h"
+#include "_rodsgenquery.h"
 
 // application headers
 #include "rodsmetadataitem.h"

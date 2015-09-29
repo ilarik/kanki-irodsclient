@@ -14,27 +14,31 @@
 // application class RodsUploadThread header
 #include "rodsuploadthread.h"
 
-RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths, std::string destColl)
+RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths,
+                                   std::string destColl,  const QModelIndex &refresh)
     : QThread()
 {
     this->conn = new Kanki::RodsConnection(theConn);
     this->filePathList = filePaths;
     this->destCollPath = destColl;
+    this->refreshIndex = refresh;
 }
 
-RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath, std::string destColl)
+RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath,
+                                   std::string destColl, const QModelIndex &refresh)
     : QThread()
 {
     this->conn = new Kanki::RodsConnection(theConn);
     this->basePath = baseDirPath;
     this->destCollPath = destColl;
+    this->refreshIndex = refresh;
 }
 
-void RodsUploadThread::run() Q_DECL_OVERRIDE
+void RodsUploadThread::run()
 {
     QString statusStr = "Initializing...";
     int status = 0;
-    int c = 0;
+    int c = 1;
 
     // signal ui to setup progress display
     progressMarquee(statusStr);
@@ -118,8 +122,12 @@ void RodsUploadThread::run() Q_DECL_OVERRIDE
         c++;
     }
 
+    // cleanly disconnect parallel connection
     this->conn->disconnect();
     delete(this->conn);
+
+    // signal out a request for ui to refresh itself
+    refreshObjectModel(this->refreshIndex);
 }
 
 void RodsUploadThread::makeBillOfMaterials(const QString &dirPath, QStringList *filePaths)

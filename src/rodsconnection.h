@@ -28,10 +28,11 @@
 #include <boost/thread/mutex.hpp>
 
 // iRODS client library headers
-#include "rodsClient.hpp"
-#include "rodsPath.hpp"
+#include "rodsClient.h"
+#include "rodsPath.h"
 #include "irods_client_api_table.hpp"
 #include "irods_pack_table.hpp"
+#include "checksum.hpp"
 
 // Kanki iRODS C++ class library headers
 #include "rodsobjentry.h"
@@ -135,8 +136,8 @@ public:
 private:
 
     // we deny assignments and copying of the object
-    RodsConnection(RodsConnection &conn);
-    RodsConnection& operator=(RodsConnection &conn);
+    RodsConnection(RodsConnection &);
+    RodsConnection& operator=(RodsConnection &);
 
     // a boost mutex to provide locking for the TCP connection data stream
     boost::mutex commMutex;

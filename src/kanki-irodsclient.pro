@@ -3,6 +3,8 @@
 # (C) 2014-2015 University of Jyväskylä. All rights reserved.
 # See LICENSE file for more information.
 
+include(../config/build.pri)
+
 QT       += core gui svg xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -37,13 +39,15 @@ SOURCES += main.cpp\
     rodsdownloadthread.cpp \
     rodsobjentry.cpp \
     rodsuploadthread.cpp \
-    rodstransferwindow.cpp
+    rodstransferwindow.cpp \
+    rodsdatastream.cpp \
+    rodsdatainstream.cpp \
+    rodsdataoutstream.cpp
 
 HEADERS  += rodsmainwindow.h \
     rodsconnection.h \
     rodsobjtreeitem.h \
     rodsobjtreemodel.h \
-    rodsgenquery.h \
     rodsmetadatawindow.h \
     rodsqueuewindow.h \
     rodsqueuemodel.h \
@@ -57,7 +61,11 @@ HEADERS  += rodsmainwindow.h \
     rodsobjentry.h \
     version.h \
     rodsuploadthread.h \
-    rodstransferwindow.h
+    rodstransferwindow.h \
+    rodsdatastream.h \
+    rodsdatainstream.h \
+    rodsdataoutstream.h \
+    _rodsgenquery.h
 
 FORMS    += rodsmainwindow.ui \
     rodsmetadatawindow.ui \
@@ -88,12 +96,16 @@ macx {
 }
 
 macx {
-    QMAKE_CXXFLAGS += -Dosx_platform 
+    QMAKE_CXXFLAGS += -Dosx_platform #-DHIGH_DPI
+}
+
+else {
+    QMAKE_CXXFLAGS += -std=c++0x
 }
 
 QMAKE_CXXFLAGS += -Wno-write-strings -fPIC -Wno-deprecated -D_FILE_OFFSET_BITS=64 -DPARA_OPR=1 -D_REENTRANT
 QMAKE_CXXFLAGS += -DTAR_STRUCT_FILE -DGNU_TAR -DTAR_EXEC_PATH="/bin/tar" -DZIP_EXEC_PATH="/usr/bin/zip" -DUNZIP_EXEC_PATH="/usr/bin/unzip"
-QMAKE_CXXFLAGS += -DPAM_AUTH -DUSE_BOOST #-DHIGH_DPI
+QMAKE_CXXFLAGS += -DPAM_AUTH -DUSE_BOOST
 
 macx {
     QMAKE_INFO_PLIST = AppConfig.plist
@@ -102,16 +114,20 @@ macx {
 INCLUDEPATH += /usr/include/openssl
 
 macx {
-    INCLUDEPATH += /var/lib/irods/build/external/boost_1_55_0z
-    INCLUDEPATH += /var/lib/irods/build/iRODS/lib/core/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/server/core/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/server/icat/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/server/drivers/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/server/re/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/lib/api/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/lib/md5/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/lib/sha1/include
-    INCLUDEPATH += /var/lib/irods/build/iRODS/lib/rbudp/include
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
+
+    INCLUDEPATH += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/core/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/api/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/hasher/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/server/core/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/server/icat/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/server/drivers/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/server/re/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/api/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/md5/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/sha1/include
+    INCLUDEPATH += $$OSX_IRODS_BUILD/iRODS/lib/rbudp/include
 }
 
 else {
@@ -119,14 +135,29 @@ else {
     INCLUDEPATH += /usr/include/irods/boost
 }
    
-LIBS += -ldl -lm -lpthread -lcurl -lssl -lcrypto
+LIBS += -ldl -lm -lpthread -lcurl
 
 macx {
-    LIBS += /var/lib/irods/build/iRODS/lib/core/obj/libRodsAPIs.a
-    LIBS += /var/lib/irods/build/external/boost_1_55_0z/stage/lib/libboost_filesystem.a
-    LIBS += /var/lib/irods/build/external/boost_1_55_0z/stage/lib/libboost_regex.a
-    LIBS += /var/lib/irods/build/external/boost_1_55_0z/stage/lib/libboost_system.a
-    LIBS += /var/lib/irods/build/external/boost_1_55_0z/stage/lib/libboost_thread.a
+    INCLUDEPATH += /usr/local/opt/openssl/include
+    LIBS += -L/usr/local/opt/openssl/lib -lssl -lcrypto
+}
+
+else {
+    LIBS += -lssl -lcrypto
+}
+
+macx {
+    LIBS += -lc++
+    LIBS += $$OSX_IRODS_BUILD/iRODS/lib/core/obj/libRodsAPIs.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_filesystem.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_regex.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_system.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_thread.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_chrono.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_date_time.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_iostreams.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_program_options.a
+    LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_JANSSON/src/.libs/libjansson.a
 } 
 
 else {

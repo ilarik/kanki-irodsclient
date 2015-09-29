@@ -12,7 +12,7 @@
  */
 
 // Kanki library class RodsGenQuery header
-#include "rodsgenquery.h"
+#include "_rodsgenquery.h"
 
 namespace Kanki {
 

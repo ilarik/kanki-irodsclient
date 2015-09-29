@@ -287,8 +287,9 @@ int RodsConnection::removeColl(const std::string &collPath)
 int RodsConnection::putFile(const std::string &localPath, const std::string &objPath, unsigned int numThreads)
 {
     dataObjInp_t putParam;
-    int size = 0, status = 0;
     char filePath[MAX_NAME_LEN];
+    rodsLong_t size = 0;
+    int status = 0;
 
     // get file size
     std::ifstream fileStream(localPath.c_str(), std::ifstream::binary);

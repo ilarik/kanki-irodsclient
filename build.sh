@@ -1,15 +1,24 @@
-#!/bin/sh
+#!/bin/bash
+
+show_help() {
+echo "build.sh - build irodsclient package for OS X and Linux"
+echo "usage: ./build.sh [-h] [-v] [-r os-release-label] [-q qt-root-dir]"
+echo "-h prints help"
+echo "-v sets verbose mode on"
+echo "-r sets os release label in build package"
+echo "-q sets Qt root directory path"
+}
 
 # initialize parameters with defaults
 PLATFORM=`uname`
-VERSION=1.0.3
+VERSION=1.0.4
 OSRELEASE=unknown
 
 # reset POSIX option index variable
 OPTIND=1
 
 # parse command line arguments
-while getopts "hvr:" opt; do
+while getopts "hvr:q:" opt; do
     case "$opt" in
 	h)
 	    show_help
@@ -21,21 +30,20 @@ while getopts "hvr:" opt; do
 	r)
 	    OSRELEASE=$OPTARG
 	    ;;
+	q)
+	    QTROOT=$OPTARG
+	    ;;
     esac
 done
-
-show_help() {
-    echo "build.sh - build irods-client package for OS X and Linux"
-    echo "usage: ./build.sh [-h] [-v] [-r os-release-label]"
-    echo "-h prints help"
-    echo "-v sets verbose mode on"
-    echo "-r sets os release label in build package"
-}
 
 if [ "$PLATFORM" = "Darwin" ]; then
     echo "Building for OS X"
 
-    QTROOT=~/Qt/5.3/clang_64
+    # if no Qt path was provided, set to default
+    if [ "$QTROOT" == "" ]; then
+	QTROOT=~/Qt/5.5/clang_64
+    fi
+
     QTDEPLOY=$QTROOT/bin/macdeployqt
 
     APPBUNDLE=iRODS.app
@@ -50,7 +58,7 @@ if [ "$PLATFORM" = "Darwin" ]; then
 
     # compile executable and build app bundle
     echo "compiling executable and building osx app bundle..."
-    (cd src; $QTROOT/bin/qmake -spec macx-g++49-fsf && make)
+    (cd src; $QTROOT/bin/qmake -spec macx-clang CONFIG+=x86_64 && make)
 
     # continue build only if make is successful
     if [ $? -ne "0" ]; then
@@ -75,14 +83,23 @@ if [ "$PLATFORM" = "Darwin" ]; then
 	--install-location $PKG_INSTALL \
 	$PKG_FILE
 else
-    QTROOT=/usr/lib64/qt5
     echo "Building for Linux:"
     
+    # if no Qt path was provided, set to default
+    if [ "$QTROOT" == "" ]; then
+	QTROOT=/usr/lib64/qt5
+    fi
+
     # build a makefile and make
     echo "building executable..."
     (cd src; $QTROOT/bin/qmake && make)
-    
+
+   # continue build only if make was successful
+    if [ $? -ne "0" ]; then
+        exit
+    fi
+
     # create tar package
-    echo "creating install package..."
-    (cd src; tar cvzf ../irods-jyu-client-$VERSION-linux-$OSRELEASE.tar.gz irodsclient schema.xml)
+    echo "creating rpmbuild dist tarball package..."
+    (cd src; tar cvzf ../kanki-irodsclient-$VERSION-linux-$OSRELEASE.tar.gz irodsclient schema.xml)
 fi
