@@ -7,7 +7,7 @@ The software is implemented in C++ and builds currently against irods-4.1.x on L
 Building from source
 --------------------
 
-The following instructions should work on CentOS/RHEL 6 and 7 and probably on Fedora as well. Unbuntu goes similarly (TODO).
+The following instructions should work on CentOS/RHEL 6 and 7 and probably on Fedora as well.
 
     yum -y groupinstall "Development Tools"
     yum -y install epel-release
@@ -23,9 +23,17 @@ The following instructions should work on CentOS/RHEL 6 and 7 and probably on Fe
     yum -y install ftp://ftp.renci.org/pub/irods/releases/4.1.5/centos7/irods-icommands-4.1.5-centos7-x86_64.rpm
     yum -y install ftp://ftp.renci.org/pub/irods/releases/4.1.5/centos7/irods-dev-4.1.5-centos7-x86_64.rpm
 
+On Ubuntu 14.04 and up you can install build depedencies with (thanks to Paul van Schayck for this information!)
+
+   sudo apt-get install qt5-qmake qtbase5-dev libqt5svg5-dev libcurl4-nss-dev qt5-default
+
+Building the application is done simply via
+
     git clone https://github.com/ilarik/kanki-irodsclient.git
     cd kanki-irodsclient
-    ./build.sh
+    ./build.sh [ -q /usr/lib/x86_64-linux-gnu/qt5 for Ubuntu!]
+
+You can install the binary and config into place by running
 
     sudo install ./src/irodsclient /usr/bin
     sudo install -D -m 644 ./src/schema.xml /etc/irods/schema.xml
