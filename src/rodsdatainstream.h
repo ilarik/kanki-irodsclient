@@ -36,7 +36,7 @@ public:
     int openDataObj();
 
     //
-    int initGetOpr();
+    int getOprInit();
 
     // Interface for reading from the iRODS data stream to buffer at bufPtr
     // for a block of len bytes.
@@ -46,7 +46,7 @@ public:
     int readAdaptive(void *bufPtr, size_t maxLen);
 
     //
-    void getOprDone();
+    void getOprEnd();
 
     //
     const std::string& checksumStr() const;
@@ -60,20 +60,28 @@ private:
     RodsDataInStream(RodsDataInStream &);
     RodsDataInStream& operator=(RodsDataInStream &);
 
-    //
+    // read only to internal buffer
     int read(size_t len);
 
     // managed pointer to a Kanki object entry
     RodsObjEntryPtr entPtr;
 
-    //
+    // data object checksum from rods
     std::string objChecksum;
 
-    // testing adaptive read size tuning algorithm
+    // adaptive read size parameter
     size_t adaptiveSize;
+
+    //
     std::vector<std::chrono::milliseconds> dt_;
+
+    //
     std::vector<size_t> bytes_;
+
+    //
     std::vector<long int> speed_;
+
+    //
     std::vector<long int> diff_;
 };
 

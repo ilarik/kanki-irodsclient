@@ -46,7 +46,7 @@ int RodsDataInStream::openDataObj()
     return (openResult);
 }
 
-int RodsDataInStream::initGetOpr()
+int RodsDataInStream::getOprInit()
 {
     dataObjInp_t getParam;
     bytesBuf_t getBuffer;
@@ -150,21 +150,21 @@ int RodsDataInStream::readAdaptive(void *bufPtr, size_t maxLen)
         this->diff_.push_back(diff);
     }
 
-    // we store previous time points
+    // we store previous transaction data
     this->dt_.push_back(dt);
     this->bytes_.push_back(readResult);
     this->speed_.push_back(speed);
 
+    // and keep only n previous data points
     if (this->dt_.size() > __KANKI_ADAPTIVE_INT && this->bytes_.size() > __KANKI_ADAPTIVE_INT)
     {
         this->dt_.erase(this->dt_.begin());
         this->bytes_.erase(this->bytes_.begin());
         this->speed_.erase(this->speed_.begin());
-
         this->diff_.erase(this->diff_.begin());
     }
 
-    // compute moving average for time window
+    // compute moving average of diffs for the 'time window'
     double avg = 0;
 
     for (unsigned int i = 0; i < this->diff_.size(); i++)
@@ -177,9 +177,6 @@ int RodsDataInStream::readAdaptive(void *bufPtr, size_t maxLen)
     {
         if (this->adaptiveSize + __KANKI_BUFSIZE_INCR < maxLen)
             this->adaptiveSize += __KANKI_BUFSIZE_INCR;
-
-        std::cout << __FUNCTION__ << ": increasing read request size to "
-                  << this->adaptiveSize << std::endl << std::flush;
     }
 
     // on a very negative average, we decrease the transfer size parameter
@@ -187,22 +184,12 @@ int RodsDataInStream::readAdaptive(void *bufPtr, size_t maxLen)
     {
         if (this->adaptiveSize > __KANKI_BUFSIZE_INCR)
             this->adaptiveSize -= __KANKI_BUFSIZE_INCR;
-
-        std::cout << __FUNCTION__ << ": decreased read request size to "
-                  << this->adaptiveSize << std::endl << std::flush;
     }
-
-    else
-        std::cout << __FUNCTION__ << ": keeping read request size steady at "
-                  << this->adaptiveSize << std::endl << std::flush;
-
-    std::cout << __FUNCTION__ << ": current read size is "
-              << readResult << " bytes" << std::endl << std::endl << std::flush;
 
     return (readResult);
 }
 
-void RodsDataInStream::getOprDone()
+void RodsDataInStream::getOprEnd()
 {
     // complete client rods api get request
     rcOprComplete(this->connPtr->commPtr(), this->rodsL1Inx);
