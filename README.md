@@ -25,7 +25,8 @@ The following instructions should work on CentOS/RHEL 6 and 7 and probably on Fe
 
 On Ubuntu 14.04 and up you can install build depedencies with (thanks to Paul van Schayck for this information!)
 
-   sudo apt-get install qt5-qmake qtbase5-dev libqt5svg5-dev libcurl4-nss-dev qt5-default
+    # for Ubuntu 14.04 LTS and upwards
+    sudo apt-get install qt5-qmake qtbase5-dev libqt5svg5-dev libcurl4-nss-dev qt5-default
 
 Building the application is done simply via
 
