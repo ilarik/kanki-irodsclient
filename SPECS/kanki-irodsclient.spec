@@ -1,5 +1,5 @@
 Name:		kanki-irodsclient
-Version:	1.0.3
+Version:	1.0.4
 Release:	1.el6
 Summary:	Kanki iRODS GUI Client 
 
