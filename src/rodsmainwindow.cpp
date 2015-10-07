@@ -455,10 +455,9 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
 
     if (uploadDirectory)
         uploadWorker = new RodsUploadThread(this->conn, fileNames.at(0).toStdString(),
-                                            destCollPath, this->getCurrentRodsObjIndex());
+                                            destCollPath);
     else
-        uploadWorker = new RodsUploadThread(this->conn, fileNames,
-                                            destCollPath, this->getCurrentRodsObjIndex());
+        uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath);
 
     QString title = QString("Uploading to '") + destCollPath.c_str() + "'";
     RodsTransferWindow *transferWindow = new RodsTransferWindow(title);
@@ -474,8 +473,8 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
     // error reporting signal connects to a main window slot
     connect(uploadWorker, &RodsUploadThread::reportError, this,
             &RodsMainWindow::doErrorMsg);
-    connect(uploadWorker, &RodsUploadThread::refreshObjectModel, this,
-            &RodsMainWindow::doRefreshTreeView);
+    connect(uploadWorker, &RodsUploadThread::refreshObjectModel, this->model,
+            &RodsObjTreeModel::refreshAtPath);
 
     // connect thread finished signal to Qt object deletion mechanisms
     connect(uploadWorker, &RodsUploadThread::finished, &QObject::deleteLater);
@@ -518,15 +517,15 @@ void RodsMainWindow::doRefreshTreeView(QModelIndex atIndex)
     {
         // if a collection was selected, refresh it
         if (selection->getObjEntryPtr()->objType == COLL_OBJ_T)
-            model->refreshChildren(curIndex);
+            model->refreshAtIndex(curIndex);
 
         // if a data object was selected, refresh parent collection
         else if (selection->getObjEntryPtr()->objType == DATA_OBJ_T)
-            model->refreshChildren(model->parent(curIndex));
+            model->refreshAtIndex(model->parent(curIndex));
     }
 
     else
-        model->refreshChildren(curIndex);
+        model->refreshAtIndex(curIndex);
 }
 
 void RodsMainWindow::doRodsConnect()

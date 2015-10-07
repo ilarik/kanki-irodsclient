@@ -15,23 +15,21 @@
 #include "rodsuploadthread.h"
 
 RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths,
-                                   std::string destColl,  const QModelIndex &refresh)
+                                   std::string destColl)
     : QThread()
 {
     this->conn = new Kanki::RodsConnection(theConn);
     this->filePathList = filePaths;
     this->destCollPath = destColl;
-    this->refreshIndex = refresh;
 }
 
 RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath,
-                                   std::string destColl, const QModelIndex &refresh)
+                                   std::string destColl)
     : QThread()
 {
     this->conn = new Kanki::RodsConnection(theConn);
     this->basePath = baseDirPath;
     this->destCollPath = destColl;
-    this->refreshIndex = refresh;
 }
 
 void RodsUploadThread::run()
@@ -46,13 +44,13 @@ void RodsUploadThread::run()
     // open a parallel connection for the transfer and authenticate
     if ((status = this->conn->connect()) < 0)
     {
-        reportError("Download failed", "Open parallel connection failed", status);
+        reportError("Upload failed", "Open parallel connection failed", status);
         return;
     }
 
     else if ((status = this->conn->login()) < 0)
     {
-        reportError("Download failed", "Authentication failed", status);
+        reportError("Upload failed", "Authentication failed", status);
         return;
     }
 
@@ -127,7 +125,7 @@ void RodsUploadThread::run()
     delete(this->conn);
 
     // signal out a request for ui to refresh itself
-    refreshObjectModel(this->refreshIndex);
+    refreshObjectModel(QString(this->destCollPath.c_str()));
 }
 
 void RodsUploadThread::makeBillOfMaterials(const QString &dirPath, QStringList *filePaths)
