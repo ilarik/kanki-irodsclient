@@ -211,7 +211,7 @@ void RodsMainWindow::enterDisconnectedState()
 void RodsMainWindow::unregisterMetadataWindow(std::string objPath)
 {
     // try to find metadata editor instance
-    std::map<std::string, RodsMetadataWindow*>:: iterator i = this->metaEditors.find(objPath);
+    std::map<std::string, RodsMetadataWindow*>::iterator i = this->metaEditors.find(objPath);
 
     // if found, unregister it
     if (i != this->metaEditors.end())

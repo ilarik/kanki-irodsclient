@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 
-//
+// boost library headers
 #include "boost/tokenizer.hpp"
 
 // Qt framework headers
