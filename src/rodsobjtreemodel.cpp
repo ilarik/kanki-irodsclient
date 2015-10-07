@@ -422,8 +422,6 @@ void RodsObjTreeModel::refreshAtIndex(QModelIndex parent)
     }
 
     else {
-        std::cout << __FUNCTION__ << ": refreshing at '" << collPath << "'" << std::endl << std::flush;
-
         // if there is something to insert
         if (rodsColl->size())
         {
@@ -459,6 +457,7 @@ void RodsObjTreeModel::refreshAtPath(QString path)
     boost::char_separator<char> separator("/");
     boost::tokenizer< boost::char_separator<char> > tokens(pathStr, separator);
 
+    // iterate path tokens to find item
     for (boost::tokenizer< boost::char_separator<char> >::iterator iter = tokens.begin();
          iter != tokens.end(); iter++)
     {
@@ -469,6 +468,7 @@ void RodsObjTreeModel::refreshAtPath(QString path)
             RodsObjTreeItem *childItem = curItem->child(i);
             Kanki::RodsObjEntryPtr objEntry = childItem->getObjEntryPtr();
 
+            // if we found an item matching path token, we break from loop
             if (!objEntry || (objEntry->objType == COLL_OBJ_T && !objEntry->objName.compare(curPath)))
             {
                 curItem = childItem;
@@ -479,9 +479,11 @@ void RodsObjTreeModel::refreshAtPath(QString path)
         }
     }
 
+    // if item is a proper item and its path matches, refresh it
     if (curItem->getObjEntryPtr() && !curItem->getObjEntryPtr()->getObjectFullPath().compare(path.toStdString()))
         this->refreshAtIndex(curIndex);
 
+    // if item is a mount point and its mount path matches, also refresh
     else if (!curItem->mountPoint().compare(path.toStdString()))
         this->refreshAtIndex(curIndex);
 }
