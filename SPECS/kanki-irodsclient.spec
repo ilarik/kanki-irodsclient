@@ -1,5 +1,5 @@
 Name:		kanki-irodsclient
-Version:	1.0.4
+Version:	1.0.5
 Release:	1.el6
 Summary:	Kanki iRODS GUI Client 
 
@@ -42,7 +42,15 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %attr(755, root, root) /usr/bin/irodsclient
 %attr(644, root, root) /etc/irods/schema.xml
+%attr(644, root, root) /usr/share/applications/irodsclient.desktop
+%attr(644, root, root) /usr/share/icons/hicolor/128x128/apps/irodsclient.png
 
 %changelog
+* Wed Oct 07 2015 Ilari Korhonen <ilari.korhonen@jyu.fi>
+* version 1.0.5 - refresh related bug fixes 
+
+* Tue Sep 29 2015 Ilari Korhonen <ilari.korhonen@jyu.fi>
+* version 1.0.4 - improved download + bug fixes
+
 * Fri Sep 18 2015 Ilari Korhonen <ilari.korhonen@jyu.fi>
 * initial rpm release version 1.0.3

@@ -14,12 +14,19 @@
 #ifndef RODSDATASTREAM_H
 #define RODSDATASTREAM_H
 
+// C++ standard library headers
 #include <cstdlib>
 
+// Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
 
+// initial I/O request/buffer size
 #define __KANKI_BUFSIZE_INIT    262144
+
+// increment size for I/O request scaling
 #define __KANKI_BUFSIZE_INCR    1048576
+
+// maximum I/O request/buffer size
 #define __KANKI_BUFSIZE_MAX     33554432
 
 namespace Kanki {

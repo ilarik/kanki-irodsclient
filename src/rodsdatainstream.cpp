@@ -173,14 +173,14 @@ int RodsDataInStream::readAdaptive(void *bufPtr, size_t maxLen)
     avg /= this->diff_.size();
 
     // of our moving average is at all positive, we increase adaptive read size
-    if ((avg > 0) && (abs(avg) > 1.0e3))
+    if ((avg > 0) && (std::abs(avg) > 1.0e3))
     {
         if (this->adaptiveSize + __KANKI_BUFSIZE_INCR < maxLen)
             this->adaptiveSize += __KANKI_BUFSIZE_INCR;
     }
 
     // on a very negative average, we decrease the transfer size parameter
-    if ((avg < 0) && (abs(avg) > 1.0e6))
+    if ((avg < 0) && (std::abs(avg) > 1.0e6))
     {
         if (this->adaptiveSize > __KANKI_BUFSIZE_INCR)
             this->adaptiveSize -= __KANKI_BUFSIZE_INCR;

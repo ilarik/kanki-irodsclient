@@ -14,12 +14,15 @@
 #ifndef RODSDATAINSTREAM_H
 #define RODSDATAINSTREAM_H
 
+// C++ standard library headers
 #include <chrono>
 
+// Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
 #include "rodsobjentry.h"
 #include "rodsdatastream.h"
 
+// interval of last I/O operations to keep track of (adaptive)
 #define __KANKI_ADAPTIVE_INT    10
 
 namespace Kanki {

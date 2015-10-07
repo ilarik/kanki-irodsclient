@@ -102,7 +102,7 @@ bool RodsObjTreeModel::setData(const QModelIndex &index, const QVariant &value, 
 
                 // for collection items children must be refreshed!
                 if (item->childCount())
-                    this->refreshChildren(index);
+                    this->refreshAtIndex(index);
 
                 return (true);
             }
@@ -323,7 +323,7 @@ void RodsObjTreeModel::fetchMore(const QModelIndex &parent)
     QApplication::processEvents();
 
     // refresh children
-    this->refreshChildren(parent);
+    this->refreshAtIndex(parent);
 
     QApplication::restoreOverrideCursor();
 }
@@ -361,7 +361,7 @@ bool RodsObjTreeModel::removeRows(int row, int count, const QModelIndex &parent)
     return (false);
 }
 
-void RodsObjTreeModel::refreshChildren(const QModelIndex &parent)
+void RodsObjTreeModel::refreshAtIndex(QModelIndex parent)
 {
     if (!parent.isValid())
         return;
@@ -411,7 +411,8 @@ void RodsObjTreeModel::refreshChildren(const QModelIndex &parent)
     {
         // report error via a message box
         QMessageBox errMsg;
-        QString errStr = "Unrecoverable iRODS API error in rods object model refresh: " + QVariant(status).toString() + ", exiting!";
+        QString errStr = "Unrecoverable iRODS API error in rods object model refresh: ";
+        errStr += QVariant(status).toString() + ", exiting!";
 
         errMsg.setText(errStr);
         errMsg.setIcon(QMessageBox::Critical);
@@ -448,13 +449,53 @@ void RodsObjTreeModel::refreshChildren(const QModelIndex &parent)
     delete rodsColl;
 }
 
+void RodsObjTreeModel::refreshAtPath(QString path)
+{
+    QModelIndex curIndex;
+    RodsObjTreeItem *curItem = this->rootItem;
+    std::string curPath, pathStr = path.toStdString();
+    boost::char_separator<char> separator("/");
+    boost::tokenizer< boost::char_separator<char> > tokens(pathStr, separator);
+
+    // iterate path tokens to find item
+    for (boost::tokenizer< boost::char_separator<char> >::iterator iter = tokens.begin();
+         iter != tokens.end(); iter++)
+    {
+        curPath += "/" + *iter;
+
+        for (int i = 0; i < curItem->childCount(); i++)
+        {
+            RodsObjTreeItem *childItem = curItem->child(i);
+            Kanki::RodsObjEntryPtr objEntry = childItem->getObjEntryPtr();
+
+            // if we found an item matching path token, we break from loop
+            if (!objEntry || (objEntry->objType == COLL_OBJ_T && !objEntry->objName.compare(curPath)))
+            {
+                curItem = childItem;
+                curIndex = this->index(i, 0, curIndex);
+
+                break;
+            }
+        }
+    }
+
+    // if item is a proper item and its path matches, refresh it
+    if (curItem->getObjEntryPtr() && !curItem->getObjEntryPtr()->getObjectFullPath().compare(path.toStdString()))
+        this->refreshAtIndex(curIndex);
+
+    // if item is a mount point and its mount path matches, also refresh
+    else if (!curItem->mountPoint().compare(path.toStdString()))
+        this->refreshAtIndex(curIndex);
+}
+
 Qt::DropActions RodsObjTreeModel::supportedDropActions() const
 {
     // we support copy and move actions
     return (Qt::CopyAction | Qt::MoveAction);
 }
 
-bool RodsObjTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+bool RodsObjTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
+                                    int row, int column, const QModelIndex &parent)
 {
     (void)data;
     (void)action;
@@ -466,7 +507,8 @@ bool RodsObjTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action
     return (false);
 }
 
-bool RodsObjTreeModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) const
+bool RodsObjTreeModel::canDropMimeData(const QMimeData *data, Qt::DropAction action,
+                                       int row, int column, const QModelIndex &parent) const
 {
     (void)data;
     (void)action;

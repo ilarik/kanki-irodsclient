@@ -155,15 +155,17 @@ void RodsMainWindow::enterConnectedState()
     // instantiate new model for new connection
     this->model = new RodsObjTreeModel(this->conn, this->conn->rodsHome());
 
-    if (this->model)
-    {
-        this->ui->rodsObjTree->setModel(this->model);
-        this->ui->rodsObjTree->expand(this->model->index(0, 0, QModelIndex()));
+    // connect to model refresh interface slot
+    connect(this, &RodsMainWindow::refreshObjectModelAtIndex, this->model,
+            &RodsObjTreeModel::refreshAtIndex);
 
-        // resize columns after tree view data has been initialized
-        for (int i = 0; i < this->model->columnCount(QModelIndex()); i++)
-            this->ui->rodsObjTree->resizeColumnToContents(i);
-    }
+    // setup model with tree view and expand first item
+    this->ui->rodsObjTree->setModel(this->model);
+    this->ui->rodsObjTree->expand(this->model->index(0, 0, QModelIndex()));
+
+    // resize columns after tree view data has been initialized
+    for (int i = 0; i < this->model->columnCount(QModelIndex()); i++)
+        this->ui->rodsObjTree->resizeColumnToContents(i);
 
     this->ui->actionConnect->setDisabled(true);
     this->ui->actionDisconnect->setDisabled(false);
@@ -209,7 +211,7 @@ void RodsMainWindow::enterDisconnectedState()
 void RodsMainWindow::unregisterMetadataWindow(std::string objPath)
 {
     // try to find metadata editor instance
-    std::map<std::string, RodsMetadataWindow*>:: iterator i = this->metaEditors.find(objPath);
+    std::map<std::string, RodsMetadataWindow*>::iterator i = this->metaEditors.find(objPath);
 
     // if found, unregister it
     if (i != this->metaEditors.end())
@@ -455,10 +457,9 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
 
     if (uploadDirectory)
         uploadWorker = new RodsUploadThread(this->conn, fileNames.at(0).toStdString(),
-                                            destCollPath, this->getCurrentRodsObjIndex());
+                                            destCollPath);
     else
-        uploadWorker = new RodsUploadThread(this->conn, fileNames,
-                                            destCollPath, this->getCurrentRodsObjIndex());
+        uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath);
 
     QString title = QString("Uploading to '") + destCollPath.c_str() + "'";
     RodsTransferWindow *transferWindow = new RodsTransferWindow(title);
@@ -474,8 +475,8 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
     // error reporting signal connects to a main window slot
     connect(uploadWorker, &RodsUploadThread::reportError, this,
             &RodsMainWindow::doErrorMsg);
-    connect(uploadWorker, &RodsUploadThread::refreshObjectModel, this,
-            &RodsMainWindow::doRefreshTreeView);
+    connect(uploadWorker, &RodsUploadThread::refreshObjectModel, this->model,
+            &RodsObjTreeModel::refreshAtPath);
 
     // connect thread finished signal to Qt object deletion mechanisms
     connect(uploadWorker, &RodsUploadThread::finished, &QObject::deleteLater);
@@ -504,11 +505,9 @@ void RodsMainWindow::doRefreshTreeView(QModelIndex atIndex)
     if (!curIndex.isValid())
         curIndex = this->ui->rodsObjTree->currentIndex();
 
-    RodsObjTreeModel *model = static_cast<RodsObjTreeModel*>(this->ui->rodsObjTree->model());
-
     // if no valid index (no selection), assume initial mount point
     if (!curIndex.isValid())
-        curIndex = model->index(0, 0, QModelIndex());
+        curIndex = this->model->index(0, 0, QModelIndex());
 
     // get object pointers for selected item and tree view model
     RodsObjTreeItem *selection = static_cast<RodsObjTreeItem*>(curIndex.internalPointer());
@@ -518,15 +517,15 @@ void RodsMainWindow::doRefreshTreeView(QModelIndex atIndex)
     {
         // if a collection was selected, refresh it
         if (selection->getObjEntryPtr()->objType == COLL_OBJ_T)
-            model->refreshChildren(curIndex);
+            this->refreshObjectModelAtIndex(curIndex);
 
         // if a data object was selected, refresh parent collection
         else if (selection->getObjEntryPtr()->objType == DATA_OBJ_T)
-            model->refreshChildren(model->parent(curIndex));
+            this->refreshObjectModelAtIndex(this->model->parent(curIndex));
     }
 
     else
-        model->refreshChildren(curIndex);
+        this->refreshObjectModelAtIndex(curIndex);
 }
 
 void RodsMainWindow::doRodsConnect()

@@ -14,6 +14,7 @@
 #ifndef RODSDATAOUTSTREAM_H
 #define RODSDATAOUTSTREAM_H
 
+// Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
 #include "rodsdatastream.h"
 
