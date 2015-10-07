@@ -195,6 +195,11 @@ private slots:
     // qt slot which connects to upload directory triggered signal
     void on_actionUploadDirectory_triggered();
 
+signals:
+
+    // private signal for requesting object model refresh
+    void refreshObjectModelAtIndex(QModelIndex index);
+
 private:
 
     // gets the current user selected rods path from the gui

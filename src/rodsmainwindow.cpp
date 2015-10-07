@@ -155,15 +155,17 @@ void RodsMainWindow::enterConnectedState()
     // instantiate new model for new connection
     this->model = new RodsObjTreeModel(this->conn, this->conn->rodsHome());
 
-    if (this->model)
-    {
-        this->ui->rodsObjTree->setModel(this->model);
-        this->ui->rodsObjTree->expand(this->model->index(0, 0, QModelIndex()));
+    // connect to model refresh interface slot
+    connect(this, &RodsMainWindow::refreshObjectModelAtIndex, this->model,
+            &RodsObjTreeModel::refreshAtIndex);
 
-        // resize columns after tree view data has been initialized
-        for (int i = 0; i < this->model->columnCount(QModelIndex()); i++)
-            this->ui->rodsObjTree->resizeColumnToContents(i);
-    }
+    // setup model with tree view and expand first item
+    this->ui->rodsObjTree->setModel(this->model);
+    this->ui->rodsObjTree->expand(this->model->index(0, 0, QModelIndex()));
+
+    // resize columns after tree view data has been initialized
+    for (int i = 0; i < this->model->columnCount(QModelIndex()); i++)
+        this->ui->rodsObjTree->resizeColumnToContents(i);
 
     this->ui->actionConnect->setDisabled(true);
     this->ui->actionDisconnect->setDisabled(false);
@@ -503,11 +505,9 @@ void RodsMainWindow::doRefreshTreeView(QModelIndex atIndex)
     if (!curIndex.isValid())
         curIndex = this->ui->rodsObjTree->currentIndex();
 
-    RodsObjTreeModel *model = static_cast<RodsObjTreeModel*>(this->ui->rodsObjTree->model());
-
     // if no valid index (no selection), assume initial mount point
     if (!curIndex.isValid())
-        curIndex = model->index(0, 0, QModelIndex());
+        curIndex = this->model->index(0, 0, QModelIndex());
 
     // get object pointers for selected item and tree view model
     RodsObjTreeItem *selection = static_cast<RodsObjTreeItem*>(curIndex.internalPointer());
@@ -517,15 +517,15 @@ void RodsMainWindow::doRefreshTreeView(QModelIndex atIndex)
     {
         // if a collection was selected, refresh it
         if (selection->getObjEntryPtr()->objType == COLL_OBJ_T)
-            model->refreshAtIndex(curIndex);
+            this->refreshObjectModelAtIndex(curIndex);
 
         // if a data object was selected, refresh parent collection
         else if (selection->getObjEntryPtr()->objType == DATA_OBJ_T)
-            model->refreshAtIndex(model->parent(curIndex));
+            this->refreshObjectModelAtIndex(this->model->parent(curIndex));
     }
 
     else
-        model->refreshAtIndex(curIndex);
+        this->refreshObjectModelAtIndex(curIndex);
 }
 
 void RodsMainWindow::doRodsConnect()

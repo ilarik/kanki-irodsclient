@@ -112,7 +112,7 @@ public:
 public slots:
 
     // Interface for requesting the model to refresh at a certain index.
-    void refreshAtIndex(const QModelIndex &parent);
+    void refreshAtIndex(QModelIndex parent);
 
     // Qt slot for refreshing a rods collection in the object model at given path.
     void refreshAtPath(QString path);

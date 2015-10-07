@@ -361,7 +361,7 @@ bool RodsObjTreeModel::removeRows(int row, int count, const QModelIndex &parent)
     return (false);
 }
 
-void RodsObjTreeModel::refreshAtIndex(const QModelIndex &parent)
+void RodsObjTreeModel::refreshAtIndex(QModelIndex parent)
 {
     if (!parent.isValid())
         return;
