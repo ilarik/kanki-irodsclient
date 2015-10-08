@@ -90,6 +90,10 @@ public:
     // copy of the rods api provided C string.
     std::string rodsZone() const;
 
+    // Interface for querying the iRODS default resource of the user, provides a C++ std string
+    // copy of the rods api provided C string.
+    std::string rodsDefResc() const;
+
     // Interface for querying the last rods api provided error message, provides a C++ std string
     // copy of the rods api provided C string.
     std::string lastErrorMsg() const;

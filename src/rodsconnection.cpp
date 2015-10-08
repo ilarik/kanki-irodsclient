@@ -175,6 +175,11 @@ std::string RodsConnection::rodsZone() const
     return std::string(this->rodsUserEnv.rodsZone);
 }
 
+std::string RodsConnection::rodsDefResc() const
+{
+    return std::string(this->rodsUserEnv.rodsDefResource);
+}
+
 std::string RodsConnection::lastErrorMsg() const
 {
     return std::string(this->lastErrMsg.msg);
