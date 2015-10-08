@@ -167,6 +167,8 @@ void RodsMainWindow::enterConnectedState()
     for (int i = 0; i < this->model->columnCount(QModelIndex()); i++)
         this->ui->rodsObjTree->resizeColumnToContents(i);
 
+    this->refreshResources();
+
     this->ui->actionConnect->setDisabled(true);
     this->ui->actionDisconnect->setDisabled(false);
     this->ui->actionMetadata->setDisabled(false);
@@ -180,6 +182,9 @@ void RodsMainWindow::enterConnectedState()
     this->ui->actionDownload->setDisabled(false);
     this->ui->rodsObjTree->setDisabled(false);
     this->ui->viewSize->setDisabled(false);
+    this->ui->verifyChecksum->setDisabled(false);
+    this->ui->allowOverwrite->setDisabled(false);
+    this->ui->storageResc->setDisabled(false);
 }
 
 void RodsMainWindow::enterDisconnectedState()
@@ -201,6 +206,11 @@ void RodsMainWindow::enterDisconnectedState()
     this->ui->actionUpload->setDisabled(true);
     this->ui->actionUploadDirectory->setDisabled(true);
     this->ui->actionDownload->setDisabled(true);
+
+    // disable settings controls
+    this->ui->verifyChecksum->setDisabled(true);
+    this->ui->allowOverwrite->setDisabled(true);
+    this->ui->storageResc->setDisabled(true);
 
     // display disconnected message
     this->ui->statusBar->showMessage("Disconnected", 5000);
@@ -766,6 +776,49 @@ void RodsMainWindow::showAbout()
 {
     QMessageBox::about(this, "About Kanki irodsclient",
                        QString("Version: " VERSION) + QString("\n\n") + QString(LICENSE));
+}
+
+void RodsMainWindow::refreshResources()
+{
+    int status = 0;
+
+    // sanity checks for a ready connection
+    if (!this->conn || !this->conn->isReady())
+        return;
+
+    Kanki::RodsGenQuery rescQuery(this->conn);
+    rescQuery.addQueryAttribute(COL_R_RESC_NAME);
+    rescQuery.addQueryAttribute(COL_R_RESC_COMMENT);
+
+    if ((status = rescQuery.execute()) < 0)
+        this->doErrorMsg("Error while refreshing available iRODS storage resources",
+                         "iRODS GenQuery error", status);
+
+    else {
+        std::vector<std::string> resources = rescQuery.getResultSetForAttr(COL_R_RESC_NAME);
+        std::vector<std::string> comments = rescQuery.getResultSetForAttr(COL_R_RESC_COMMENT);
+
+        for (unsigned int i = 0; i < resources.size() && i < comments.size(); i ++)
+        {
+            QString rescStr = resources.at(i).c_str();
+            QString rescDesc = rescStr;
+
+            if (comments.at(i).length())
+            {
+                rescDesc += " (";
+
+                if (comments.at(i).length() > 32)
+                    rescDesc += comments.at(i).substr(0,31).c_str() + QString("...");
+
+                else
+                    rescDesc += comments.at(i).c_str();
+
+                rescDesc += QString(")");
+            }
+
+            this->ui->storageResc->addItem(rescDesc, rescStr);
+        }
+    }
 }
 
 void RodsMainWindow::on_actionConnect_triggered()

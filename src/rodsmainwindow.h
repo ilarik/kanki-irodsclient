@@ -41,6 +41,7 @@
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
 #include "rodsobjentry.h"
+#include "_rodsgenquery.h"
 
 // application headers
 #include "rodsmetadatawindow.h"
@@ -148,6 +149,9 @@ public slots:
     // Qt slot for showing an about dialog
     void showAbout();
 
+    // Qt slot for refreshing available storage resources from the iRODS grid.
+    void refreshResources();
+
 private slots:
 
     // qt slot which connects to connect action triggered signal
@@ -228,6 +232,9 @@ private:
 
     // settings from the gui
     bool verifyChecksum, allowOverwrite;
+
+    // current selected resource
+    std::string currentResc;
 };
 
 #endif // RODSMAINWINDOW_H
