@@ -199,6 +199,9 @@ private slots:
     // qt slot which connects to upload directory triggered signal
     void on_actionUploadDirectory_triggered();
 
+    //
+    void on_storageResc_activated(const QString &arg1);
+
 signals:
 
     // private signal for requesting object model refresh

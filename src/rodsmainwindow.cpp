@@ -786,14 +786,19 @@ void RodsMainWindow::refreshResources()
     if (!this->conn || !this->conn->isReady())
         return;
 
+    std::string defResc = this->conn->rodsDefResc();
+
+    // setup a genquery for resource names and comments
     Kanki::RodsGenQuery rescQuery(this->conn);
     rescQuery.addQueryAttribute(COL_R_RESC_NAME);
     rescQuery.addQueryAttribute(COL_R_RESC_COMMENT);
 
+    // try to execute genquery
     if ((status = rescQuery.execute()) < 0)
         this->doErrorMsg("Error while refreshing available iRODS storage resources",
                          "iRODS GenQuery error", status);
 
+    // on success, add found resources with their comments to the combo box
     else {
         std::vector<std::string> resources = rescQuery.getResultSetForAttr(COL_R_RESC_NAME);
         std::vector<std::string> comments = rescQuery.getResultSetForAttr(COL_R_RESC_COMMENT);
@@ -803,6 +808,7 @@ void RodsMainWindow::refreshResources()
             QString rescStr = resources.at(i).c_str();
             QString rescDesc = rescStr;
 
+            // add comment if there is one and truncate long ones
             if (comments.at(i).length())
             {
                 rescDesc += " (";
@@ -816,7 +822,11 @@ void RodsMainWindow::refreshResources()
                 rescDesc += QString(")");
             }
 
+            // add new item and select it if it's the user default
             this->ui->storageResc->addItem(rescDesc, rescStr);
+
+            if (!defResc.compare(resources.at(i)))
+                this->ui->storageResc->setCurrentIndex(i);
         }
     }
 }
@@ -894,4 +904,14 @@ void RodsMainWindow::on_actionAbout_triggered()
 void RodsMainWindow::on_actionUploadDirectory_triggered()
 {
     this->doUpload(true);
+}
+
+void RodsMainWindow::on_storageResc_activated(const QString &arg1)
+{
+    (void)arg1;
+
+    QString rescStr = this->ui->storageResc->currentData().toString();
+
+    if (rescStr.length())
+        this->currentResc = rescStr.toStdString();
 }
