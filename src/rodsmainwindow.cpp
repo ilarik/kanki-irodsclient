@@ -912,6 +912,7 @@ void RodsMainWindow::on_storageResc_activated(const QString &arg1)
 {
     (void)arg1;
 
+    // fetch resource name and if valid, set it as current resc
     QString rescStr = this->ui->storageResc->currentData().toString();
 
     if (rescStr.length())

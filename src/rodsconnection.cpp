@@ -336,8 +336,8 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
 
 int RodsConnection::putFile(const std::string &localPath, const std::string &objPath, unsigned int numThreads)
 {
+    // do put file to user default resource
     std::string defResc = this->rodsDefResc();
-
     return (this->putFile(localPath, objPath, defResc, numThreads));
 }
 
