@@ -289,7 +289,8 @@ int RodsConnection::removeColl(const std::string &collPath)
     return (status);
 }
 
-int RodsConnection::putFile(const std::string &localPath, const std::string &objPath, unsigned int numThreads)
+int RodsConnection::putFile(const std::string &localPath, const std::string &objPath, const std::string &rodsResc,
+                            unsigned int numThreads)
 {
     dataObjInp_t putParam;
     char filePath[MAX_NAME_LEN];
@@ -318,6 +319,9 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
     // for now, we use the generic data type
     addKeyVal(&putParam.condInput, DATA_TYPE_KW, "generic");
 
+    // target storage resource
+    addKeyVal(&putParam.condInput, DEST_RESC_NAME_KW, rodsResc.c_str());
+
     // take copy of the local file path for the rods api
     strcpy(filePath, localPath.c_str());
 
@@ -328,6 +332,13 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
 
     // return rods api status
     return (status);
+}
+
+int RodsConnection::putFile(const std::string &localPath, const std::string &objPath, unsigned int numThreads)
+{
+    std::string defResc = this->rodsDefResc();
+
+    return (this->putFile(localPath, objPath, defResc, numThreads));
 }
 
 int RodsConnection::removeObj(const std::string &objPath)
