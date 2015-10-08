@@ -90,6 +90,10 @@ public:
     // copy of the rods api provided C string.
     std::string rodsZone() const;
 
+    // Interface for querying the iRODS default resource of the user, provides a C++ std string
+    // copy of the rods api provided C string.
+    std::string rodsDefResc() const;
+
     // Interface for querying the last rods api provided error message, provides a C++ std string
     // copy of the rods api provided C string.
     std::string lastErrorMsg() const;
@@ -115,8 +119,12 @@ public:
     // Removes an iRODS collection at specified path recursively.
     int removeColl(const std::string &collPath);
 
-    // Puts a local file at localPath into iRODS as a data object at objPath,
+    // Puts a local file at localPath into iRODS as a data object at objPath to resource rodsResc
     // optionally using multithreaded iRODS transfer mode, defaults to one transfer thread.
+    int putFile(const std::string &localPath, const std::string &objPath, const std::string &rodsResc,
+                unsigned int numThreads = 1);
+
+    // Puts a local file at localPAth into iRODS at objPath to the default resc
     int putFile(const std::string &localPath, const std::string &objPath, unsigned int numThreads = 1);
 
     // Gets an iRODS data object at objPath into a file located at localPath, optionally verifies
