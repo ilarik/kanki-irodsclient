@@ -38,12 +38,12 @@ public:
     // Constructor initializes the upload worker thread and sets its parameters for execution,
     // requires a rods conn pointer, file paths list and dest coll path.
     RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths,
-                     std::string destColl);
+                     std::string destColl, std::string rodsResc);
 
     // Constructor initializes the upload worker thread and sets its parameters for execution,
     // requires a rods conn pointer, base path for recursive upload and dest coll path.
     RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath,
-                     std::string destColl);
+                     std::string destColl, std::string rodsResc);
 
 signals:
 
@@ -84,6 +84,6 @@ private:
     QStringList filePathList;
 
     // destination rods collection path
-    std::string destCollPath, basePath;
+    std::string destCollPath, basePath, targetResc;
 };
 #endif // RODSUPLODADTHREAD_H

@@ -467,9 +467,10 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
 
     if (uploadDirectory)
         uploadWorker = new RodsUploadThread(this->conn, fileNames.at(0).toStdString(),
-                                            destCollPath);
+                                            destCollPath, this->currentResc);
     else
-        uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath);
+        uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath,
+                                            this->currentResc);
 
     QString title = QString("Uploading to '") + destCollPath.c_str() + "'";
     RodsTransferWindow *transferWindow = new RodsTransferWindow(title);
@@ -787,6 +788,7 @@ void RodsMainWindow::refreshResources()
         return;
 
     std::string defResc = this->conn->rodsDefResc();
+    this->currentResc = defResc;
 
     // setup a genquery for resource names and comments
     Kanki::RodsGenQuery rescQuery(this->conn);
