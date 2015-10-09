@@ -17,6 +17,10 @@ set(iRODS_Jansson jansson-2.7 CACHE STRING "iRODS Jansson version")
 # find Qt CMake packages
 find_package(Qt5 5.4.0 CONFIG REQUIRED Widgets Xml Svg)
 
+# find and setup VTK CMake package
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
+
 # Qt UI compiler files
 file(GLOB UI_FILES *.ui)
 
@@ -78,4 +82,5 @@ target_link_libraries(
 	jansson
 	ssl
 	crypto
+	${VTK_LIBRARIES}
 )

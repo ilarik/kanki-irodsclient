@@ -10,7 +10,7 @@ QT       += core gui svg xml
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 macx {
-    TARGET = iRODS
+    TARGET = irodsclient
 }
 
 else {
@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     rodstransferwindow.cpp \
     rodsdatastream.cpp \
     rodsdatainstream.cpp \
-    rodsdataoutstream.cpp
+    rodsdataoutstream.cpp \
+    rodsobjlinkviz.cpp
 
 HEADERS  += rodsmainwindow.h \
     rodsconnection.h \
@@ -65,7 +66,8 @@ HEADERS  += rodsmainwindow.h \
     rodsdatastream.h \
     rodsdatainstream.h \
     rodsdataoutstream.h \
-    _rodsgenquery.h
+    _rodsgenquery.h \
+    rodsobjlinkviz.h
 
 FORMS    += rodsmainwindow.ui \
     rodsmetadatawindow.ui \

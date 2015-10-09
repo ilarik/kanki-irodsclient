@@ -918,3 +918,9 @@ void RodsMainWindow::on_storageResc_activated(const QString &arg1)
     if (rescStr.length())
         this->currentResc = rescStr.toStdString();
 }
+
+void RodsMainWindow::on_actionVisualize_triggered()
+{
+    RodsObjLinkViz *vizWindow = new RodsObjLinkViz(this->conn);
+    vizWindow->show();
+}

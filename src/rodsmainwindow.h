@@ -53,6 +53,8 @@
 #include "rodstransferwindow.h"
 #include "version.h"
 
+#include "rodsobjlinkviz.h"
+
 // Qt UI compiler namespace for generated classes
 namespace Ui {
 class RodsMainWindow;
@@ -201,6 +203,8 @@ private slots:
 
     //
     void on_storageResc_activated(const QString &arg1);
+
+    void on_actionVisualize_triggered();
 
 signals:
 

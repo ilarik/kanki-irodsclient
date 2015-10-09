@@ -293,7 +293,14 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuCool_Stuff">
+    <property name="title">
+     <string>Cool Stuff</string>
+    </property>
+    <addaction name="actionVisualize"/>
+   </widget>
    <addaction name="menuIRODS"/>
+   <addaction name="menuCool_Stuff"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="enabled">
@@ -557,6 +564,14 @@
    </property>
    <property name="text">
     <string>Upload Directory</string>
+   </property>
+  </action>
+  <action name="actionVisualize">
+   <property name="text">
+    <string>Visualize</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
    </property>
   </action>
  </widget>
