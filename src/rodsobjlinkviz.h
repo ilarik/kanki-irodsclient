@@ -22,6 +22,17 @@
 #include <vtkStringArray.h>
 #include <vtkDataSetAttributes.h>
 #include <vtkCircularLayoutStrategy.h>
+#include <vtkFast2DLayoutStrategy.h>
+#include <vtkIntArray.h>
+#include <vtkLookupTable.h>
+#include <vtkViewTheme.h>
+#include <vtkMutableDirectedGraph.h>
+#include <vtkDoubleArray.h>
+#include <vtkSimple3DCirclesStrategy.h>
+#include <vtkTreeOrbitLayoutStrategy.h>
+#include <vtkSplineGraphEdges.h>
+#include <vtkGlyphSource2D.h>
+
 
 class RodsObjLinkViz : public QWidget
 {
