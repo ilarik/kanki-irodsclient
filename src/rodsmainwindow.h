@@ -99,7 +99,7 @@ public slots:
     void endModalProgressDialog();
 
     // Qt slot for reporting an error with a message string, error string and error code.
-    void doErrorMsg(QString msgStr, QString errorStr, int errorCode);
+    void reportError(QString msgStr, QString errorStr, int errorCode);
 
     // Qt slot for setting the Kanki rods connection object for the grid browser window.
     void setConnection(Kanki::RodsConnection *newConn);

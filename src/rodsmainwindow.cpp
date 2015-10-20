@@ -265,7 +265,7 @@ void RodsMainWindow::mountPath()
         }
 
         else
-            this->doErrorMsg("Mount collection error", "Read collection failed", status);
+            this->reportError("Mount collection error", "Read collection failed", status);
     }
 }
 
@@ -408,7 +408,7 @@ void RodsMainWindow::doDownload()
 
             // error reporting signal connects to a main window slot
             connect(downloadWorker, &RodsDownloadThread::reportError, this,
-                    &RodsMainWindow::doErrorMsg);
+                    &RodsMainWindow::reportError);
 
             // connect thread finished signal to Qt object deletion mechanisms
             connect(downloadWorker, &RodsDownloadThread::finished,
@@ -485,7 +485,7 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
 
     // error reporting signal connects to a main window slot
     connect(uploadWorker, &RodsUploadThread::reportError, this,
-            &RodsMainWindow::doErrorMsg);
+            &RodsMainWindow::reportError);
     connect(uploadWorker, &RodsUploadThread::refreshObjectModel, this->model,
             &RodsObjTreeModel::refreshAtPath);
 
@@ -548,7 +548,7 @@ void RodsMainWindow::doRodsConnect()
     connect(connThread, &RodsConnectThread::progressUpdate, this,
             &RodsMainWindow::setProgress);
     connect(connThread, &RodsConnectThread::reportError, this,
-            &RodsMainWindow::doErrorMsg);
+            &RodsMainWindow::reportError);
     connect(connThread, &RodsConnectThread::setConnection, this,
             &RodsMainWindow::setConnection);
 
@@ -617,7 +617,7 @@ void RodsMainWindow::doCreateCollection()
 
         // make new collection into path
         if ((status = this->conn->makeColl(collPath, false)) < 0)
-            this->doErrorMsg("Create collection error", "Create collection failed", status);
+            this->reportError("Create collection error", "Create collection failed", status);
 
         // refresh tree view on success
         else
@@ -625,7 +625,7 @@ void RodsMainWindow::doCreateCollection()
     }
 
     else
-        this->doErrorMsg("Emtpy collection name!", QString(), -1);
+        this->reportError("Emtpy collection name!", QString(), -1);
 }
 
 void RodsMainWindow::doDelete()
@@ -675,7 +675,7 @@ void RodsMainWindow::doDelete()
 
                 // try to delete collection
                 if ((status = this->conn->removeColl(itemData->objName)) < 0)
-                    this->doErrorMsg("Delete collection error", "iRODS API error", status);
+                    this->reportError("Delete collection error", "iRODS API error", status);
 
                 // on success refresh view
                 else {
@@ -704,7 +704,7 @@ void RodsMainWindow::doDelete()
 
                     // try to remove data object
                     if ((status = this->conn->removeObj(objPath)) < 0)
-                        this->doErrorMsg("Delete object error", "iRODS API error", status);
+                        this->reportError("Delete object error", "iRODS API error", status);
 
                     // on success refresh
                     else {
@@ -716,7 +716,7 @@ void RodsMainWindow::doDelete()
     }
 }
 
-void RodsMainWindow::doErrorMsg(QString msgStr, QString errorStr, int errorCode)
+void RodsMainWindow::reportError(QString msgStr, QString errorStr, int errorCode)
 {
     // create new message box object and detail string
     QMessageBox errorMsg;
@@ -797,7 +797,7 @@ void RodsMainWindow::refreshResources()
 
     // try to execute genquery
     if ((status = rescQuery.execute()) < 0)
-        this->doErrorMsg("Error while refreshing available iRODS storage resources",
+        this->reportError("Error while refreshing available iRODS storage resources",
                          "iRODS GenQuery error", status);
 
     // on success, add found resources with their comments to the combo box
