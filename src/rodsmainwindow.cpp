@@ -37,6 +37,10 @@ RodsMainWindow::RodsMainWindow(QWidget *parent) :
     // initialize progress bar display
     this->progress = new QProgressDialog(this);
 
+    // initialize error log
+    this->errorLogWindow = new RodsErrorLogWindow();
+    connect(this, &RodsMainWindow::logError, this->errorLogWindow, &RodsErrorLogWindow::logError);
+
     // enable drag & drop
     this->setAcceptDrops(false);
     this->ui->rodsObjTree->viewport()->setAcceptDrops(true);
@@ -728,8 +732,8 @@ void RodsMainWindow::reportError(QString msgStr, QString errorStr, int errorCode
     errorMsg.setIcon(QMessageBox::Critical);
     errorMsg.exec();
 
-    // set the same status message to status bar for 5 seconds
-    this->ui->statusBar->showMessage(msgStr, 5000);
+    // log the error
+    this->logError(msgStr, errorStr, errorCode);
 }
 
 std::string RodsMainWindow::getCurrentRodsCollPath()
@@ -776,7 +780,7 @@ QModelIndex RodsMainWindow::getCurrentRodsObjIndex()
 void RodsMainWindow::showAbout()
 {
     QMessageBox::about(this, "About Kanki irodsclient",
-                       QString("Version: " VERSION) + QString("\n\n") + QString(LICENSE));
+                       QString("Version: " VERSION "\n\n" LICENSE));
 }
 
 void RodsMainWindow::refreshResources()

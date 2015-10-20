@@ -51,6 +51,7 @@
 #include "rodsdownloadthread.h"
 #include "rodsobjtreemodel.h"
 #include "rodstransferwindow.h"
+#include "rodserrorlogwindow.h"
 #include "version.h"
 
 // Qt UI compiler namespace for generated classes
@@ -210,8 +211,11 @@ private slots:
 
 signals:
 
-    // private signal for requesting object model refresh
+    // signal for requesting object model refresh
     void refreshObjectModelAtIndex(QModelIndex index);
+
+    // signal for adding an error to log
+    void logError(QString msgStr, QString errorStr, int errorCode);
 
 private:
 
@@ -230,8 +234,11 @@ private:
     // our queue window instance
     RodsQueueWindow *queueWindow;
 
+    // our error log window instance
+    RodsErrorLogWindow *errorLogWindow;
+
     // a container of metadata window object pointers
-    std::map< std::string, RodsMetadataWindow*> metaEditors;
+    std::map<std::string, RodsMetadataWindow*> metaEditors;
 
     // our object tree model instance
     RodsObjTreeModel *model;

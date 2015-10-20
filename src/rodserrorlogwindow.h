@@ -16,8 +16,10 @@
 
 #include <QWidget>
 #include <QListWidget>
+#include <QListWidgetItem>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QIcon>
 
 class RodsErrorLogWindow : public QWidget
 {
@@ -46,6 +48,8 @@ private:
 
     //
     QPushButton *ackButton;
+
+    static const QIcon warnIcon;
 };
 
 #endif // RODSERRORWINDOW_H

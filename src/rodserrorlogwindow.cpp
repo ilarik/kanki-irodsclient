@@ -13,6 +13,9 @@
 
 #include "rodserrorlogwindow.h"
 
+// initialize static icon
+const QIcon RodsErrorLogWindow::warnIcon(":/tango/icons/dialog-warning.svg");
+
 RodsErrorLogWindow::RodsErrorLogWindow() :
     QWidget(NULL)
 {
@@ -34,5 +37,9 @@ RodsErrorLogWindow::~RodsErrorLogWindow()
 
 void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCode)
 {
+    QListWidgetItem *item = new QListWidgetItem(RodsErrorLogWindow::warnIcon,
+                                                msgStr + errorStr + QVariant(errorCode).toString(),
+                                                this->errorLog);
 
+    this->errorLog->insertItem(0, item);
 }
