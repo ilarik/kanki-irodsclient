@@ -629,7 +629,7 @@ void RodsMainWindow::doCreateCollection()
     }
 
     else
-        this->reportError("Emtpy collection name!", QString(), -1);
+        this->reportError("Emtpy collection name entered!", QString(), 0);
 }
 
 void RodsMainWindow::doDelete()
@@ -839,7 +839,10 @@ void RodsMainWindow::refreshResources()
 
 void RodsMainWindow::openErrorLog()
 {
+    this->errorLogWindow->show();
+    this->errorLogWindow->raise();
 
+    QApplication::setActiveWindow(this->errorLogWindow);
 }
 
 void RodsMainWindow::on_actionConnect_triggered()

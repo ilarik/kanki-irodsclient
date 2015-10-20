@@ -13,12 +13,12 @@
 
 #include "rodserrorlogwindow.h"
 
-// initialize static icon
-const QIcon RodsErrorLogWindow::warnIcon(":/tango/icons/dialog-warning.svg");
-
 RodsErrorLogWindow::RodsErrorLogWindow() :
     QWidget(NULL)
 {
+    this->setWindowTitle("iRODS Client Error Log");
+    this->setFixedWidth(600);
+
     this->layout = new QVBoxLayout(this);
 
     this->errorLog = new QListWidget(this);
@@ -26,6 +26,8 @@ RodsErrorLogWindow::RodsErrorLogWindow() :
 
     this->ackButton = new QPushButton("Acknowledge", this);
     this->layout->addWidget(this->ackButton);
+
+    this->warnIcon = QIcon(":/tango/icons/dialog-warning.svg");
 }
 
 RodsErrorLogWindow::~RodsErrorLogWindow()
@@ -37,9 +39,13 @@ RodsErrorLogWindow::~RodsErrorLogWindow()
 
 void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCode)
 {
-    QListWidgetItem *item = new QListWidgetItem(RodsErrorLogWindow::warnIcon,
-                                                msgStr + errorStr + QVariant(errorCode).toString(),
-                                                this->errorLog);
+    QString itemStr = msgStr;
 
+    if (errorStr.length())
+        itemStr += "\nError Description: " + errorStr;
+
+    itemStr += "\nError Code: " + QVariant(errorCode).toString();
+
+    QListWidgetItem *item = new QListWidgetItem(this->warnIcon, itemStr, this->errorLog);
     this->errorLog->insertItem(0, item);
 }

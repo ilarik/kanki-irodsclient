@@ -49,7 +49,8 @@ private:
     //
     QPushButton *ackButton;
 
-    static const QIcon warnIcon;
+    //
+    QIcon warnIcon;
 };
 
 #endif // RODSERRORWINDOW_H
