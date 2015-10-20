@@ -297,7 +297,7 @@
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="acceptDrops">
     <bool>false</bool>
@@ -320,6 +320,7 @@
    <addaction name="actionRuleExec"/>
    <addaction name="actionQueueStat"/>
    <addaction name="actionFind"/>
+   <addaction name="actionError_Log"/>
    <addaction name="separator"/>
    <addaction name="actionNewColl"/>
    <addaction name="actionUpload"/>
@@ -557,6 +558,15 @@
    </property>
    <property name="text">
     <string>Upload Directory</string>
+   </property>
+  </action>
+  <action name="actionError_Log">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/tango/icons/dialog-warning.svg</normaloff>:/tango/icons/dialog-warning.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Error Log</string>
    </property>
   </action>
  </widget>
