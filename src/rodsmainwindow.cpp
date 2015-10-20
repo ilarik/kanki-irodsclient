@@ -833,6 +833,11 @@ void RodsMainWindow::refreshResources()
     }
 }
 
+void RodsMainWindow::openErrorLog()
+{
+
+}
+
 void RodsMainWindow::on_actionConnect_triggered()
 {
     this->doRodsConnect();
@@ -917,4 +922,9 @@ void RodsMainWindow::on_storageResc_activated(const QString &arg1)
 
     if (rescStr.length())
         this->currentResc = rescStr.toStdString();
+}
+
+void RodsMainWindow::on_actionErrorLog_triggered()
+{
+    this->openErrorLog();
 }

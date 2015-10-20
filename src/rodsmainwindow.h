@@ -152,6 +152,9 @@ public slots:
     // Qt slot for refreshing available storage resources from the iRODS grid.
     void refreshResources();
 
+    //
+    void openErrorLog();
+
 private slots:
 
     // qt slot which connects to connect action triggered signal
@@ -201,6 +204,9 @@ private slots:
 
     //
     void on_storageResc_activated(const QString &arg1);
+
+    //
+    void on_actionErrorLog_triggered();
 
 signals:
 
