@@ -11,9 +11,9 @@
  * @author Ilari Korhonen
  */
 
-#include "rodserrorwindow.h"
+#include "rodserrorlogwindow.h"
 
-RodsErrorWindow::RodsErrorWindow() :
+RodsErrorLogWindow::RodsErrorLogWindow() :
     QWidget(NULL)
 {
     this->layout = new QVBoxLayout(this);
@@ -25,9 +25,14 @@ RodsErrorWindow::RodsErrorWindow() :
     this->layout->addWidget(this->ackButton);
 }
 
-RodsErrorWindow::~RodsErrorWindow()
+RodsErrorLogWindow::~RodsErrorLogWindow()
 {
     delete (this->layout);
     delete (this->errorLog);
     delete (this->ackButton);
+}
+
+void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCode)
+{
+
 }

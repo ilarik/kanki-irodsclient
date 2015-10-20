@@ -19,17 +19,22 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-class RodsErrorWindow : public QWidget
+class RodsErrorLogWindow : public QWidget
 {
     Q_OBJECT
 
 public:
 
     //
-    explicit RodsErrorWindow();
+    explicit RodsErrorLogWindow();
 
     //
-    ~RodsErrorWindow();
+    ~RodsErrorLogWindow();
+
+public slots:
+
+    //
+    void logError(QString msgStr, QString errorStr, int errorCode);
 
 private:
 
