@@ -14,12 +14,14 @@
 #ifndef RODSERRORWINDOW_H
 #define RODSERRORWINDOW_H
 
+#include <QApplication>
 #include <QWidget>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QIcon>
+#include <QDateTime>
 
 class RodsErrorLogWindow : public QWidget
 {

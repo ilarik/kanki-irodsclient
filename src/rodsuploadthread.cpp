@@ -118,7 +118,7 @@ void RodsUploadThread::run()
 
             // try to put file and report possible error to user
             if ((status = this->conn->putFile(fileName.toStdString(), objPath, this->targetResc)) < 0)
-                reportError("iRODS put file error", "Put failed", status);
+                reportError("iRODS put file error", objPath.c_str(), status);
         }
 
         c++;

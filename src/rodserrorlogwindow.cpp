@@ -39,7 +39,8 @@ RodsErrorLogWindow::~RodsErrorLogWindow()
 
 void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCode)
 {
-    QString itemStr = msgStr;
+    QString itemStr = QDateTime::currentDateTime().toString() + "\n";
+    itemStr += msgStr;
 
     if (errorStr.length())
         itemStr += "\nError Description: " + errorStr;
@@ -48,4 +49,9 @@ void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCod
 
     QListWidgetItem *item = new QListWidgetItem(this->warnIcon, itemStr, this->errorLog);
     this->errorLog->insertItem(0, item);
+
+    this->show();
+    this->raise();
+
+    QApplication::setActiveWindow(this);
 }

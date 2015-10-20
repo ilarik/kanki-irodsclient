@@ -410,9 +410,9 @@ void RodsMainWindow::doDownload()
             connect(downloadWorker, &RodsDownloadThread::progressMarquee, transferWindow,
                     &RodsTransferWindow::progressMarquee);
 
-            // error reporting signal connects to a main window slot
-            connect(downloadWorker, &RodsDownloadThread::reportError, this,
-                    &RodsMainWindow::reportError);
+            // error reporting signal connects to the error log window slot
+            connect(downloadWorker, &RodsDownloadThread::reportError, this->errorLogWindow,
+                    &RodsErrorLogWindow::logError);
 
             // connect thread finished signal to Qt object deletion mechanisms
             connect(downloadWorker, &RodsDownloadThread::finished,
@@ -487,9 +487,11 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
     connect(uploadWorker, &RodsUploadThread::progressUpdate, transferWindow,
             &RodsTransferWindow::updateMainProgress);
 
-    // error reporting signal connects to a main window slot
-    connect(uploadWorker, &RodsUploadThread::reportError, this,
-            &RodsMainWindow::reportError);
+    // error reporting signal connects to the error log window slot
+    connect(uploadWorker, &RodsUploadThread::reportError, this->errorLogWindow,
+            &RodsErrorLogWindow::logError);
+
+    // refresh signal connects directly to object model refresh slot
     connect(uploadWorker, &RodsUploadThread::refreshObjectModel, this->model,
             &RodsObjTreeModel::refreshAtPath);
 
