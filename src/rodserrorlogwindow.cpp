@@ -17,7 +17,7 @@ RodsErrorLogWindow::RodsErrorLogWindow() :
     QWidget(NULL)
 {
     this->setWindowTitle("iRODS Client Error Log");
-    this->setFixedWidth(600);
+    this->setMinimumWidth(600);
 
     this->layout = new QVBoxLayout(this);
 
@@ -49,6 +49,7 @@ void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCod
 
     QListWidgetItem *item = new QListWidgetItem(this->warnIcon, itemStr, this->errorLog);
     this->errorLog->insertItem(0, item);
+    this->errorLog->scrollToItem(item);
 
     this->show();
     this->raise();
