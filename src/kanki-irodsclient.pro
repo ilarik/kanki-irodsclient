@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     rodstransferwindow.cpp \
     rodsdatastream.cpp \
     rodsdatainstream.cpp \
-    rodsdataoutstream.cpp
+    rodsdataoutstream.cpp \
+    rodserrorwindow.cpp
 
 HEADERS  += rodsmainwindow.h \
     rodsconnection.h \
@@ -65,7 +66,8 @@ HEADERS  += rodsmainwindow.h \
     rodsdatastream.h \
     rodsdatainstream.h \
     rodsdataoutstream.h \
-    _rodsgenquery.h
+    _rodsgenquery.h \
+    rodserrorwindow.h
 
 FORMS    += rodsmainwindow.ui \
     rodsmetadatawindow.ui \
