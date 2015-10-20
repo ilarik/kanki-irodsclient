@@ -32,6 +32,8 @@ public:
     // sets window title as the provided title argument.
     explicit RodsTransferWindow(QString title);
 
+    ~RodsTransferWindow();
+
 signals:
 
     // Qt signal for signalling out the users request of cancelling.
