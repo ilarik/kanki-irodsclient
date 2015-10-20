@@ -16,10 +16,18 @@
 RodsErrorWindow::RodsErrorWindow() :
     QWidget(NULL)
 {
+    this->layout = new QVBoxLayout(this);
 
+    this->errorLog = new QListWidget(this);
+    this->layout->addWidget(this->errorLog);
+
+    this->ackButton = new QPushButton("Acknowledge", this);
+    this->layout->addWidget(this->ackButton);
 }
 
 RodsErrorWindow::~RodsErrorWindow()
 {
-
+    delete (this->layout);
+    delete (this->errorLog);
+    delete (this->ackButton);
 }

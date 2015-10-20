@@ -25,12 +25,22 @@ class RodsErrorWindow : public QWidget
 
 public:
 
+    //
     explicit RodsErrorWindow();
 
+    //
     ~RodsErrorWindow();
 
 private:
 
+    //
+    QVBoxLayout *layout;
+
+    //
+    QListWidget *errorLog;
+
+    //
+    QPushButton *ackButton;
 };
 
 #endif // RODSERRORWINDOW_H

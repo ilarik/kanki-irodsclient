@@ -19,6 +19,7 @@
         <file>icons/folder-remote.png</file>
         <file>icons/text-x-generic.png</file>
         <file>icons/applications-internet.svg</file>
+        <file>icons/dialog-warning.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/irodsclient.png</file>
