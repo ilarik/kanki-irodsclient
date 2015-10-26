@@ -144,10 +144,6 @@ macx {
     LIBS += -L/usr/local/opt/openssl/lib -lssl -lcrypto
 }
 
-else {
-    LIBS += -lssl -lcrypto
-}
-
 macx {
     LIBS += -lc++
     LIBS += $$OSX_IRODS_BUILD/iRODS/lib/core/obj/libRodsAPIs.a
@@ -166,4 +162,5 @@ else {
     LIBS += -L/usr/lib/irods/externals -lirods_client -lirods_client_api -lboost_filesystem -lboost_regex -lboost_system -lboost_thread 
     LIBS += -lboost_chrono -lboost_date_time -lboost_filesystem -lboost_iostreams -lboost_program_options
     LIBS += /usr/lib/irods/externals/libjansson.a
+    LIBS += -llcrypto -lssl
 }
