@@ -837,8 +837,12 @@ void RodsMainWindow::refreshResources()
             // add new item and select it if it's the user default
             this->ui->storageResc->addItem(rescDesc, rescStr);
 
-            if (!defResc.compare(resources.at(i)))
+            // select (first by default) or user-defined default resource
+            if ((i == 0) || (!defResc.compare(resources.at(i))))
+            {
                 this->ui->storageResc->setCurrentIndex(i);
+                this->currentResc = rescStr.toStdString();
+            }
         }
     }
 }
