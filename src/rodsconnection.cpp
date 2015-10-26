@@ -319,8 +319,9 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
     // for now, we use the generic data type
     addKeyVal(&putParam.condInput, DATA_TYPE_KW, "generic");
 
-    // target storage resource
-    addKeyVal(&putParam.condInput, DEST_RESC_NAME_KW, rodsResc.c_str());
+    // target storage resource, if defined
+    if (rodsResc.length())
+        addKeyVal(&putParam.condInput, DEST_RESC_NAME_KW, rodsResc.c_str());
 
     // take copy of the local file path for the rods api
     strcpy(filePath, localPath.c_str());
