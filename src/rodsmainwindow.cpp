@@ -801,6 +801,10 @@ void RodsMainWindow::refreshResources()
     rescQuery.addQueryAttribute(COL_R_RESC_NAME);
     rescQuery.addQueryAttribute(COL_R_RESC_COMMENT);
 
+    // we omit bundleResc
+    rescQuery.addQueryCondition(COL_R_RESC_NAME, Kanki::RodsGenQuery::isNotEqual,
+                                "bundleResc");
+
     // try to execute genquery
     if ((status = rescQuery.execute()) < 0)
         this->reportError("Error while refreshing available iRODS storage resources",
