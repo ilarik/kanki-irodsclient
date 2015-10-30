@@ -40,6 +40,11 @@ public slots:
     //
     void logError(QString msgStr, QString errorStr, int errorCode);
 
+signals:
+
+    //
+    void errorsPresent(unsigned int errorCount);
+
 private:
 
     //

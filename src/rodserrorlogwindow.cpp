@@ -24,9 +24,6 @@ RodsErrorLogWindow::RodsErrorLogWindow() :
     this->errorLog = new QListWidget(this);
     this->layout->addWidget(this->errorLog);
 
-    this->ackButton = new QPushButton("Acknowledge", this);
-    this->layout->addWidget(this->ackButton);
-
     this->warnIcon = QIcon(":/tango/icons/dialog-warning.svg");
 }
 
@@ -34,7 +31,6 @@ RodsErrorLogWindow::~RodsErrorLogWindow()
 {
     delete (this->layout);
     delete (this->errorLog);
-    delete (this->ackButton);
 }
 
 void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCode)
@@ -43,9 +39,9 @@ void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCod
     itemStr += msgStr;
 
     if (errorStr.length())
-        itemStr += "\nError Description: " + errorStr;
+        itemStr += "\Details: " + errorStr;
 
-    itemStr += "\nError Code: " + QVariant(errorCode).toString();
+    itemStr += "\Status: " + QVariant(errorCode).toString();
 
     QListWidgetItem *item = new QListWidgetItem(this->warnIcon, itemStr, this->errorLog);
     this->errorLog->insertItem(0, item);
@@ -55,4 +51,6 @@ void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCod
     this->raise();
 
     QApplication::setActiveWindow(this);
+
+    this->errorsPresent(1);
 }
