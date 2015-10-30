@@ -243,22 +243,6 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
           <widget class="QCheckBox" name="allowOverwrite">
            <property name="enabled">
             <bool>false</bool>
@@ -320,13 +304,14 @@
    <addaction name="actionRuleExec"/>
    <addaction name="actionQueueStat"/>
    <addaction name="actionFind"/>
-   <addaction name="actionErrorLog"/>
    <addaction name="separator"/>
    <addaction name="actionNewColl"/>
    <addaction name="actionUpload"/>
    <addaction name="actionUploadDirectory"/>
    <addaction name="actionDownload"/>
    <addaction name="actionDelete"/>
+   <addaction name="separator"/>
+   <addaction name="actionErrorLog"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="statusTip">
@@ -562,7 +547,7 @@
   </action>
   <action name="actionErrorLog">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">
