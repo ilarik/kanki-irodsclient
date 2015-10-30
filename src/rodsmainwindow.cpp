@@ -855,6 +855,11 @@ void RodsMainWindow::openErrorLog()
     QApplication::setActiveWindow(this->errorLogWindow);
 }
 
+void RodsMainWindow::errorsReported(unsigned int errorCount)
+{
+    this->ui->actionErrorLog->setDisabled(false);
+}
+
 void RodsMainWindow::on_actionConnect_triggered()
 {
     this->doRodsConnect();

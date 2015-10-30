@@ -156,6 +156,9 @@ public slots:
     //
     void openErrorLog();
 
+    //
+    void errorsReported(unsigned int errorCount);
+
 private slots:
 
     // qt slot which connects to connect action triggered signal
