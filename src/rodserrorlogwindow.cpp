@@ -47,10 +47,5 @@ void RodsErrorLogWindow::logError(QString msgStr, QString detailStr, int errorCo
     this->errorLog->insertItem(0, item);
     this->errorLog->scrollToItem(item);
 
-    this->show();
-    this->raise();
-
-    QApplication::setActiveWindow(this);
-
     this->errorsPresent(this->errorLog->count());
 }

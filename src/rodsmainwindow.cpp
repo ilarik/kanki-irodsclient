@@ -854,6 +854,8 @@ void RodsMainWindow::openErrorLog()
     this->errorLogWindow->raise();
 
     QApplication::setActiveWindow(this->errorLogWindow);
+    this->ui->statusBar->clearMessage();
+    this->ui->actionErrorLog->setText("Error Log");
 }
 
 void RodsMainWindow::errorsReported(unsigned int errorCount)
@@ -861,6 +863,9 @@ void RodsMainWindow::errorsReported(unsigned int errorCount)
     this->ui->actionErrorLog->setDisabled(false);
     this->ui->actionErrorLog->setToolTip("Errors reported in this session (" +
                                          QVariant(errorCount).toString() + ")");
+
+    this->ui->statusBar->showMessage("Errors reported, see error log!");
+    this->ui->actionErrorLog->setText("Error Log (NEW!)");
 }
 
 void RodsMainWindow::on_actionConnect_triggered()
