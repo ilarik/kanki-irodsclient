@@ -94,7 +94,76 @@ macx {
     SCHEMA_XML.files = schema.xml
     SCHEMA_XML.path = Contents/Resources
 
+    IRODS_PLUGINS_AUTH.files = \
+        $$OSX_IRODS_BUILD/plugins/auth/libnative.so \
+        $$OSX_IRODS_BUILD/plugins/auth/libosauth.so \
+        $$OSX_IRODS_BUILD/plugins/auth/libpam.so
+    IRODS_PLUGINS_AUTH.path = Contents/PlugIns/irods/auth
+
+    IRODS_PLUGINS_NETWORK.files = \
+        $$OSX_IRODS_BUILD/plugins/network/libtcp.so \
+        $$OSX_IRODS_BUILD/plugins/network/libssl.so
+    IRODS_PLUGINS_NETWORK.path = Contents/PlugIns/irods/network
+
+    IRODS_ICOMMANDS_BIN.files = \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/genOSAuth \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iadmin \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iapitest \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ibun \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/icd \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ichksum \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ichmod \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/icp \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/idbug \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ienv \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ierror \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iexecmd \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iexit \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ifsck \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iget \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/igetwild \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/igroupadmin \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ihelp \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iinit \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ilocate \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ils \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ilsresc \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/imcoll \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/imeta \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/imiscsvrinfo \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/imkdir \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/imv \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ipasswd \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iphybun \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iphymv \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ips \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iput \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ipwd \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iqdel \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iqmod \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iqstat \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iquest \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iquota \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ireg \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irepl \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irm \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irmtrash \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irods-grid \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irsync \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irule \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iscan \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/isysmeta \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iticket \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/itrim \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iuserinfo \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ixmsg \
+        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/izonereport
+    IRODS_ICOMMANDS_BIN.path = Contents/PlugIns/irods/icommands
+
     QMAKE_BUNDLE_DATA += SCHEMA_XML
+    QMAKE_BUNDLE_DATA += IRODS_PLUGINS_AUTH
+    QMAKE_BUNDLE_DATA += IRODS_PLUGINS_NETWORK
+    QMAKE_BUNDLE_DATA += IRODS_ICOMMANDS_BIN
 }
 
 macx {
