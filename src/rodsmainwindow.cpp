@@ -782,8 +782,11 @@ QModelIndex RodsMainWindow::getCurrentRodsObjIndex()
 
 void RodsMainWindow::showAbout()
 {
-    QMessageBox::about(this, "About Kanki irodsclient",
-                       QString("Version: " VERSION "\n\n" LICENSE));
+    QString versionStr = "Version: " VERSION "\n\n";
+    versionStr += "Build: " BUILD_TAG " on host " BUILD_HOST "\n\n";
+    versionStr += LICENSE;
+
+    QMessageBox::about(this, "About Kanki irodsclient", versionStr);
 }
 
 void RodsMainWindow::refreshResources()
