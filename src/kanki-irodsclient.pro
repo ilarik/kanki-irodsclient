@@ -176,7 +176,7 @@ else {
 
 QMAKE_CXXFLAGS += -Wno-write-strings -fPIC -Wno-deprecated -D_FILE_OFFSET_BITS=64 -DPARA_OPR=1 -D_REENTRANT
 QMAKE_CXXFLAGS += -DTAR_STRUCT_FILE -DGNU_TAR -DTAR_EXEC_PATH="/bin/tar" -DZIP_EXEC_PATH="/usr/bin/zip" -DUNZIP_EXEC_PATH="/usr/bin/unzip"
-QMAKE_CXXFLAGS += -DPAM_AUTH -DUSE_BOOST
+QMAKE_CXXFLAGS += -DPAM_AUTH -DUSE_BOOST -DBUILD_HOST=\\\"`hostname`\\\" -DBUILD_TAG=\\\"$(BUILD_TAG)\\\"
 
 macx {
     QMAKE_INFO_PLIST = AppConfig.plist
