@@ -54,7 +54,7 @@ if [ "$PLATFORM" = "Darwin" ]; then
     PKG_VERSION=$VERSION
     PKG_ID=fi.jyu.iRODS.app
     PKG_INSTALL=/Applications
-    PKG_FILE=iRODS.app.pkg
+    PKG_FILE=iRODS.app-$VERSION.pkg
 
     # compile executable and build app bundle
     echo "compiling executable and building osx app bundle..."
