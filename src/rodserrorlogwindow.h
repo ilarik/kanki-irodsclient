@@ -29,34 +29,34 @@ class RodsErrorLogWindow : public QWidget
 
 public:
 
-    //
+    // Default constructor accepts no arguments, generates
+    // error log window ui.
     explicit RodsErrorLogWindow();
 
-    //
+    // Destructor cleans up after allocated resources.
     ~RodsErrorLogWindow();
 
 public slots:
 
-    //
-    void logError(QString msgStr, QString errorStr, int errorCode);
+    // Qt slot for logging an error to the error log with message msgStr,
+    // detail string detailStr and rods api error errorCode.
+    void logError(QString msgStr, QString detailStr, int errorCode);
 
 signals:
 
-    //
+    // Qt signal for signaling out that we have errors with
+    // a count of errorCount.
     void errorsPresent(unsigned int errorCount);
 
 private:
 
-    //
+    // qt layout for error log window
     QVBoxLayout *layout;
 
-    //
+    // qt listwidget provides the error log
     QListWidget *errorLog;
 
-    //
-    QPushButton *ackButton;
-
-    //
+    // qt icon resource for the warning icon
     QIcon warnIcon;
 };
 

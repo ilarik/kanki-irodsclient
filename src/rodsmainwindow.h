@@ -153,10 +153,10 @@ public slots:
     // Qt slot for refreshing available storage resources from the iRODS grid.
     void refreshResources();
 
-    //
+    // Qt slot for opening error log window owned by the grid browser.
     void openErrorLog();
 
-    //
+    // Qt slot for repoting error count to grid browser window ui.
     void errorsReported(unsigned int errorCount);
 
 private slots:
@@ -206,10 +206,10 @@ private slots:
     // qt slot which connects to upload directory triggered signal
     void on_actionUploadDirectory_triggered();
 
-    //
+    // qt slot which connects to storage resource list activated signal
     void on_storageResc_activated(const QString &arg1);
 
-    //
+    // qt slot which connects to error log open triggered signal
     void on_actionErrorLog_triggered();
 
 signals:
