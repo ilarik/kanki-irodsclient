@@ -557,7 +557,7 @@
     <string>Error Log</string>
    </property>
    <property name="toolTip">
-    <string>View Error Log</string>
+    <string>Available when errors have been reported</string>
    </property>
   </action>
  </widget>

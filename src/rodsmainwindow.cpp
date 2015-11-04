@@ -40,6 +40,7 @@ RodsMainWindow::RodsMainWindow(QWidget *parent) :
     // initialize error log
     this->errorLogWindow = new RodsErrorLogWindow();
     connect(this, &RodsMainWindow::logError, this->errorLogWindow, &RodsErrorLogWindow::logError);
+    connect(this->errorLogWindow, &RodsErrorLogWindow::errorsPresent, this, &RodsMainWindow::errorsReported);
 
     // enable drag & drop
     this->setAcceptDrops(false);
@@ -858,6 +859,8 @@ void RodsMainWindow::openErrorLog()
 void RodsMainWindow::errorsReported(unsigned int errorCount)
 {
     this->ui->actionErrorLog->setDisabled(false);
+    this->ui->actionErrorLog->setToolTip("Errors reported in this session (" +
+                                         QVariant(errorCount).toString() + ")");
 }
 
 void RodsMainWindow::on_actionConnect_triggered()

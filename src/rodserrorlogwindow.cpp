@@ -33,15 +33,15 @@ RodsErrorLogWindow::~RodsErrorLogWindow()
     delete (this->errorLog);
 }
 
-void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCode)
+void RodsErrorLogWindow::logError(QString msgStr, QString detailStr, int errorCode)
 {
     QString itemStr = QDateTime::currentDateTime().toString() + "\n";
     itemStr += msgStr;
 
-    if (errorStr.length())
-        itemStr += "\Details: " + errorStr;
+    if (detailStr.length())
+        itemStr += "\nDetails: " + detailStr;
 
-    itemStr += "\Status: " + QVariant(errorCode).toString();
+    itemStr += "\nStatus: " + QVariant(errorCode).toString();
 
     QListWidgetItem *item = new QListWidgetItem(this->warnIcon, itemStr, this->errorLog);
     this->errorLog->insertItem(0, item);
@@ -52,5 +52,5 @@ void RodsErrorLogWindow::logError(QString msgStr, QString errorStr, int errorCod
 
     QApplication::setActiveWindow(this);
 
-    this->errorsPresent(1);
+    this->errorsPresent(this->errorLog->count());
 }
