@@ -11,7 +11,7 @@ echo "-q sets Qt root directory path"
 
 # initialize parameters with defaults
 PLATFORM=`uname`
-VERSION=1.0.6
+VERSION=1.0.7
 OSRELEASE=unknown
 
 # reset POSIX option index variable
@@ -54,7 +54,7 @@ if [ "$PLATFORM" = "Darwin" ]; then
     PKG_VERSION=$VERSION
     PKG_ID=fi.jyu.iRODS.app
     PKG_INSTALL=/Applications
-    PKG_FILE=iRODS.app.pkg
+    PKG_FILE=iRODS.app-$VERSION.pkg
 
     # compile executable and build app bundle
     echo "compiling executable and building osx app bundle..."

@@ -22,7 +22,7 @@
 // Qt framework headers
 #include <QApplication>
 #include <QFile>
-#include <QDomDocument>
+#include <QtXml/QDomDocument>
 #include <QString>
 #include <QStringList>
 #include <QRegularExpression>

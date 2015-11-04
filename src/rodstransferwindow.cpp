@@ -42,6 +42,16 @@ RodsTransferWindow::RodsTransferWindow(QString title) :
     connect(this->cancelButton, &QPushButton::pressed, this, &RodsTransferWindow::invokeCancel);
 }
 
+RodsTransferWindow::~RodsTransferWindow()
+{
+    delete (this->layout);
+    delete (this->mainProgressMsg);
+    delete (this->mainProgressBar);
+    delete (this->subProgressMsg);
+    delete (this->subProgressBar);
+    delete (this->cancelButton);
+}
+
 void RodsTransferWindow::setupMainProgressBar(QString initialMsg, int value, int maxValue)
 {
     this->progressMax = maxValue;

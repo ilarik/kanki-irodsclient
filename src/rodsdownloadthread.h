@@ -79,7 +79,9 @@ private:
     // Constructs the list of objects to be downloaded in a recursive manner.
     int makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs);
 
-    //
+    // Implements double-buffered rods object download using Kanki::RodsDataInStream
+    // and its adaptive rods i/o request size scaling for best resposniveness and
+    // connection throughput utilization.
     int downloadFile(Kanki::RodsObjEntryPtr obj, std::string localPath,
                      bool verifyChecksum = false, bool allowOverwrite = true);
 

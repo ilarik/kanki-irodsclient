@@ -83,7 +83,7 @@ void RodsDownloadThread::run()
 
                     // try to do a rods get operation
                     if ((status = this->downloadFile(curObj, dstPath, this->verify, this->overwrite)) < 0)
-                        reportError("iRODS get file error", "Get failed", status);
+                        reportError("iRODS get file error", curObj->getObjectFullPath().c_str(), status);
                 }
 
                 // for collection objects we create the corresponding directory

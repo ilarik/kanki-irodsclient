@@ -51,6 +51,7 @@
 #include "rodsdownloadthread.h"
 #include "rodsobjtreemodel.h"
 #include "rodstransferwindow.h"
+#include "rodserrorlogwindow.h"
 #include "version.h"
 
 // Qt UI compiler namespace for generated classes
@@ -99,7 +100,7 @@ public slots:
     void endModalProgressDialog();
 
     // Qt slot for reporting an error with a message string, error string and error code.
-    void doErrorMsg(QString msgStr, QString errorStr, int errorCode);
+    void reportError(QString msgStr, QString errorStr, int errorCode);
 
     // Qt slot for setting the Kanki rods connection object for the grid browser window.
     void setConnection(Kanki::RodsConnection *newConn);
@@ -152,6 +153,12 @@ public slots:
     // Qt slot for refreshing available storage resources from the iRODS grid.
     void refreshResources();
 
+    // Qt slot for opening error log window owned by the grid browser.
+    void openErrorLog();
+
+    // Qt slot for repoting error count to grid browser window ui.
+    void errorsReported(unsigned int errorCount);
+
 private slots:
 
     // qt slot which connects to connect action triggered signal
@@ -199,13 +206,19 @@ private slots:
     // qt slot which connects to upload directory triggered signal
     void on_actionUploadDirectory_triggered();
 
-    //
+    // qt slot which connects to storage resource list activated signal
     void on_storageResc_activated(const QString &arg1);
+
+    // qt slot which connects to error log open triggered signal
+    void on_actionErrorLog_triggered();
 
 signals:
 
-    // private signal for requesting object model refresh
+    // signal for requesting object model refresh
     void refreshObjectModelAtIndex(QModelIndex index);
+
+    // signal for adding an error to log
+    void logError(QString msgStr, QString errorStr, int errorCode);
 
 private:
 
@@ -224,8 +237,11 @@ private:
     // our queue window instance
     RodsQueueWindow *queueWindow;
 
+    // our error log window instance
+    RodsErrorLogWindow *errorLogWindow;
+
     // a container of metadata window object pointers
-    std::map< std::string, RodsMetadataWindow*> metaEditors;
+    std::map<std::string, RodsMetadataWindow*> metaEditors;
 
     // our object tree model instance
     RodsObjTreeModel *model;

@@ -37,6 +37,11 @@ RodsMainWindow::RodsMainWindow(QWidget *parent) :
     // initialize progress bar display
     this->progress = new QProgressDialog(this);
 
+    // initialize error log
+    this->errorLogWindow = new RodsErrorLogWindow();
+    connect(this, &RodsMainWindow::logError, this->errorLogWindow, &RodsErrorLogWindow::logError);
+    connect(this->errorLogWindow, &RodsErrorLogWindow::errorsPresent, this, &RodsMainWindow::errorsReported);
+
     // enable drag & drop
     this->setAcceptDrops(false);
     this->ui->rodsObjTree->viewport()->setAcceptDrops(true);
@@ -265,7 +270,7 @@ void RodsMainWindow::mountPath()
         }
 
         else
-            this->doErrorMsg("Mount collection error", "Read collection failed", status);
+            this->reportError("Mount collection error", "Read collection failed", status);
     }
 }
 
@@ -406,9 +411,9 @@ void RodsMainWindow::doDownload()
             connect(downloadWorker, &RodsDownloadThread::progressMarquee, transferWindow,
                     &RodsTransferWindow::progressMarquee);
 
-            // error reporting signal connects to a main window slot
-            connect(downloadWorker, &RodsDownloadThread::reportError, this,
-                    &RodsMainWindow::doErrorMsg);
+            // error reporting signal connects to the error log window slot
+            connect(downloadWorker, &RodsDownloadThread::reportError, this->errorLogWindow,
+                    &RodsErrorLogWindow::logError);
 
             // connect thread finished signal to Qt object deletion mechanisms
             connect(downloadWorker, &RodsDownloadThread::finished,
@@ -483,9 +488,11 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
     connect(uploadWorker, &RodsUploadThread::progressUpdate, transferWindow,
             &RodsTransferWindow::updateMainProgress);
 
-    // error reporting signal connects to a main window slot
-    connect(uploadWorker, &RodsUploadThread::reportError, this,
-            &RodsMainWindow::doErrorMsg);
+    // error reporting signal connects to the error log window slot
+    connect(uploadWorker, &RodsUploadThread::reportError, this->errorLogWindow,
+            &RodsErrorLogWindow::logError);
+
+    // refresh signal connects directly to object model refresh slot
     connect(uploadWorker, &RodsUploadThread::refreshObjectModel, this->model,
             &RodsObjTreeModel::refreshAtPath);
 
@@ -548,7 +555,7 @@ void RodsMainWindow::doRodsConnect()
     connect(connThread, &RodsConnectThread::progressUpdate, this,
             &RodsMainWindow::setProgress);
     connect(connThread, &RodsConnectThread::reportError, this,
-            &RodsMainWindow::doErrorMsg);
+            &RodsMainWindow::reportError);
     connect(connThread, &RodsConnectThread::setConnection, this,
             &RodsMainWindow::setConnection);
 
@@ -617,7 +624,7 @@ void RodsMainWindow::doCreateCollection()
 
         // make new collection into path
         if ((status = this->conn->makeColl(collPath, false)) < 0)
-            this->doErrorMsg("Create collection error", "Create collection failed", status);
+            this->reportError("Create collection error", "Create collection failed", status);
 
         // refresh tree view on success
         else
@@ -625,7 +632,7 @@ void RodsMainWindow::doCreateCollection()
     }
 
     else
-        this->doErrorMsg("Emtpy collection name!", QString(), -1);
+        this->reportError("Emtpy collection name entered!", QString(), 0);
 }
 
 void RodsMainWindow::doDelete()
@@ -675,7 +682,7 @@ void RodsMainWindow::doDelete()
 
                 // try to delete collection
                 if ((status = this->conn->removeColl(itemData->objName)) < 0)
-                    this->doErrorMsg("Delete collection error", "iRODS API error", status);
+                    this->reportError("Delete collection error", "iRODS API error", status);
 
                 // on success refresh view
                 else {
@@ -704,7 +711,7 @@ void RodsMainWindow::doDelete()
 
                     // try to remove data object
                     if ((status = this->conn->removeObj(objPath)) < 0)
-                        this->doErrorMsg("Delete object error", "iRODS API error", status);
+                        this->reportError("Delete object error", "iRODS API error", status);
 
                     // on success refresh
                     else {
@@ -716,7 +723,7 @@ void RodsMainWindow::doDelete()
     }
 }
 
-void RodsMainWindow::doErrorMsg(QString msgStr, QString errorStr, int errorCode)
+void RodsMainWindow::reportError(QString msgStr, QString errorStr, int errorCode)
 {
     // create new message box object and detail string
     QMessageBox errorMsg;
@@ -728,8 +735,8 @@ void RodsMainWindow::doErrorMsg(QString msgStr, QString errorStr, int errorCode)
     errorMsg.setIcon(QMessageBox::Critical);
     errorMsg.exec();
 
-    // set the same status message to status bar for 5 seconds
-    this->ui->statusBar->showMessage(msgStr, 5000);
+    // log the error
+    this->logError(msgStr, errorStr, errorCode);
 }
 
 std::string RodsMainWindow::getCurrentRodsCollPath()
@@ -775,8 +782,17 @@ QModelIndex RodsMainWindow::getCurrentRodsObjIndex()
 
 void RodsMainWindow::showAbout()
 {
-    QMessageBox::about(this, "About Kanki irodsclient",
-                       QString("Version: " VERSION) + QString("\n\n") + QString(LICENSE));
+    QString versionStr = "Version: " VERSION "\n\n";
+
+    if (strlen(BUILD_TAG))
+        versionStr += "Build: " BUILD_TAG "\n\n";
+
+    if (strlen(BUILD_HOST))
+        versionStr += "Build host: " BUILD_HOST "\n\n";
+
+    versionStr += LICENSE;
+
+    QMessageBox::about(this, "About Kanki irodsclient", versionStr);
 }
 
 void RodsMainWindow::refreshResources()
@@ -795,9 +811,13 @@ void RodsMainWindow::refreshResources()
     rescQuery.addQueryAttribute(COL_R_RESC_NAME);
     rescQuery.addQueryAttribute(COL_R_RESC_COMMENT);
 
+    // we omit bundleResc
+    rescQuery.addQueryCondition(COL_R_RESC_NAME, Kanki::RodsGenQuery::isNotEqual,
+                                "bundleResc");
+
     // try to execute genquery
     if ((status = rescQuery.execute()) < 0)
-        this->doErrorMsg("Error while refreshing available iRODS storage resources",
+        this->reportError("Error while refreshing available iRODS storage resources",
                          "iRODS GenQuery error", status);
 
     // on success, add found resources with their comments to the combo box
@@ -827,10 +847,34 @@ void RodsMainWindow::refreshResources()
             // add new item and select it if it's the user default
             this->ui->storageResc->addItem(rescDesc, rescStr);
 
-            if (!defResc.compare(resources.at(i)))
+            // select (first by default) or user-defined default resource
+            if ((i == 0) || (!defResc.compare(resources.at(i))))
+            {
                 this->ui->storageResc->setCurrentIndex(i);
+                this->currentResc = rescStr.toStdString();
+            }
         }
     }
+}
+
+void RodsMainWindow::openErrorLog()
+{
+    this->errorLogWindow->show();
+    this->errorLogWindow->raise();
+
+    QApplication::setActiveWindow(this->errorLogWindow);
+    this->ui->statusBar->clearMessage();
+    this->ui->actionErrorLog->setText("Error Log");
+}
+
+void RodsMainWindow::errorsReported(unsigned int errorCount)
+{
+    this->ui->actionErrorLog->setDisabled(false);
+    this->ui->actionErrorLog->setToolTip("Errors reported in this session (" +
+                                         QVariant(errorCount).toString() + ")");
+
+    this->ui->statusBar->showMessage("Errors reported, see error log!");
+    this->ui->actionErrorLog->setText("Error Log (NEW!)");
 }
 
 void RodsMainWindow::on_actionConnect_triggered()
@@ -917,4 +961,9 @@ void RodsMainWindow::on_storageResc_activated(const QString &arg1)
 
     if (rescStr.length())
         this->currentResc = rescStr.toStdString();
+}
+
+void RodsMainWindow::on_actionErrorLog_triggered()
+{
+    this->openErrorLog();
 }
