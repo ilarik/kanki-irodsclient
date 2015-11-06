@@ -16,17 +16,6 @@ In CentOS/RHEL Linux distributions the installation of the binary packages is ve
 
 In OS X you need to download the OS X .pkg file from https://github.com/ilarik/kanki-irodsclient/releases and right-click the download to open contextual menu from which selecting open will prompt you for confirmation to install an unsigned package (as I don't have an Apple Developer ID yet).
 
-After the install process is finished you have the irodsclient and a full distribution of irods-icommands at /Applications/iRODS.app. To configure the iRODS environment you need to update your shell configuration as follows (for bash, zsh etc. Bourne-derived shells)
-
-    export PATH=/Applications/iRODS.app/Contents/PlugIns/irods/icommands:$PATH
-    export DYLD_LIBRARY_PATH=/Applications/iRODS.app/Contents/Frameworks:$DYLD_LIBRARY_PATH
-
-In your iRODS environment file at ~/.irods/irods_environment.json you need to define
-
-    "irods_plugins_home": "/Applications/iRODS.app/Contents/PlugIns/irods/"
-
-That concludes the install procedure, running `iinit` will initialize your iRODS commandline and GUI environment.
-
 
 Getting started
 ---------------
@@ -40,8 +29,19 @@ So to be able to connect, you should have the iRODS environment configured at
 
 and then run
 
-iinit
-irodsclient &
+    iinit
+    irodsclient &
+
+In OS X after the package install process is finished you have the irodsclient and a full distribution of irods-icommands at /Applications/iRODS.app. To configure the iRODS environment you need to update your shell configuration as follows (for bash, zsh etc. Bourne-derived shells)
+
+    export PATH=/Applications/iRODS.app/Contents/PlugIns/irods/icommands:$PATH
+    export DYLD_LIBRARY_PATH=/Applications/iRODS.app/Contents/Frameworks:$DYLD_LIBRARY_PATH
+
+In your iRODS environment file at ~/.irods/irods_environment.json you need to define
+
+    "irods_plugins_home": "/Applications/iRODS.app/Contents/PlugIns/irods/"
+
+That concludes the install procedure, running `iinit` will initialize your iRODS commandline and GUI environment.
 
 
 
