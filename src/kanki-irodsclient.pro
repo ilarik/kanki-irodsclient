@@ -44,8 +44,8 @@ SOURCES += main.cpp\
     rodsdatainstream.cpp \
     rodsdataoutstream.cpp \
     rodserrorlogwindow.cpp \
-    rodscriteriawidget.cpp \
-    rodsstringconditionwidget.cpp
+    rodsstringconditionwidget.cpp \
+    rodsconditionwidget.cpp
 
 HEADERS  += rodsmainwindow.h \
     rodsconnection.h \
