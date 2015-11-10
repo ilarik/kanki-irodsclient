@@ -16,6 +16,7 @@
 
 // Qt framework headers
 #include <QMainWindow>
+#include <QWidget>
 
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
@@ -49,8 +50,11 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private slots:
+
+    // qt slot connected to ui add action triggered signal
     void on_actionAdd_triggered();
 
+    // qt slot connected to ui execute action triggered signal
     void on_actionExecute_triggered();
 
 private:
