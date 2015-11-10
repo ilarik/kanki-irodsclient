@@ -17,6 +17,10 @@
 // Qt framework headers
 #include <QMainWindow>
 
+// Kanki iRODS C++ class library headers
+#include "rodsconnection.h"
+#include "_rodsgenquery.h"
+
 // Qt UI compiler namespace for generated classes
 namespace Ui {
 class RodsFindWindow;
@@ -27,10 +31,21 @@ class RodsFindWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit RodsFindWindow(QWidget *parent = 0);
+
+    //
+    explicit RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent = 0);
+
+    //
     ~RodsFindWindow();
 
+signals:
+
+    // Qt signal for unregistering the find window for deletion of the object.
+    void unregister();
+
 private:
+
+    // instance of Qt UI compiler generated UI
     Ui::RodsFindWindow *ui;
 };
 

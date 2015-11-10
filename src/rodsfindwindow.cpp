@@ -17,7 +17,7 @@
 // generated UI class Ui::RodsFindWindow header
 #include "ui_rodsfindwindow.h"
 
-RodsFindWindow::RodsFindWindow(QWidget *parent) :
+RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::RodsFindWindow)
 {

@@ -52,6 +52,7 @@
 #include "rodsobjtreemodel.h"
 #include "rodstransferwindow.h"
 #include "rodserrorlogwindow.h"
+#include "rodsfindwindow.h"
 #include "version.h"
 
 // Qt UI compiler namespace for generated classes
@@ -138,10 +139,10 @@ public slots:
     // Qt slot for invoking the create collection gui operation.
     void doCreateCollection();
 
-    // Qt slot for invoking the delete object gui operatio.
+    // Qt slot for invoking the delete object gui operation.
     void doDelete();
 
-    // Qt slot for invoking the open queue stat window gui operatio.
+    // Qt slot for invoking the open queue stat window gui operation.
     void doQueueStatOpen();
 
     // Qt slot for invoking the download gui operation.
@@ -155,6 +156,12 @@ public slots:
 
     // Qt slot for opening error log window owned by the grid browser.
     void openErrorLog();
+
+    // Qt slot for opening find window owned by the grid browser.
+    void openFindWindow();
+
+    // Qt slot for unregistering a find window to be destroyed.
+    void unregisterFindWindow();
 
     // Qt slot for repoting error count to grid browser window ui.
     void errorsReported(unsigned int errorCount);
@@ -212,6 +219,9 @@ private slots:
     // qt slot which connects to error log open triggered signal
     void on_actionErrorLog_triggered();
 
+    // qt slot which connects to find action triggered signal
+    void on_actionFind_triggered();
+
 signals:
 
     // signal for requesting object model refresh
@@ -239,6 +249,9 @@ private:
 
     // our error log window instance
     RodsErrorLogWindow *errorLogWindow;
+
+    // our find window instance
+    RodsFindWindow *findWindow;
 
     // a container of metadata window object pointers
     std::map<std::string, RodsMetadataWindow*> metaEditors;
