@@ -16,11 +16,13 @@
 
 // Qt framework headers
 #include <QMainWindow>
-#include <QWidget>
 
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
 #include "_rodsgenquery.h"
+
+// application headers
+#include "rodscriteriawidget.h"
 
 // Qt UI compiler namespace for generated classes
 namespace Ui {
