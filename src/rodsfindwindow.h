@@ -48,6 +48,11 @@ protected:
     // Qt close window event handler, invokes unregister signal.
     void closeEvent(QCloseEvent *event);
 
+private slots:
+    void on_actionAdd_triggered();
+
+    void on_actionExecute_triggered();
+
 private:
 
     // instance of Qt UI compiler generated UI

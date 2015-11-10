@@ -36,3 +36,13 @@ void RodsFindWindow::closeEvent(QCloseEvent *event)
     // signal out unregistering
     this->unregister();
 }
+
+void RodsFindWindow::on_actionAdd_triggered()
+{
+
+}
+
+void RodsFindWindow::on_actionExecute_triggered()
+{
+
+}
