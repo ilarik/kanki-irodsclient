@@ -22,7 +22,7 @@
 #include "_rodsgenquery.h"
 
 // application headers
-#include "rodscriteriawidget.h"
+#include "rodsconditionwidget.h"
 
 // Qt UI compiler namespace for generated classes
 namespace Ui {

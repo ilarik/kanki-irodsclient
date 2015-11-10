@@ -1,8 +1,8 @@
 /**
- * @file rodscriteriawidget.cpp
- * @brief Implementation of RodsCriteriaWidget class
+ * @file rodsconditionwidget.cpp
+ * @brief Implementation of RodsConditionWidget class
  *
- * The RodsCriteriaWidget class extends the Qt widget class QWidget and
+ * The RodsConditionWidget class extends the Qt widget class QWidget and
  * implements an abstract widget for entering an iRODS GenQuery condition.
  *
  * Copyright (C) 2014-2015 University of Jyväskylä. All rights reserved.
@@ -11,10 +11,11 @@
  * @author Ilari Korhonen
  */
 
-// application class RodsCriteriaWidget header
-#include "rodscriteriawidget.h"
+// application class RodsConditionWidget header
+#include "rodsconditionwidget.h"
 
-RodsCriteriaWidget::RodsCriteriaWidget(QWidget *parent) : QWidget(parent)
+RodsConditionWidget::RodsConditionWidget(QWidget *parent) :
+    QWidget(parent)
 {
 
 }
