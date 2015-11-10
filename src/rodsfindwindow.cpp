@@ -28,3 +28,11 @@ RodsFindWindow::~RodsFindWindow()
 {
     delete ui;
 }
+
+void RodsFindWindow::closeEvent(QCloseEvent *event)
+{
+    (void)event;
+
+    // signal out unregistering
+    this->unregister();
+}

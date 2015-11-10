@@ -43,6 +43,11 @@ signals:
     // Qt signal for unregistering the find window for deletion of the object.
     void unregister();
 
+protected:
+
+    // Qt close window event handler, invokes unregister signal.
+    void closeEvent(QCloseEvent *event);
+
 private:
 
     // instance of Qt UI compiler generated UI

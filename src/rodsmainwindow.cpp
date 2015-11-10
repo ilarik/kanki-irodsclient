@@ -900,7 +900,13 @@ void RodsMainWindow::openFindWindow()
 
 void RodsMainWindow::unregisterFindWindow()
 {
-
+    // sanity check
+    if (this->findWindow)
+    {
+        // delete object and clear pointer
+        delete (this->findWindow);
+        this->findWindow = NULL;
+    }
 }
 
 void RodsMainWindow::on_actionConnect_triggered()
