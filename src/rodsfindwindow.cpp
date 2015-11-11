@@ -21,7 +21,16 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
     QMainWindow(parent),
     ui(new Ui::RodsFindWindow)
 {
-    ui->setupUi(this);
+    this->ui->setupUi(this);
+    this->ui->criteriaLayout->setAlignment(Qt::AlignTop);
+
+    // setup combo box for condition selection
+    this->ui->condSel->addItem("Data Object Name", RodsFindWindow::DataObjName);
+    this->ui->condSel->addItem("Collection Name (Path)", RodsFindWindow::CollName);
+
+    // connect ui event signals to handler slots
+    connect(this->ui->condAdd, &QPushButton::clicked, this, &RodsFindWindow::addCondition);
+
 }
 
 RodsFindWindow::~RodsFindWindow()
@@ -37,7 +46,34 @@ void RodsFindWindow::closeEvent(QCloseEvent *event)
     this->unregister();
 }
 
-void RodsFindWindow::on_actionAdd_triggered()
+void RodsFindWindow::addCondition()
+{
+    RodsConditionWidget *widget = NULL;
+    int cond = this->ui->condSel->currentData().toInt();
+    QString label = this->ui->condSel->currentText();
+
+    switch (cond)
+    {
+        case RodsFindWindow::DataObjName:
+            widget = new RodsStringConditionWidget(COL_DATA_NAME, label);
+        break;
+
+        case RodsFindWindow::CollName:
+            widget = new RodsStringConditionWidget(COL_COLL_NAME, label);
+        break;
+
+        default:
+        break;
+    }
+
+    if (widget)
+    {
+        this->ui->criteriaLayout->addWidget(widget);
+        this->condWidgets.push_back(widget);
+    }
+}
+
+void RodsFindWindow::executeSearch()
 {
 
 }

@@ -14,8 +14,11 @@
 #ifndef RODSFINDWINDOW_H
 #define RODSFINDWINDOW_H
 
+#include <vector>
+
 // Qt framework headers
 #include <QMainWindow>
+#include <QInputDialog>
 
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
@@ -23,6 +26,7 @@
 
 // application headers
 #include "rodsconditionwidget.h"
+#include "rodsstringconditionwidget.h"
 
 // Qt UI compiler namespace for generated classes
 namespace Ui {
@@ -35,6 +39,8 @@ class RodsFindWindow : public QMainWindow
 
 public:
 
+    enum SearchConditions { DataObjName, CollName };
+
     //
     explicit RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent = 0);
 
@@ -46,15 +52,20 @@ signals:
     // Qt signal for unregistering the find window for deletion of the object.
     void unregister();
 
+public slots:
+
+    // Qt slot for requesting to add a condition
+    void addCondition();
+
+    // Qt slot for requesting to execute
+    void executeSearch();
+
 protected:
 
     // Qt close window event handler, invokes unregister signal.
     void closeEvent(QCloseEvent *event);
 
 private slots:
-
-    // qt slot connected to ui add action triggered signal
-    void on_actionAdd_triggered();
 
     // qt slot connected to ui execute action triggered signal
     void on_actionExecute_triggered();
@@ -63,6 +74,10 @@ private:
 
     // instance of Qt UI compiler generated UI
     Ui::RodsFindWindow *ui;
+
+    // container for condition widgets (to be added dynamically)
+    std::vector<RodsConditionWidget*> condWidgets;
+
 };
 
 #endif // RODSFINDWINDOW_H
