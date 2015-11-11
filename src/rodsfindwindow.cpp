@@ -118,7 +118,7 @@ void RodsFindWindow::executeSearch()
 
         }
 
-        // when success, parse thru query result set
+        // when successful, report results
         else {
             std::vector<std::string> names = query.getResultSetForAttr(COL_DATA_NAME);
             std::vector<std::string> colls = query.getResultSetForAttr(COL_COLL_NAME);

@@ -45,7 +45,8 @@ SOURCES += main.cpp\
     rodsdataoutstream.cpp \
     rodserrorlogwindow.cpp \
     rodsstringconditionwidget.cpp \
-    rodsconditionwidget.cpp
+    rodsconditionwidget.cpp \
+    rodsdateconditionwidget.cpp
 
 HEADERS  += rodsmainwindow.h \
     rodsconnection.h \
@@ -71,7 +72,8 @@ HEADERS  += rodsmainwindow.h \
     _rodsgenquery.h \
     rodserrorlogwindow.h \
     rodsconditionwidget.h \
-    rodsstringconditionwidget.h
+    rodsstringconditionwidget.h \
+    rodsdateconditionwidget.h
 
 FORMS    += rodsmainwindow.ui \
     rodsmetadatawindow.ui \
