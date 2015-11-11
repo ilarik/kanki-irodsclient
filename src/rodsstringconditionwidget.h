@@ -52,6 +52,18 @@ private:
 
     // rods attr code
     int attr;
+
+    // widget layout
+    QHBoxLayout *layout;
+
+    // label widget
+    QLabel *labelWidget;
+
+    // condition operator select
+    QComboBox *condBox;
+
+    // text field
+    QLineEdit *valueField;
 };
 
 #endif // RODSSTRINGCONDITIONWIDGET_H

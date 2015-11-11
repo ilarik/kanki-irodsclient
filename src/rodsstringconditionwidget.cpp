@@ -19,25 +19,57 @@ RodsStringConditionWidget::RodsStringConditionWidget(int rodsAttr, QString label
 {
     this->attr = rodsAttr;
 
-    QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setMargin(0);
+    this->layout = new QHBoxLayout(this);
+    this->layout->setMargin(0);
 
-    QLabel *labelWidget = new QLabel(label, this);
-    layout->addWidget(labelWidget);
+    this->labelWidget = new QLabel(label, this);
+    this->layout->addWidget(this->labelWidget);
 
-    QComboBox *condBox = new QComboBox(this);
-    condBox->addItem("Equals", RodsStringConditionWidget::Equals);
-    condBox->addItem("Begins With", RodsStringConditionWidget::BeginsWith);
-    condBox->addItem("Ends With", RodsStringConditionWidget::EndsWith);
-    condBox->addItem("Contains", RodsStringConditionWidget::Contains);
-    condBox->addItem("Is Like (Wildcard %)", RodsStringConditionWidget::IsLike);
-    layout->addWidget(condBox);
+    this->condBox = new QComboBox(this);
+    this->condBox->addItem("Equals", RodsStringConditionWidget::Equals);
+    this->condBox->addItem("Begins With", RodsStringConditionWidget::BeginsWith);
+    this->condBox->addItem("Ends With", RodsStringConditionWidget::EndsWith);
+    this->condBox->addItem("Contains", RodsStringConditionWidget::Contains);
+    this->condBox->addItem("Is Like (Wildcard %)", RodsStringConditionWidget::IsLike);
+    this->layout->addWidget(condBox);
 
-    QLineEdit *valueField = new QLineEdit(this);
-    layout->addWidget(valueField);
+    this->valueField = new QLineEdit(this);
+    this->layout->addWidget(this->valueField);
 }
 
 void RodsStringConditionWidget::evaluateConds(Kanki::RodsGenQuery *query)
 {
+    int opr = this->condBox->currentData().toInt();
+    std::string value;
 
+    switch (opr)
+    {
+        case RodsStringConditionWidget::Equals:
+            value = this->valueField->text().toStdString();
+            query->addQueryCondition(this->attr, Kanki::RodsGenQuery::isEqual, value);
+        break;
+
+        case RodsStringConditionWidget::BeginsWith:
+            value = this->valueField->text().toStdString() + "%";
+            query->addQueryCondition(this->attr, Kanki::RodsGenQuery::isLike, value);
+        break;
+
+        case RodsStringConditionWidget::EndsWith:
+            value = "%" + this->valueField->text().toStdString();
+            query->addQueryCondition(this->attr, Kanki::RodsGenQuery::isLike, value);
+        break;
+
+        case RodsStringConditionWidget::Contains:
+            value = "%" + this->valueField->text().toStdString() + "%";
+            query->addQueryCondition(this->attr, Kanki::RodsGenQuery::isLess, value);
+        break;
+
+        case RodsStringConditionWidget::IsLike:
+            value = this->valueField->text().toStdString();
+            query->addQueryCondition(this->attr, Kanki::RodsGenQuery::isLike, value);
+        break;
+
+        default:
+        break;
+    }
 }
