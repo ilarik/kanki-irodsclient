@@ -20,6 +20,7 @@ RodsDateConditionWidget::RodsDateConditionWidget(int rodsAttr, QString label, QW
 
     this->layout = new QHBoxLayout(this);
     this->layout->setMargin(0);
+    this->layout->setAlignment(Qt::AlignLeft);
 
     this->labelWidget = new QLabel(label, this);
     this->layout->addWidget(this->labelWidget);
