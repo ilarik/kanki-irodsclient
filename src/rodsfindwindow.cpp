@@ -21,6 +21,8 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
     QMainWindow(parent),
     ui(new Ui::RodsFindWindow)
 {
+    this->conn = rodsConn;
+
     this->ui->setupUi(this);
     this->ui->criteriaLayout->setAlignment(Qt::AlignTop);
 
@@ -30,12 +32,20 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
 
     // connect ui event signals to handler slots
     connect(this->ui->condAdd, &QPushButton::clicked, this, &RodsFindWindow::addCondition);
-
+    connect(this->ui->actionExecute, &QAction::triggered, this, &RodsFindWindow::executeSearch);
 }
 
 RodsFindWindow::~RodsFindWindow()
 {
-    delete ui;
+    delete (this->ui);
+
+    // delete dynamically created widgets
+    for (std::vector<RodsConditionWidget*>::iterator i = this->condWidgets.begin();
+         i != this->condWidgets.end(); i++)
+    {
+        RodsConditionWidget *ptr = *i;
+        delete (ptr);
+    }
 }
 
 void RodsFindWindow::closeEvent(QCloseEvent *event)
@@ -52,6 +62,7 @@ void RodsFindWindow::addCondition()
     int cond = this->ui->condSel->currentData().toInt();
     QString label = this->ui->condSel->currentText();
 
+    // depending on condition, instantiate appropriate widget
     switch (cond)
     {
         case RodsFindWindow::DataObjName:
@@ -66,6 +77,7 @@ void RodsFindWindow::addCondition()
         break;
     }
 
+    // if we have a widget, add it
     if (widget)
     {
         this->ui->criteriaLayout->addWidget(widget);
@@ -75,10 +87,39 @@ void RodsFindWindow::addCondition()
 
 void RodsFindWindow::executeSearch()
 {
+    int status = 0;
+    Kanki::RodsGenQuery query(this->conn);
+    query.addQueryAttribute(COL_DATA_NAME);
+    query.addQueryAttribute(COL_COLL_NAME);
 
-}
+    // evaluate genquery conditions from the condition widgets
+    for (std::vector<RodsConditionWidget*>::iterator i = this->condWidgets.begin();
+         i != this->condWidgets.end(); i++)
+    {
+        RodsConditionWidget *widget = *i;
+        widget->evaluateConds(&query);
+    }
 
-void RodsFindWindow::on_actionExecute_triggered()
-{
+    if (this->conn->isReady())
+    {
+        if ((status = query.execute()) < 0)
+        {
+            // report error
+        }
 
+        // when success, parse thru query result set
+        else {
+            std::vector<std::string> names = query.getResultSetForAttr(COL_DATA_NAME);
+            std::vector<std::string> colls = query.getResultSetForAttr(COL_COLL_NAME);
+
+            for (unsigned int i = 0; i < names.size() && i < colls.size(); i++)
+            {
+                QTreeWidgetItem *item = new QTreeWidgetItem();
+                std::string path = colls.at(i) + '/' + names.at(i);
+
+                item->setText(0, path.c_str());
+                this->ui->treeWidget->addTopLevelItem(item);
+            }
+        }
+    }
 }

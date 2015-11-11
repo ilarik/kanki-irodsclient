@@ -65,15 +65,13 @@ protected:
     // Qt close window event handler, invokes unregister signal.
     void closeEvent(QCloseEvent *event);
 
-private slots:
-
-    // qt slot connected to ui execute action triggered signal
-    void on_actionExecute_triggered();
-
 private:
 
     // instance of Qt UI compiler generated UI
     Ui::RodsFindWindow *ui;
+
+    // our connection object
+    Kanki::RodsConnection *conn;
 
     // container for condition widgets (to be added dynamically)
     std::vector<RodsConditionWidget*> condWidgets;
