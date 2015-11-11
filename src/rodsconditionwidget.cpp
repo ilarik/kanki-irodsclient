@@ -15,8 +15,7 @@
 #include "rodsconditionwidget.h"
 
 RodsConditionWidget::RodsConditionWidget(QWidget *parent) :
-    QWidget(parent)
+    QFrame(parent)
 {
-
+    this->setFrameStyle(QFrame::Panel | QFrame::Raised);
 }
-

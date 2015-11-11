@@ -19,13 +19,14 @@
 
 // Qt framework headers
 #include <QWidget>
+#include <QFrame>
 
 // Kanki iRODS C++ class library headers
 #include <rodsconnection.h>
 #include <_rodsgenquery.h>
 
 
-class RodsConditionWidget : public QWidget
+class RodsConditionWidget : public QFrame
 {
     Q_OBJECT
 
