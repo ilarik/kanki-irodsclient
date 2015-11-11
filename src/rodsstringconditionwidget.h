@@ -22,6 +22,8 @@
 #include <QString>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QComboBox>
+#include <QLineEdit>
 
 // Kanki iRODS C++ class library headers
 #include "_rodsgenquery.h"
@@ -35,6 +37,9 @@ class RodsStringConditionWidget : public RodsConditionWidget
     Q_OBJECT
 
 public:
+
+    // class local enumeration for string conditions
+    enum StringConditions { Equals, BeginsWith, EndsWith, Contains, IsLike };
 
     // constructor instantiates a new widget for entering a string
     // condition against a given rods attribute with a given label
