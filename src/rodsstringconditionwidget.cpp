@@ -61,7 +61,7 @@ void RodsStringConditionWidget::evaluateConds(Kanki::RodsGenQuery *query)
 
         case RodsStringConditionWidget::Contains:
             value = "%" + this->valueField->text().toStdString() + "%";
-            query->addQueryCondition(this->attr, Kanki::RodsGenQuery::isLess, value);
+            query->addQueryCondition(this->attr, Kanki::RodsGenQuery::isLike, value);
         break;
 
         case RodsStringConditionWidget::IsLike:
