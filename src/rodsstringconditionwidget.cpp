@@ -37,6 +37,14 @@ RodsStringConditionWidget::RodsStringConditionWidget(int rodsAttr, QString label
     this->layout->addWidget(this->valueField);
 }
 
+RodsStringConditionWidget::~RodsStringConditionWidget()
+{
+    delete (this->valueField);
+    delete (this->condBox);
+    delete (this->labelWidget);
+    delete (this->layout);
+}
+
 void RodsStringConditionWidget::evaluateConds(Kanki::RodsGenQuery *query)
 {
     int opr = this->condBox->currentData().toInt();

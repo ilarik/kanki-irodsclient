@@ -45,6 +45,9 @@ public:
     // condition against a given rods attribute with a given label
     RodsStringConditionWidget(int rodsAttr, QString label, QWidget *parent = 0);
 
+    // destructor
+    ~RodsStringConditionWidget();
+
     // evaluate genquery condition generated
     virtual void evaluateConds(Kanki::RodsGenQuery *query);
 
