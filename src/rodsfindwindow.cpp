@@ -28,6 +28,7 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
 
     // setup combo box for condition selection
     this->ui->condSel->addItem("Data Object Name", RodsFindWindow::DataObjName);
+    this->ui->condSel->addItem("Data Object Checksum", RodsFindWindow::DataObjChksum);
     this->ui->condSel->addItem("Collection Name (Path)", RodsFindWindow::CollName);
 
     // connect ui event signals to handler slots
@@ -67,6 +68,10 @@ void RodsFindWindow::addCondition()
     {
         case RodsFindWindow::DataObjName:
             widget = new RodsStringConditionWidget(COL_DATA_NAME, label);
+        break;
+
+        case RodsFindWindow::DataObjChksum:
+            widget = new RodsStringConditionWidget(COL_D_DATA_CHECKSUM, label);
         break;
 
         case RodsFindWindow::CollName:

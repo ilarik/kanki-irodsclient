@@ -14,6 +14,8 @@
 #ifndef RODSFINDWINDOW_H
 #define RODSFINDWINDOW_H
 
+// C++ standard library headers
+#include <chrono>
 #include <vector>
 
 // Qt framework headers
@@ -39,7 +41,7 @@ class RodsFindWindow : public QMainWindow
 
 public:
 
-    enum SearchConditions { DataObjName, CollName };
+    enum SearchConditions { DataObjName, DataObjType, DataObjChksum, CollName };
 
     //
     explicit RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent = 0);

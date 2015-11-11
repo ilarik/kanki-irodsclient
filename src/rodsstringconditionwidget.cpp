@@ -27,9 +27,9 @@ RodsStringConditionWidget::RodsStringConditionWidget(int rodsAttr, QString label
 
     this->condBox = new QComboBox(this);
     this->condBox->addItem("Equals", RodsStringConditionWidget::Equals);
+    this->condBox->addItem("Contains", RodsStringConditionWidget::Contains);
     this->condBox->addItem("Begins With", RodsStringConditionWidget::BeginsWith);
     this->condBox->addItem("Ends With", RodsStringConditionWidget::EndsWith);
-    this->condBox->addItem("Contains", RodsStringConditionWidget::Contains);
     this->condBox->addItem("Is Like (Wildcard %)", RodsStringConditionWidget::IsLike);
     this->layout->addWidget(condBox);
 
