@@ -20,7 +20,7 @@ RodsStringConditionWidget::RodsStringConditionWidget(int rodsAttr, QString label
     this->attr = rodsAttr;
 
     this->layout = new QHBoxLayout(this);
-    this->layout->setMargin(0);
+    this->layout->setMargin(4);
 
     this->labelWidget = new QLabel(label, this);
     this->layout->addWidget(this->labelWidget);
