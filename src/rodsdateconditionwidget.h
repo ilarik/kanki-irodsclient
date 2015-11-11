@@ -15,19 +15,40 @@
 #define RODSDATECONDITIONWIDGET_H
 
 #include <QWidget>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QComboBox>
+#include <QDateTimeEdit>
 
-class RodsDateConditionWidget
+#include "rodsconditionwidget.h"
+
+
+class RodsDateConditionWidget : public RodsConditionWidget
 {
 public:
 
     //
-    RodsDateConditionWidget();
+    RodsDateConditionWidget(int rodsAttr, QString label, QWidget *parent = 0);
 
     //
     ~RodsDateConditionWidget();
 
 private:
 
+    // rods attr code
+    int attr;
+
+    // widget layout
+    QHBoxLayout *layout;
+
+    // label widget
+    QLabel *labelWidget;
+
+    // condition operator select
+    QComboBox *condBox;
+
+    // date/time widget
+    QDateTimeEdit *dateTime;
 };
 
 #endif // RODSDATECONDITIONWIDGET_H
