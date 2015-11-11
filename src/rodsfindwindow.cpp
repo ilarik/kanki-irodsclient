@@ -107,15 +107,26 @@ void RodsFindWindow::executeSearch()
 
     if (this->conn->isReady())
     {
-        if ((status = query.execute()) < 0)
+        // execute a timed query
+        std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+        status = query.execute();
+        std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+       // report errors
+        if (status < 0)
         {
-            // report error
+
         }
 
         // when success, parse thru query result set
         else {
             std::vector<std::string> names = query.getResultSetForAttr(COL_DATA_NAME);
             std::vector<std::string> colls = query.getResultSetForAttr(COL_COLL_NAME);
+            std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+
+            QString statusMsg = "Search query successful: " + QVariant((int)names.size()).toString();
+            statusMsg += " results (execution time " + QVariant(((double)diff.count() / (double)1000)).toString() + " sec).";
+            this->statusBar()->showMessage(statusMsg);
 
             for (unsigned int i = 0; i < names.size() && i < colls.size(); i++)
             {
