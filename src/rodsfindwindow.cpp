@@ -28,8 +28,12 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
 
     // setup combo box for condition selection
     this->ui->condSel->addItem("Data Object Name", RodsFindWindow::DataObjName);
+    this->ui->condSel->addItem("Data Object Created", RodsFindWindow::DataObjCreated);
+    this->ui->condSel->addItem("Data Object Modified", RodsFindWindow::DataObjModified);
     this->ui->condSel->addItem("Data Object Checksum", RodsFindWindow::DataObjChksum);
     this->ui->condSel->addItem("Collection Name (Path)", RodsFindWindow::CollName);
+    this->ui->condSel->addItem("Collection Created", RodsFindWindow::CollCreated);
+    this->ui->condSel->addItem("Collection Modified", RodsFindWindow::CollModified);
 
     // connect ui event signals to handler slots
     connect(this->ui->condAdd, &QPushButton::clicked, this, &RodsFindWindow::addCondition);
@@ -70,12 +74,28 @@ void RodsFindWindow::addCondition()
             widget = new RodsStringConditionWidget(COL_DATA_NAME, label);
         break;
 
+        case RodsFindWindow::DataObjCreated:
+            widget = new RodsDateConditionWidget(COL_D_CREATE_TIME, label);
+        break;
+
+        case RodsFindWindow::DataObjModified:
+            widget = new RodsDateConditionWidget(COL_D_MODIFY_TIME, label);
+        break;
+
         case RodsFindWindow::DataObjChksum:
             widget = new RodsStringConditionWidget(COL_D_DATA_CHECKSUM, label);
         break;
 
         case RodsFindWindow::CollName:
             widget = new RodsStringConditionWidget(COL_COLL_NAME, label);
+        break;
+
+        case RodsFindWindow::CollCreated:
+            widget = new RodsDateConditionWidget(COL_COLL_CREATE_TIME, label);
+        break;
+
+        case RodsFindWindow::CollModified:
+            widget = new RodsDateConditionWidget(COL_COLL_MODIFY_TIME, label);
         break;
 
         default:

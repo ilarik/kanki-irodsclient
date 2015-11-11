@@ -29,6 +29,7 @@
 // application headers
 #include "rodsconditionwidget.h"
 #include "rodsstringconditionwidget.h"
+#include "rodsdateconditionwidget.h"
 
 // Qt UI compiler namespace for generated classes
 namespace Ui {
@@ -41,7 +42,7 @@ class RodsFindWindow : public QMainWindow
 
 public:
 
-    enum SearchConditions { DataObjName, DataObjType, DataObjChksum, CollName };
+    enum SearchConditions { DataObjName, DataObjType, DataObjCreated, DataObjModified, DataObjChksum, CollName, CollCreated, CollModified };
 
     //
     explicit RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent = 0);
