@@ -27,11 +27,16 @@ class RodsDateConditionWidget : public RodsConditionWidget
 {
 public:
 
+    enum DateConditions { Equals, IsNewer, IsOlder };
+
     //
     RodsDateConditionWidget(int rodsAttr, QString label, QWidget *parent = 0);
 
     //
     ~RodsDateConditionWidget();
+
+    // evaluate genquery condition generated
+    virtual void evaluateConds(Kanki::RodsGenQuery *query);
 
 private:
 

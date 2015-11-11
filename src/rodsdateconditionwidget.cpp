@@ -25,8 +25,9 @@ RodsDateConditionWidget::RodsDateConditionWidget(int rodsAttr, QString label, QW
     this->layout->addWidget(this->labelWidget);
 
     this->condBox = new QComboBox(this);
-    //this->condBox->addItem("Equals", RodsStringConditionWidget::Equals);
-
+    this->condBox->addItem("After", RodsDateConditionWidget::IsNewer);
+    this->condBox->addItem("Before", RodsDateConditionWidget::IsOlder);
+    this->condBox->addItem("Exactly", RodsDateConditionWidget::Equals);
     this->layout->addWidget(condBox);
 
     this->dateTime = new QDateTimeEdit();
@@ -39,4 +40,28 @@ RodsDateConditionWidget::~RodsDateConditionWidget()
     delete (this->condBox);
     delete (this->labelWidget);
     delete (this->layout);
+}
+
+void RodsDateConditionWidget::evaluateConds(Kanki::RodsGenQuery *query)
+{
+    int opr = this->condBox->currentData().toInt();
+    std::string value = "0" + QVariant(this->dateTime->dateTime().toTime_t()).toString().toStdString();
+
+    switch (opr)
+    {
+        case RodsDateConditionWidget::Equals:
+            query->addQueryCondition(this->attr, Kanki::RodsGenQuery::isEqual, value);
+        break;
+
+        case RodsDateConditionWidget::IsNewer:
+            query->addQueryCondition(this->attr, Kanki::RodsGenQuery::isGreaterOrEqual, value);
+        break;
+
+        case RodsDateConditionWidget::IsOlder:
+            query->addQueryCondition(this->attr, Kanki::RodsGenQuery::isLessOrEqual, value);
+        break;
+
+        default:
+        break;
+    }
 }
