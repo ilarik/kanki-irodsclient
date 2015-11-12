@@ -51,7 +51,7 @@ public:
     // evaluate genquery condition generated
     virtual void evaluateConds(Kanki::RodsGenQuery *query);
 
-private:
+protected:
 
     // rods attr code
     int attr;

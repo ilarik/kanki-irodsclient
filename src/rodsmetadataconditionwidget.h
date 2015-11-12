@@ -33,30 +33,28 @@
 
 // application headers
 #include "rodsconditionwidget.h"
+#include "rodsstringconditionwidget.h"
 
-class RodsMetadataConditionWidget : public RodsConditionWidget
+class RodsMetadataConditionWidget : public RodsStringConditionWidget
 {
     Q_OBJECT
 
 public:
 
     //
-    RodsMetadataConditionWidget(objType_t objType, const std::map<std::string, std::string> &attrs,
+    RodsMetadataConditionWidget(objType_t type, const std::map<std::string, std::string> &attrs,
                                 QWidget *parent = 0);
 
 private:
 
-    // widget layout
-    QHBoxLayout *layout;
+    // object type
+    objType_t objType;
 
-    // label widget
-    QLabel *labelWidget;
+    // available attributes
+    std::map<std::string, std::string> attrMap;
 
     // metadata attribute select
     QComboBox *attrSel;
-
-    // condition operator select
-    QComboBox *condBox;
 
     // text field
     QLineEdit *valueField;

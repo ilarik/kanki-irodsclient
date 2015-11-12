@@ -27,9 +27,11 @@
 #include "_rodsgenquery.h"
 
 // application headers
+#include "rodsmetadataschema.h"
 #include "rodsconditionwidget.h"
 #include "rodsstringconditionwidget.h"
 #include "rodsdateconditionwidget.h"
+#include "rodsmetadataconditionwidget.h"
 
 // Qt UI compiler namespace for generated classes
 namespace Ui {
@@ -43,8 +45,8 @@ class RodsFindWindow : public QMainWindow
 public:
 
     //
-    enum SearchConditions { DataObjName, DataObjType, DataObjCreated, DataObjModified,
-                            DataObjChksum, CollName, CollCreated, CollModified };
+    enum SearchConditions { DataObjName, DataObjType, DataObjCreated, DataObjModified, DataObjMetadata,
+                            DataObjChksum, CollName, CollCreated, CollModified, CollMetadata };
 
     //
     explicit RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent = 0);
@@ -75,15 +77,23 @@ protected:
 
 private:
 
+    // refresh available data object attributes from iCAT
+    void refreshMetadataAttrs(objType_t objType);
+
     // instance of Qt UI compiler generated UI
     Ui::RodsFindWindow *ui;
 
     // our connection object
     Kanki::RodsConnection *conn;
 
+    // our schema instance
+    RodsMetadataSchema *schema;
+
     // container for condition widgets (to be added dynamically)
     std::vector<RodsConditionWidget*> condWidgets;
 
+    // container for available metadata attributes
+    std::map<std::string, std::string> attrMap;
 };
 
 #endif // RODSFINDWINDOW_H

@@ -23,6 +23,8 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
 {
     this->conn = rodsConn;
 
+    this->schema = new RodsMetadataSchema();
+
     this->ui->setupUi(this);
     this->ui->criteriaLayout->setAlignment(Qt::AlignTop);
 
@@ -31,9 +33,11 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
     this->ui->condSel->addItem("Data Object Created", RodsFindWindow::DataObjCreated);
     this->ui->condSel->addItem("Data Object Modified", RodsFindWindow::DataObjModified);
     this->ui->condSel->addItem("Data Object Checksum", RodsFindWindow::DataObjChksum);
+    this->ui->condSel->addItem("Data Object Metadata", RodsFindWindow::DataObjMetadata);
     this->ui->condSel->addItem("Collection Name (Path)", RodsFindWindow::CollName);
     this->ui->condSel->addItem("Collection Created", RodsFindWindow::CollCreated);
     this->ui->condSel->addItem("Collection Modified", RodsFindWindow::CollModified);
+    this->ui->condSel->addItem("Collection Metadata", RodsFindWindow::CollMetadata);
 
     // connect ui event signals to handler slots
     connect(this->ui->condAdd, &QPushButton::clicked, this, &RodsFindWindow::addCondition);
@@ -80,6 +84,12 @@ void RodsFindWindow::addCondition()
             widget = new RodsStringConditionWidget(COL_D_DATA_CHECKSUM, label);
         break;
 
+        case RodsFindWindow::DataObjMetadata:
+            if (this->attrMap.empty())
+                this->refreshMetadataAttrs(DATA_OBJ_T);
+            widget = new RodsMetadataConditionWidget(DATA_OBJ_T, this->attrMap);
+        break;
+
         case RodsFindWindow::CollName:
             widget = new RodsStringConditionWidget(COL_COLL_NAME, label);
         break;
@@ -90,6 +100,12 @@ void RodsFindWindow::addCondition()
 
         case RodsFindWindow::CollModified:
             widget = new RodsDateConditionWidget(COL_COLL_MODIFY_TIME, label);
+        break;
+
+        case RodsFindWindow::CollMetadata:
+            if (this->attrMap.empty())
+                this->refreshMetadataAttrs(COLL_OBJ_T);
+            widget = new RodsMetadataConditionWidget(COLL_OBJ_T, this->attrMap);
         break;
 
         default:
@@ -156,7 +172,6 @@ void RodsFindWindow::executeSearch()
     }
 }
 
-
 void RodsFindWindow::resetConditions()
 {
     // delete dynamically created widgets
@@ -170,4 +185,27 @@ void RodsFindWindow::resetConditions()
     }
 
     this->condWidgets.clear();
+}
+
+void RodsFindWindow::refreshMetadataAttrs(objType_t objType)
+{
+    int status = 0;
+    Kanki::RodsGenQuery query(this->conn);
+
+    if (objType == DATA_OBJ_T)
+        query.addQueryAttribute(COL_META_DATA_ATTR_NAME);
+    else if (objType == COLL_OBJ_T)
+        query.addQueryAttribute(COL_META_COLL_ATTR_NAME);
+
+    if ((status = query.execute()) < 0)
+    {
+        // report error
+    }
+
+    else {
+        std::vector<std::string> attrNames = query.getResultSet(0);
+
+        for (unsigned int i = 0; i < attrNames.size(); i ++)
+            this->attrMap[attrNames.at(i)] = this->schema->translateName(attrNames.at(i));
+    }
 }

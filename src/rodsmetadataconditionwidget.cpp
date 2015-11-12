@@ -14,9 +14,22 @@
 // application class RodsMetadataConditionWidget header
 #include "rodsmetadataconditionwidget.h"
 
-RodsMetadataConditionWidget::RodsMetadataConditionWidget(objType_t objType, const std::map<std::string, std::string> &attrs,
-                                                         QWidget *parent)
+RodsMetadataConditionWidget::RodsMetadataConditionWidget(objType_t type, const std::map<std::string, std::string> &attrs,
+                                                         QWidget *parent) :
+     RodsStringConditionWidget(type == DATA_OBJ_T ? COL_META_DATA_ATTR_VALUE : COL_META_COLL_ATTR_VALUE,
+                               type == DATA_OBJ_T ? "Data Object Metadata Attribute" : "Collection Metadata Attribute", parent)
 {
+    this->objType = type;
+    this->attrMap = attrs;
 
+    this->attrSel = new QComboBox(this);
+
+    for (std::map<std::string,std::string>::iterator i = this->attrMap.begin();
+         i != this->attrMap.end(); i++)
+    {
+
+    }
+
+    this->layout->insertWidget (1, this->attrSel);
 }
 
