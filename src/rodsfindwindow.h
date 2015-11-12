@@ -42,7 +42,9 @@ class RodsFindWindow : public QMainWindow
 
 public:
 
-    enum SearchConditions { DataObjName, DataObjType, DataObjCreated, DataObjModified, DataObjChksum, CollName, CollCreated, CollModified };
+    //
+    enum SearchConditions { DataObjName, DataObjType, DataObjCreated, DataObjModified,
+                            DataObjChksum, CollName, CollCreated, CollModified };
 
     //
     explicit RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent = 0);
