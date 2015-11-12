@@ -54,7 +54,7 @@ int RodsGenQuery::execute()
 
     // set rods api select array sizes
     queryInput.selectInp.len = this->queryAttrs.size();
-    queryInput.maxRows = 10;
+    queryInput.maxRows = 100;
 
     // allocate new arrays for rods api
     queryInput.selectInp.inx = new int[this->queryAttrs.size()];
