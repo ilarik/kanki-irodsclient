@@ -61,6 +61,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="resetButton">
+            <property name="text">
+             <string>Reset</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -116,6 +123,16 @@
          </widget>
         </widget>
        </item>
+       <item alignment="Qt::AlignLeft">
+        <widget class="QPushButton" name="executeButton">
+         <property name="text">
+          <string>Execute</string>
+         </property>
+         <property name="autoDefault">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -152,32 +169,6 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionExecute"/>
-   <addaction name="actionReset"/>
-  </widget>
-  <action name="actionExecute">
-   <property name="text">
-    <string>Execute</string>
-   </property>
-  </action>
-  <action name="actionReset">
-   <property name="text">
-    <string>Reset</string>
-   </property>
-   <property name="toolTip">
-    <string>Reset Search</string>
-   </property>
-  </action>
  </widget>
  <resources/>
  <connections/>

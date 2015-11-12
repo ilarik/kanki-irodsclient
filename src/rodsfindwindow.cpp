@@ -37,20 +37,14 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
 
     // connect ui event signals to handler slots
     connect(this->ui->condAdd, &QPushButton::clicked, this, &RodsFindWindow::addCondition);
-    connect(this->ui->actionExecute, &QAction::triggered, this, &RodsFindWindow::executeSearch);
+    connect(this->ui->resetButton, &QPushButton::clicked, this, &RodsFindWindow::reset);
+    connect(this->ui->executeButton, &QPushButton::clicked, this, &RodsFindWindow::executeSearch);
 }
 
 RodsFindWindow::~RodsFindWindow()
 {
+    this->removeCondWidgets();
     delete (this->ui);
-
-    // delete dynamically created widgets
-    for (std::vector<RodsConditionWidget*>::iterator i = this->condWidgets.begin();
-         i != this->condWidgets.end(); i++)
-    {
-        RodsConditionWidget *ptr = *i;
-        delete (ptr);
-    }
 }
 
 void RodsFindWindow::closeEvent(QCloseEvent *event)
@@ -132,7 +126,7 @@ void RodsFindWindow::executeSearch()
         status = query.execute();
         std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
-       // report errors
+        // report errors
         if (status < 0)
         {
 
@@ -140,6 +134,8 @@ void RodsFindWindow::executeSearch()
 
         // when successful, report results
         else {
+            this->ui->treeWidget->clear();
+
             std::vector<std::string> names = query.getResultSetForAttr(COL_DATA_NAME);
             std::vector<std::string> colls = query.getResultSetForAttr(COL_COLL_NAME);
             std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
@@ -158,4 +154,24 @@ void RodsFindWindow::executeSearch()
             }
         }
     }
+}
+
+void RodsFindWindow::reset()
+{
+    this->removeCondWidgets();
+}
+
+void RodsFindWindow::removeCondWidgets()
+{
+    // delete dynamically created widgets
+    for (std::vector<RodsConditionWidget*>::iterator i = this->condWidgets.begin();
+         i != this->condWidgets.end(); i++)
+    {
+        RodsConditionWidget *ptr = *i;
+
+        this->ui->criteriaLayout->removeWidget(ptr);
+        delete (ptr);
+    }
+
+    this->condWidgets.clear();
 }

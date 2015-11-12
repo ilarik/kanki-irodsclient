@@ -46,9 +46,10 @@ RodsDateConditionWidget::~RodsDateConditionWidget()
 void RodsDateConditionWidget::evaluateConds(Kanki::RodsGenQuery *query)
 {
     int opr = this->condBox->currentData().toInt();
+
+    // get unix timestamp and pad it with zeros (for string comparison...)
     std::string value = QVariant(this->dateTime->dateTime().toTime_t()).toString().toStdString();
     value.insert(0, 11 - value.length(), '0');
-
 
     switch (opr)
     {

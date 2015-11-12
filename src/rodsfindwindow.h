@@ -63,12 +63,18 @@ public slots:
     // Qt slot for requesting to execute
     void executeSearch();
 
+    // Qt slot for resetting the find window
+    void reset();
+
 protected:
 
     // Qt close window event handler, invokes unregister signal.
     void closeEvent(QCloseEvent *event);
 
 private:
+
+    //
+    void removeCondWidgets();
 
     // instance of Qt UI compiler generated UI
     Ui::RodsFindWindow *ui;
