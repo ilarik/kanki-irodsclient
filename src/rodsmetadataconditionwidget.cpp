@@ -27,7 +27,10 @@ RodsMetadataConditionWidget::RodsMetadataConditionWidget(objType_t type, const s
     for (std::map<std::string,std::string>::iterator i = this->attrMap.begin();
          i != this->attrMap.end(); i++)
     {
+        std::string attrName = i->first;
+        std::string attrLabel = i->second;
 
+        this->attrSel->addItem(attrLabel.c_str(), attrName.c_str());
     }
 
     this->layout->insertWidget (1, this->attrSel);

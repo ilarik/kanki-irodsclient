@@ -22,7 +22,6 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
     ui(new Ui::RodsFindWindow)
 {
     this->conn = rodsConn;
-
     this->schema = new RodsMetadataSchema();
 
     this->ui->setupUi(this);
