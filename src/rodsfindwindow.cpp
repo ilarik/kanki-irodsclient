@@ -37,13 +37,13 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
 
     // connect ui event signals to handler slots
     connect(this->ui->condAdd, &QPushButton::clicked, this, &RodsFindWindow::addCondition);
-    connect(this->ui->resetButton, &QPushButton::clicked, this, &RodsFindWindow::reset);
+    connect(this->ui->resetButton, &QPushButton::clicked, this, &RodsFindWindow::resetConditions);
     connect(this->ui->executeButton, &QPushButton::clicked, this, &RodsFindWindow::executeSearch);
 }
 
 RodsFindWindow::~RodsFindWindow()
 {
-    this->removeCondWidgets();
+    this->resetConditions();
     delete (this->ui);
 }
 
@@ -156,12 +156,8 @@ void RodsFindWindow::executeSearch()
     }
 }
 
-void RodsFindWindow::reset()
-{
-    this->removeCondWidgets();
-}
 
-void RodsFindWindow::removeCondWidgets()
+void RodsFindWindow::resetConditions()
 {
     // delete dynamically created widgets
     for (std::vector<RodsConditionWidget*>::iterator i = this->condWidgets.begin();

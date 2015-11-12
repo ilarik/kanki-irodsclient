@@ -64,7 +64,7 @@ public slots:
     void executeSearch();
 
     // Qt slot for resetting the find window
-    void reset();
+    void resetConditions();
 
 protected:
 
@@ -72,9 +72,6 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private:
-
-    //
-    void removeCondWidgets();
 
     // instance of Qt UI compiler generated UI
     Ui::RodsFindWindow *ui;
