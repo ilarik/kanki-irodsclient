@@ -15,6 +15,7 @@
 #include "rodsdateconditionwidget.h"
 
 RodsDateConditionWidget::RodsDateConditionWidget(int rodsAttr, QString label, QWidget *parent)
+    : RodsConditionWidget(parent)
 {
     this->attr = rodsAttr;
 
