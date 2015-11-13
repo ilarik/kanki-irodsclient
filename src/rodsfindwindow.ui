@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>960</width>
+    <width>1280</width>
     <height>600</height>
    </rect>
   </property>
@@ -63,6 +63,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="resetButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Reset</string>
             </property>
@@ -111,7 +114,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>916</width>
+            <width>1236</width>
             <height>198</height>
            </rect>
           </property>
@@ -125,6 +128,9 @@
        </item>
        <item alignment="Qt::AlignLeft">
         <widget class="QPushButton" name="executeButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Execute</string>
          </property>

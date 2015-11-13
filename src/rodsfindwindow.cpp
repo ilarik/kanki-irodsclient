@@ -111,9 +111,15 @@ void RodsFindWindow::addCondition()
         break;
     }
 
-    // if we have a widget, add it
+    // if we have a widget, add it and enable execute and reset
     if (widget)
     {
+        if (this->condWidgets.empty())
+        {
+            this->ui->resetButton->setDisabled(false);
+            this->ui->executeButton->setDisabled(false);
+        }
+
         this->ui->criteriaLayout->addWidget(widget);
         this->condWidgets.push_back(widget);
     }
@@ -183,7 +189,10 @@ void RodsFindWindow::resetConditions()
         delete (ptr);
     }
 
+    // clear widgets and disable execute and reset
     this->condWidgets.clear();
+    this->ui->resetButton->setDisabled(true);
+    this->ui->executeButton->setDisabled(true);
 }
 
 void RodsFindWindow::refreshMetadataAttrs()
