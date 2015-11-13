@@ -33,6 +33,7 @@ RodsMetadataConditionWidget::RodsMetadataConditionWidget(objType_t type, const s
 
         if (attrName.compare(attrLabel))
             label = attrName + " (" + attrLabel + ")";
+
         else
             label = attrName;
 

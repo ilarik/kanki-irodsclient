@@ -85,7 +85,7 @@ void RodsFindWindow::addCondition()
 
         case RodsFindWindow::DataObjMetadata:
             if (this->attrMap.empty())
-                this->refreshMetadataAttrs(DATA_OBJ_T);
+                this->refreshMetadataAttrs();
             widget = new RodsMetadataConditionWidget(DATA_OBJ_T, this->attrMap);
         break;
 
@@ -103,7 +103,7 @@ void RodsFindWindow::addCondition()
 
         case RodsFindWindow::CollMetadata:
             if (this->attrMap.empty())
-                this->refreshMetadataAttrs(COLL_OBJ_T);
+                this->refreshMetadataAttrs();
             widget = new RodsMetadataConditionWidget(COLL_OBJ_T, this->attrMap);
         break;
 
@@ -186,15 +186,11 @@ void RodsFindWindow::resetConditions()
     this->condWidgets.clear();
 }
 
-void RodsFindWindow::refreshMetadataAttrs(objType_t objType)
+void RodsFindWindow::refreshMetadataAttrs()
 {
     int status = 0;
     Kanki::RodsGenQuery query(this->conn);
-
-    if (objType == DATA_OBJ_T)
-        query.addQueryAttribute(COL_META_DATA_ATTR_NAME);
-    else if (objType == COLL_OBJ_T)
-        query.addQueryAttribute(COL_META_COLL_ATTR_NAME);
+    query.addQueryAttribute(COL_META_DATA_ATTR_NAME);
 
     if ((status = query.execute()) < 0)
     {

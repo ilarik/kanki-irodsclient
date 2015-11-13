@@ -78,7 +78,7 @@ protected:
 private:
 
     // refresh available data object attributes from iCAT
-    void refreshMetadataAttrs(objType_t objType);
+    void refreshMetadataAttrs();
 
     // instance of Qt UI compiler generated UI
     Ui::RodsFindWindow *ui;
