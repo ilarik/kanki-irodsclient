@@ -45,6 +45,12 @@ public:
     RodsMetadataConditionWidget(objType_t type, const std::map<std::string, std::string> &attrs,
                                 QWidget *parent = 0);
 
+    //
+    ~RodsMetadataConditionWidget();
+
+    // evaluate genquery condition generated
+    virtual void evaluateConds(Kanki::RodsGenQuery *query);
+
 private:
 
     // object type

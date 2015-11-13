@@ -36,3 +36,22 @@ RodsMetadataConditionWidget::RodsMetadataConditionWidget(objType_t type, const s
     this->layout->insertWidget (1, this->attrSel);
 }
 
+RodsMetadataConditionWidget::~RodsMetadataConditionWidget()
+{
+    delete (this->attrSel);
+}
+
+void RodsMetadataConditionWidget::evaluateConds(Kanki::RodsGenQuery *query)
+{
+    // attribute name condition
+    std::string attrName = this->attrSel->currentData().toString().toStdString();
+
+    if (this->objType == DATA_OBJ_T)
+        query->addQueryCondition(COL_META_DATA_ATTR_NAME, Kanki::RodsGenQuery::isEqual, attrName);
+
+    else if (this->objType == COLL_OBJ_T)
+        query->addQueryCondition(COL_META_COLL_ATTR_NAME, Kanki::RodsGenQuery::isEqual, attrName);
+
+    // attribute value condition
+    RodsStringConditionWidget::evaluateConds(query);
+}
