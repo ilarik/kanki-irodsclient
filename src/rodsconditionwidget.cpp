@@ -18,4 +18,13 @@ RodsConditionWidget::RodsConditionWidget(QWidget *parent) :
     QFrame(parent)
 {
     this->setFrameStyle(QFrame::Panel | QFrame::Raised);
+
+    this->layout = new QHBoxLayout(this);
+    this->layout->setMargin(4);
+    this->layout->setAlignment(Qt::AlignLeft);
+}
+
+RodsConditionWidget::~RodsConditionWidget()
+{
+    delete (this->layout);
 }

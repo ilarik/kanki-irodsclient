@@ -56,9 +56,6 @@ protected:
     // rods attr code
     int attr;
 
-    // widget layout
-    QHBoxLayout *layout;
-
     // label widget
     QLabel *labelWidget;
 

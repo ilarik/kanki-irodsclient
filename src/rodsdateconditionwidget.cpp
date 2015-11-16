@@ -19,10 +19,6 @@ RodsDateConditionWidget::RodsDateConditionWidget(int rodsAttr, QString label, QW
 {
     this->attr = rodsAttr;
 
-    this->layout = new QHBoxLayout(this);
-    this->layout->setMargin(4);
-    this->layout->setAlignment(Qt::AlignLeft);
-
     this->labelWidget = new QLabel(label, this);
     this->layout->addWidget(this->labelWidget);
 
@@ -41,7 +37,6 @@ RodsDateConditionWidget::~RodsDateConditionWidget()
     delete (this->dateTime);
     delete (this->condBox);
     delete (this->labelWidget);
-    delete (this->layout);
 }
 
 void RodsDateConditionWidget::evaluateConds(Kanki::RodsGenQuery *query)
