@@ -43,7 +43,11 @@ SOURCES += main.cpp\
     rodsdatastream.cpp \
     rodsdatainstream.cpp \
     rodsdataoutstream.cpp \
-    rodserrorlogwindow.cpp
+    rodserrorlogwindow.cpp \
+    rodsstringconditionwidget.cpp \
+    rodsconditionwidget.cpp \
+    rodsdateconditionwidget.cpp \
+    rodsmetadataconditionwidget.cpp
 
 HEADERS  += rodsmainwindow.h \
     rodsconnection.h \
@@ -67,7 +71,11 @@ HEADERS  += rodsmainwindow.h \
     rodsdatainstream.h \
     rodsdataoutstream.h \
     _rodsgenquery.h \
-    rodserrorlogwindow.h
+    rodserrorlogwindow.h \
+    rodsconditionwidget.h \
+    rodsstringconditionwidget.h \
+    rodsdateconditionwidget.h \
+    rodsmetadataconditionwidget.h
 
 FORMS    += rodsmainwindow.ui \
     rodsmetadatawindow.ui \
@@ -206,8 +214,6 @@ else {
     INCLUDEPATH += /usr/include/irods/boost
 }
    
-LIBS += -ldl -lm -lpthread -lcurl
-
 macx {
     INCLUDEPATH += /usr/local/opt/openssl/include
     LIBS += -L/usr/local/opt/openssl/lib -lssl -lcrypto
@@ -228,8 +234,11 @@ macx {
 } 
 
 else {
-    LIBS += -L/usr/lib/irods/externals -lirods_client -lirods_client_api -lboost_filesystem -lboost_regex -lboost_system -lboost_thread 
+    LIBS += -L/usr/lib/irods/externals -lirods_client_api -lirods_client -lboost_filesystem -lboost_regex -lboost_system -lboost_thread
     LIBS += -lboost_chrono -lboost_date_time -lboost_filesystem -lboost_iostreams -lboost_program_options
     LIBS += /usr/lib/irods/externals/libjansson.a
     LIBS += -lcrypto -lssl
 }
+
+LIBS += -ldl -lm -lpthread -lcurl
+

@@ -23,6 +23,7 @@ RodsMainWindow::RodsMainWindow(QWidget *parent) :
 {
     this->conn = NULL;
     this->queueWindow = NULL;
+    this->findWindow = NULL;
     this->model = NULL;
 
     // instantiate and configure Qt UI
@@ -190,6 +191,7 @@ void RodsMainWindow::enterConnectedState()
     this->ui->verifyChecksum->setDisabled(false);
     this->ui->allowOverwrite->setDisabled(false);
     this->ui->storageResc->setDisabled(false);
+    this->ui->actionFind->setDisabled(false);
 }
 
 void RodsMainWindow::enterDisconnectedState()
@@ -211,6 +213,7 @@ void RodsMainWindow::enterDisconnectedState()
     this->ui->actionUpload->setDisabled(true);
     this->ui->actionUploadDirectory->setDisabled(true);
     this->ui->actionDownload->setDisabled(true);
+    this->ui->actionFind->setDisabled(true);
 
     // disable settings controls
     this->ui->verifyChecksum->setDisabled(true);
@@ -877,6 +880,42 @@ void RodsMainWindow::errorsReported(unsigned int errorCount)
     this->ui->actionErrorLog->setText("Error Log (NEW!)");
 }
 
+void RodsMainWindow::openFindWindow()
+{
+    // create and setup new instance if necessary
+    if (!this->findWindow)
+    {
+        this->findWindow = new RodsFindWindow(this->conn);
+
+        connect(this->findWindow, &RodsFindWindow::unregister,
+                this, &RodsMainWindow::unregisterFindWindow);
+        connect(this->findWindow, &RodsFindWindow::selectObj,
+                this, &RodsMainWindow::selectRodsObject);
+    }
+
+    // show and activate window
+    this->findWindow->show();
+    this->findWindow->raise();
+    QApplication::setActiveWindow(this->findWindow);
+
+}
+
+void RodsMainWindow::unregisterFindWindow()
+{
+    // sanity check
+    if (this->findWindow)
+    {
+        // delete object and clear pointer
+        delete (this->findWindow);
+        this->findWindow = NULL;
+    }
+}
+
+void RodsMainWindow::selectRodsObject(QString objPath)
+{
+
+}
+
 void RodsMainWindow::on_actionConnect_triggered()
 {
     this->doRodsConnect();
@@ -966,4 +1005,9 @@ void RodsMainWindow::on_storageResc_activated(const QString &arg1)
 void RodsMainWindow::on_actionErrorLog_triggered()
 {
     this->openErrorLog();
+}
+
+void RodsMainWindow::on_actionFind_triggered()
+{
+    this->openFindWindow();
 }

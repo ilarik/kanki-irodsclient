@@ -1,5 +1,5 @@
 Name:		kanki-irodsclient
-Version:	1.0.7
+Version:	1.1.0b1
 Release:	1.el6
 Summary:	Kanki iRODS GUI Client 
 
@@ -46,6 +46,9 @@ rm -rf %{buildroot}
 %attr(644, root, root) /usr/share/icons/hicolor/128x128/apps/irodsclient.png
 
 %changelog
+* Mon Nov 16 2015 Ilari Korhonen <ilari.korhonen@jyu.fi>
+* beta version 1.1.0b1 - iRODS object search functionality
+
 * Wed Nov 04 2015 Ilari Korhonen <ilari.korhonen@jyu.fi>
 * version 1.0.7 - bug fixes and error reporting
 
