@@ -40,7 +40,7 @@ RodsMetadataConditionWidget::RodsMetadataConditionWidget(objType_t type, const s
         this->attrSel->addItem(label.c_str(), attrName.c_str());
     }
 
-    this->layout->insertWidget (1, this->attrSel);
+    this->layout->insertWidget (2, this->attrSel);
 }
 
 RodsMetadataConditionWidget::~RodsMetadataConditionWidget()
