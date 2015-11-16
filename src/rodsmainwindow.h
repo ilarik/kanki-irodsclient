@@ -166,6 +166,9 @@ public slots:
     // Qt slot for repoting error count to grid browser window ui.
     void errorsReported(unsigned int errorCount);
 
+    // Qt slot for selecting an object in the browser window.
+    void selectRodsObject(QString objPath);
+
 private slots:
 
     // qt slot which connects to connect action triggered signal

@@ -43,6 +43,7 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
     connect(this->ui->condAdd, &QPushButton::clicked, this, &RodsFindWindow::addCondition);
     connect(this->ui->resetButton, &QPushButton::clicked, this, &RodsFindWindow::resetConditions);
     connect(this->ui->executeButton, &QPushButton::clicked, this, &RodsFindWindow::executeSearch);
+    connect(this->ui->treeWidget, &QTreeWidget::doubleClicked, this, &RodsFindWindow::resultDoubleClicked);
 }
 
 RodsFindWindow::~RodsFindWindow()
@@ -239,5 +240,21 @@ void RodsFindWindow::unregisterCondWidget(RodsConditionWidget *ptr)
     {
         this->ui->resetButton->setDisabled(true);
         this->ui->executeButton->setDisabled(true);
+    }
+}
+
+void RodsFindWindow::resultDoubleClicked(const QModelIndex &index)
+{
+    // sanity check
+    if (index.isValid())
+    {
+        QTreeWidgetItem *item = static_cast<QTreeWidgetItem*>(index.internalPointer());
+
+        if (item)
+        {
+            // get path and signal browser window to select path
+            QString path = item->data(0, Qt::DisplayRole).toString();
+            this->selectObj(path);
+        }
     }
 }

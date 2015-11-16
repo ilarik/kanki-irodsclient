@@ -889,6 +889,8 @@ void RodsMainWindow::openFindWindow()
 
         connect(this->findWindow, &RodsFindWindow::unregister,
                 this, &RodsMainWindow::unregisterFindWindow);
+        connect(this->findWindow, &RodsFindWindow::selectObj,
+                this, &RodsMainWindow::selectRodsObject);
     }
 
     // show and activate window
@@ -907,6 +909,11 @@ void RodsMainWindow::unregisterFindWindow()
         delete (this->findWindow);
         this->findWindow = NULL;
     }
+}
+
+void RodsMainWindow::selectRodsObject(QString objPath)
+{
+
 }
 
 void RodsMainWindow::on_actionConnect_triggered()

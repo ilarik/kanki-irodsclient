@@ -60,6 +60,9 @@ signals:
     // Qt signal for unregistering the find window for deletion of the object.
     void unregister();
 
+    // Qt signal for selecting an object in the grid browser, signals out path
+    void selectObj(QString objPath);
+
 public slots:
 
     // Qt slot for requesting to add a condition
@@ -73,6 +76,9 @@ public slots:
 
     // Qt slot for unregistering a condition widget
     void unregisterCondWidget(RodsConditionWidget *ptr);
+
+    // Qt slot for invoking an object selection in the grid browser
+    void resultDoubleClicked(const QModelIndex &index);
 
 protected:
 
