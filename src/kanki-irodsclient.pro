@@ -234,7 +234,7 @@ macx {
 } 
 
 else {
-    LIBS += -L/usr/lib/irods/externals -lirods_client -lirods_client_api -lboost_filesystem -lboost_regex -lboost_system -lboost_thread 
+    LIBS += -L/usr/lib/irods/externals -lirods_client_api -lirods_client -lboost_filesystem -lboost_regex -lboost_system -lboost_thread
     LIBS += -lboost_chrono -lboost_date_time -lboost_filesystem -lboost_iostreams -lboost_program_options
     LIBS += /usr/lib/irods/externals/libjansson.a
     LIBS += -lcrypto -lssl
