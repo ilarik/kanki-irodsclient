@@ -111,9 +111,12 @@ void RodsFindWindow::addCondition()
         break;
     }
 
-    // if we have a widget, add it and enable execute and reset
+    // if we have a widget, set it up
     if (widget)
     {
+        connect(widget, &RodsConditionWidget::unregister, this, &RodsFindWindow::unregisterCondWidget);
+
+        // enable if necessary
         if (this->condWidgets.empty())
         {
             this->ui->resetButton->setDisabled(false);
@@ -179,20 +182,7 @@ void RodsFindWindow::executeSearch()
 
 void RodsFindWindow::resetConditions()
 {
-    // delete dynamically created widgets
-    for (std::vector<RodsConditionWidget*>::iterator i = this->condWidgets.begin();
-         i != this->condWidgets.end(); i++)
-    {
-        RodsConditionWidget *ptr = *i;
-
-        this->ui->criteriaLayout->removeWidget(ptr);
-        delete (ptr);
-    }
-
-    // clear widgets and disable execute and reset
-    this->condWidgets.clear();
-    this->ui->resetButton->setDisabled(true);
-    this->ui->executeButton->setDisabled(true);
+    this->unregisterCondWidget(NULL);
 }
 
 void RodsFindWindow::refreshMetadataAttrs()
@@ -211,5 +201,40 @@ void RodsFindWindow::refreshMetadataAttrs()
 
         for (unsigned int i = 0; i < attrNames.size(); i ++)
             this->attrMap[attrNames.at(i)] = this->schema->translateName(attrNames.at(i));
+    }
+}
+
+void RodsFindWindow::unregisterCondWidget(RodsConditionWidget *ptr)
+{
+    // iterate thru dynamically created widgets
+    for (std::vector<RodsConditionWidget*>::iterator i = this->condWidgets.begin();
+         i != this->condWidgets.end(); i++)
+    {
+        RodsConditionWidget *curPtr = *i;
+
+        // remove widget if ptr matches or is null
+        if (!ptr || ptr == curPtr)
+        {
+            this->ui->criteriaLayout->removeWidget(curPtr);
+
+            if (curPtr)
+                delete (curPtr);
+
+            if (ptr)
+            {
+                this->condWidgets.erase(i);
+                break;
+            }
+        }
+    }
+
+    if (!ptr)
+        this->condWidgets.clear();
+
+    // clear widgets and disable execute and reset
+    if (this->condWidgets.empty())
+    {
+        this->ui->resetButton->setDisabled(true);
+        this->ui->executeButton->setDisabled(true);
     }
 }

@@ -70,6 +70,9 @@ public slots:
     // Qt slot for resetting the find window
     void resetConditions();
 
+    // Qt slot for unregistering a condition widget
+    void unregisterCondWidget(RodsConditionWidget *ptr);
+
 protected:
 
     // Qt close window event handler, invokes unregister signal.

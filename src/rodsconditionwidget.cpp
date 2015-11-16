@@ -22,9 +22,19 @@ RodsConditionWidget::RodsConditionWidget(QWidget *parent) :
     this->layout = new QHBoxLayout(this);
     this->layout->setMargin(4);
     this->layout->setAlignment(Qt::AlignLeft);
+
+    this->remove = new QPushButton("Remove");
+    this->layout->addWidget(remove);
+
+    connect(this->remove, &QPushButton::clicked, this, &RodsConditionWidget::invokeUnregister);
 }
 
 RodsConditionWidget::~RodsConditionWidget()
 {
     delete (this->layout);
+}
+
+void RodsConditionWidget::invokeUnregister()
+{
+    this->unregister(this);
 }
