@@ -214,8 +214,6 @@ else {
     INCLUDEPATH += /usr/include/irods/boost
 }
    
-LIBS += -ldl -lm -lpthread -lcurl
-
 macx {
     INCLUDEPATH += /usr/local/opt/openssl/include
     LIBS += -L/usr/local/opt/openssl/lib -lssl -lcrypto
@@ -241,3 +239,6 @@ else {
     LIBS += /usr/lib/irods/externals/libjansson.a
     LIBS += -lcrypto -lssl
 }
+
+LIBS += -ldl -lm -lpthread -lcurl
+
