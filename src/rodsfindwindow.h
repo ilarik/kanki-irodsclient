@@ -21,6 +21,7 @@
 // Qt framework headers
 #include <QMainWindow>
 #include <QInputDialog>
+#include <QIcon>
 
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
@@ -85,6 +86,9 @@ private:
 
     // instance of Qt UI compiler generated UI
     Ui::RodsFindWindow *ui;
+
+    // icon for a search result
+    QIcon dataIcon;
 
     // our connection object
     Kanki::RodsConnection *conn;

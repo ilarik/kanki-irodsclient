@@ -26,6 +26,7 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
 
     this->ui->setupUi(this);
     this->ui->criteriaLayout->setAlignment(Qt::AlignTop);
+    this->dataIcon = QIcon(":/tango/icons/text-x-generic.png");
 
     // setup combo box for condition selection
     this->ui->condSel->addItem("Data Object Name", RodsFindWindow::DataObjName);
@@ -174,6 +175,8 @@ void RodsFindWindow::executeSearch()
                 std::string path = colls.at(i) + '/' + names.at(i);
 
                 item->setText(0, path.c_str());
+                item->setIcon(0, this->dataIcon);
+
                 this->ui->treeWidget->addTopLevelItem(item);
             }
         }
