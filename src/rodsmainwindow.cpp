@@ -813,6 +813,7 @@ void RodsMainWindow::refreshResources()
     Kanki::RodsGenQuery rescQuery(this->conn);
     rescQuery.addQueryAttribute(COL_R_RESC_NAME);
     rescQuery.addQueryAttribute(COL_R_RESC_COMMENT);
+    rescQuery.addQueryAttribute(COL_R_RESC_PARENT);
 
     // we omit bundleResc
     rescQuery.addQueryCondition(COL_R_RESC_NAME, Kanki::RodsGenQuery::isNotEqual,
@@ -827,34 +828,40 @@ void RodsMainWindow::refreshResources()
     else {
         std::vector<std::string> resources = rescQuery.getResultSetForAttr(COL_R_RESC_NAME);
         std::vector<std::string> comments = rescQuery.getResultSetForAttr(COL_R_RESC_COMMENT);
+        std::vector<std::string> parents = rescQuery.getResultSetForAttr(COL_R_RESC_PARENT);
 
-        for (unsigned int i = 0; i < resources.size() && i < comments.size(); i ++)
+        for (unsigned int i = 0; i < resources.size() && i < comments.size() && i < parents.size(); i ++)
         {
-            QString rescStr = resources.at(i).c_str();
-            QString rescDesc = rescStr;
+            QString parentStr = parents.at(i).c_str();
 
-            // add comment if there is one and truncate long ones
-            if (comments.at(i).length())
+            if (!parentStr.length())
             {
-                rescDesc += " (";
+                QString rescStr = resources.at(i).c_str();
+                QString rescDesc = rescStr;
 
-                if (comments.at(i).length() > 32)
-                    rescDesc += comments.at(i).substr(0,31).c_str() + QString("...");
+                // add comment if there is one and truncate long ones
+                if (comments.at(i).length())
+                {
+                    rescDesc += " (";
 
-                else
-                    rescDesc += comments.at(i).c_str();
+                    if (comments.at(i).length() > 32)
+                        rescDesc += comments.at(i).substr(0,31).c_str() + QString("...");
 
-                rescDesc += QString(")");
-            }
+                    else
+                        rescDesc += comments.at(i).c_str();
 
-            // add new item and select it if it's the user default
-            this->ui->storageResc->addItem(rescDesc, rescStr);
+                    rescDesc += QString(")");
+                }
 
-            // select (first by default) or user-defined default resource
-            if ((i == 0) || (!defResc.compare(resources.at(i))))
-            {
-                this->ui->storageResc->setCurrentIndex(i);
-                this->currentResc = rescStr.toStdString();
+                // add new item and select it if it's the user default
+                this->ui->storageResc->addItem(rescDesc, rescStr);
+
+                // select (first by default) or user-defined default resource
+                if ((i == 0) || (!defResc.compare(resources.at(i))))
+                {
+                    this->ui->storageResc->setCurrentIndex(i);
+                    this->currentResc = rescStr.toStdString();
+                }
             }
         }
     }
