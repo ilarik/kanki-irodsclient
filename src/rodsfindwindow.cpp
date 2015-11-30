@@ -26,7 +26,9 @@ RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent)
 
     this->ui->setupUi(this);
     this->ui->criteriaLayout->setAlignment(Qt::AlignTop);
+
     this->dataIcon = QIcon(":/tango/icons/text-x-generic.png");
+    this->collIcon = QIcon(":/tango/icons/folder.png");
 
     // setup combo box for condition selection
     this->ui->condSel->addItem("Data Object Name", RodsFindWindow::DataObjName);
@@ -165,6 +167,7 @@ void RodsFindWindow::executeSearch()
             std::vector<std::string> names = query.getResultSetForAttr(COL_DATA_NAME);
             std::vector<std::string> colls = query.getResultSetForAttr(COL_COLL_NAME);
             std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+            std::map<std::string, QTreeWidgetItem*> collMap;
 
             QString statusMsg = "Search query successful: " + QVariant((int)names.size()).toString();
             statusMsg += " results (execution time " + QVariant(((double)diff.count() / (double)1000)).toString() + " sec).";
@@ -172,14 +175,28 @@ void RodsFindWindow::executeSearch()
 
             for (unsigned int i = 0; i < names.size() && i < colls.size(); i++)
             {
-                QTreeWidgetItem *item = new QTreeWidgetItem();
-                std::string path = colls.at(i) + '/' + names.at(i);
+                QTreeWidgetItem *collItem = NULL;
 
-                item->setText(0, path.c_str());
+                if (collMap.find(colls.at(i)) == collMap.end())
+                {
+                    collItem = collMap[colls.at(i)] = new QTreeWidgetItem();
+                    collItem->setText(0, colls.at(i).c_str());
+                    collItem->setIcon(0, this->collIcon);
+
+                    this->ui->treeWidget->addTopLevelItem(collItem);
+                }
+
+                else
+                    collItem = collMap[colls.at(i)];
+
+                QTreeWidgetItem *item = new QTreeWidgetItem();
+                item->setText(0, names.at(i).c_str());
                 item->setIcon(0, this->dataIcon);
 
-                this->ui->treeWidget->addTopLevelItem(item);
+                collItem->addChild(item);
             }
+
+            this->ui->treeWidget->expandAll();
         }
     }
 }

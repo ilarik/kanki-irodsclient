@@ -94,7 +94,7 @@ private:
     Ui::RodsFindWindow *ui;
 
     // icon for a search result
-    QIcon dataIcon;
+    QIcon dataIcon, collIcon;
 
     // our connection object
     Kanki::RodsConnection *conn;
