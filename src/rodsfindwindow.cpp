@@ -179,7 +179,7 @@ void RodsFindWindow::executeSearch()
 
                 if (collMap.find(colls.at(i)) == collMap.end())
                 {
-                    collItem = collMap[colls.at(i)] = new QTreeWidgetItem();
+                    collItem = collMap[colls.at(i)] = new QTreeWidgetItem(this->ui->treeWidget);
                     collItem->setText(0, colls.at(i).c_str());
                     collItem->setIcon(0, this->collIcon);
 
@@ -189,7 +189,7 @@ void RodsFindWindow::executeSearch()
                 else
                     collItem = collMap[colls.at(i)];
 
-                QTreeWidgetItem *item = new QTreeWidgetItem();
+                QTreeWidgetItem *item = new QTreeWidgetItem(this->ui->treeWidget);
                 item->setText(0, names.at(i).c_str());
                 item->setIcon(0, this->dataIcon);
 
