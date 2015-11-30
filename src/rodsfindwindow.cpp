@@ -189,7 +189,7 @@ void RodsFindWindow::executeSearch()
                 else
                     collItem = collMap[colls.at(i)];
 
-                QTreeWidgetItem *item = new QTreeWidgetItem(this->ui->treeWidget);
+                QTreeWidgetItem *item = new QTreeWidgetItem(collItem);
                 item->setText(0, names.at(i).c_str());
                 item->setIcon(0, this->dataIcon);
 
@@ -263,14 +263,15 @@ void RodsFindWindow::unregisterCondWidget(RodsConditionWidget *ptr)
 void RodsFindWindow::resultDoubleClicked(const QModelIndex &index)
 {
     // sanity check
-    if (index.isValid())
+    if (index.isValid() && index.parent().isValid())
     {
         QTreeWidgetItem *item = static_cast<QTreeWidgetItem*>(index.internalPointer());
+        QTreeWidgetItem *parent = static_cast<QTreeWidgetItem*>(index.parent().internalPointer());
 
-        if (item)
+        if (item && parent)
         {
             // get path and signal browser window to select path
-            QString path = item->data(0, Qt::DisplayRole).toString();
+            QString path = parent->data(0, Qt::DisplayRole).toString() + "/" + item->data(0, Qt::DisplayRole).toString();
             this->selectObj(path);
         }
     }
