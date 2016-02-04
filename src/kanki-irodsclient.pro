@@ -221,6 +221,7 @@ macx {
 
 macx {
     LIBS += -lc++
+    LIBS += $$OSX_IRODS_BUILD/iRODS/lib/client_exec/obj/irods_client_rule_execution_manager_factory.o
     LIBS += $$OSX_IRODS_BUILD/iRODS/lib/core/obj/libRodsAPIs.a
     LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_filesystem.a
     LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_regex.a
