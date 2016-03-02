@@ -64,6 +64,31 @@ qt5_use_modules(irodsclient Core Gui Svg Xml)
 add_library(jansson STATIC IMPORTED)
 set_property(TARGET jansson PROPERTY IMPORTED_LOCATION ${iRODS_DIR}/external/${iRODS_Jansson}/src/.libs/libjansson.a)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+# needed for linkage in OSX with iRODS 4.1.8+
+add_library(client_exec STATIC IMPORTED)
+set_property(TARGET client_exec PROPERTY IMPORTED_LOCATION ${iRODS_DIR}/iRODS/lib/client_exec/obj/irods_client_rule_execution_manager_factory.o)
+
+target_link_libraries(
+        irodsclient
+	client_exec
+	RodsAPIs
+        boost_filesystem
+        boost_regex
+	boost_system
+        boost_thread
+        boost_chrono
+	boost_date_time
+        boost_iostreams
+        boost_program_options
+	jansson
+        ssl
+        crypto
+)
+
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
 target_link_libraries(
 	irodsclient
 	RodsAPIs 
@@ -79,3 +104,5 @@ target_link_libraries(
 	ssl
 	crypto
 )
+
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
