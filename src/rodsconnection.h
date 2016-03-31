@@ -26,6 +26,7 @@
 // boost library headers
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/system/error_code.hpp>
 
 // iRODS client library headers
 #include "rodsClient.h"
