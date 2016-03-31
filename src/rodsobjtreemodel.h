@@ -26,9 +26,12 @@
 #include <QAbstractItemModel>
 #include <QMessageBox>
 #include <QIcon>
+#include <QMimeData>
+#include <QUrl>
 
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
+#include "rodsobjentry.h"
 
 // application headers
 #include "rodsobjtreeitem.h"
@@ -105,6 +108,9 @@ public:
     // into the model at given row, column and index.
     bool dropMimeData(const QMimeData *data, Qt::DropAction action,
                       int row, int column, const QModelIndex &parent);
+
+    // Overrides superclass virtual function for generating drag&drop mime data.
+    QMimeData* mimeData(const QModelIndexList &indexes) const;
 
     // Interface for adding an additional rods mount point to the object model.
     void addMountPoint(const std::string &path);
