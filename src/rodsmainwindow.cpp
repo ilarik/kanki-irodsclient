@@ -44,7 +44,6 @@ RodsMainWindow::RodsMainWindow(QWidget *parent) :
     connect(this->errorLogWindow, &RodsErrorLogWindow::errorsPresent, this, &RodsMainWindow::errorsReported);
 
     // enable drag & drop
-    this->setAcceptDrops(false);
     this->ui->rodsObjTree->viewport()->setAcceptDrops(true);
     this->ui->rodsObjTree->setDragEnabled(true);
     this->ui->rodsObjTree->setAcceptDrops(true);
@@ -85,11 +84,6 @@ RodsMainWindow::~RodsMainWindow()
 }
 
 void RodsMainWindow::dragEnterEvent(QDragEnterEvent *event)
-{
-    event->acceptProposedAction();
-}
-
-void RodsMainWindow::dragMoveEvent(QDragMoveEvent *event)
 {
     event->acceptProposedAction();
 }
