@@ -135,8 +135,11 @@ public:
     // Removes an iRODS data object at objPath.
     int removeObj(const std::string &objPath);
 
-    // Moves an iRODS object to collPath.
+    // Moves an iRODS object represented by objEntry to collPath.
     int moveObjToColl(Kanki::RodsObjEntryPtr objEntry, const std::string &collPath);
+
+    // Moves an iRODS object at objPath to collection at collPath.
+    int moveObjToColl(const std::string &objPath, objType_t objType, const std::string &collPath);
 
     // Renames an iRODS object to newName.
     int renameObj(Kanki::RodsObjEntryPtr objEntry, const std::string &newName);

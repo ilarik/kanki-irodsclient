@@ -449,6 +449,13 @@ int RodsConnection::moveObjToColl(RodsObjEntryPtr objEntry, const std::string &c
     return (status);
 }
 
+int RodsConnection::moveObjToColl(const std::string &objPath, objType_t objType, const std::string &collPath)
+{
+    int status = 0;
+
+    return (status);
+}
+
 int RodsConnection::renameObj(RodsObjEntryPtr objEntry, const std::string &newName)
 {
     int status = 0;
