@@ -160,8 +160,8 @@ macx {
         $${TARGET}.app/$$IRODS_ICOMMANDS_BIN.path/$$icommand;
     }
 
-    QMAKE_EXTRA_TARGETS += target_auth_plugins target_network_plugins target_icommands
-    PRE_TARGETDEPS += target_auth_plugins target_network_plugins target_icommands
+    QMAKE_EXTRA_TARGETS += target_icommands #target_auth_plugins target_network_plugins
+    PRE_TARGETDEPS += target_icommands #target_auth_plugins target_network_plugins
 
     QMAKE_BUNDLE_DATA += SCHEMA_XML
     QMAKE_BUNDLE_DATA += IRODS_PLUGINS_AUTH_LIBS
