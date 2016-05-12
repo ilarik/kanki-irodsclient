@@ -488,6 +488,40 @@ void RodsObjTreeModel::refreshAtPath(QString path)
         this->refreshAtIndex(curIndex);
 }
 
+Kanki::RodsObjEntryPtr RodsObjTreeModel::resolvePathToEntry(const std::string &path)
+{
+    QModelIndex curIndex;
+    RodsObjTreeItem *curItem = this->rootItem;
+    std::string curPath;
+    boost::char_separator<char> separator("/");
+    boost::tokenizer< boost::char_separator<char> > tokens(path, separator);
+
+    // iterate path tokens to find item
+    for (boost::tokenizer< boost::char_separator<char> >::iterator iter = tokens.begin();
+         iter != tokens.end(); iter++)
+    {
+        curPath += "/" + *iter;
+
+        for (int i = 0; i < curItem->childCount(); i++)
+        {
+            RodsObjTreeItem *childItem = curItem->child(i);
+            Kanki::RodsObjEntryPtr objEntry = childItem->getObjEntryPtr();
+
+            // if we found an item matching path token, we break from loop
+            if (!objEntry || !objEntry->getObjectFullPath().compare(curPath))
+            {
+                curItem = childItem;
+                curIndex = this->index(i, 0, curIndex);
+
+                break;
+            }
+        }
+    }
+
+    return (curItem->getObjEntryPtr());
+}
+
+
 Qt::DropActions RodsObjTreeModel::supportedDropActions() const
 {
     // we support copy and move actions
@@ -531,15 +565,28 @@ bool RodsObjTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action
                     std::string objPathStr = objPath.toStdString();
                     std::string srcColl = objPathStr.substr(0, objPathStr.find_last_of('/'));
 
-                    std::cout << __FUNCTION__ << ": item path is '" << objPath.toStdString() << "'" << std::endl << std::flush;
-                    std::cout << __FUNCTION__ << ": moving from collection '" << srcColl << "'" << std::endl << std::flush;
-                    std::cout << __FUNCTION__ << ": destination path is '" << destColl << "'" << std::endl << std::flush;
-
                     // we move only if src and dest differ
                     if (srcColl.compare(destColl))
                     {
-                        std::cout << __FUNCTION__ << ": source and dest differ, execute move operation" << std::endl << std::flush;
+                        Kanki::RodsObjEntryPtr sourceEntryPtr = this->resolvePathToEntry(objPath.toStdString());
 
+                        // if we have a valid object to move
+                        if (sourceEntryPtr)
+                        {
+                            int status = 0;
+
+                            if (status = this->rodsConn->moveObjToColl(sourceEntryPtr, destColl))
+                            {
+                                // report error
+                            }
+
+                            else {
+                                this->refreshAtPath(srcColl.c_str());
+                                this->refreshAtPath(destColl.c_str());
+
+                                return (true);
+                            }
+                        }
                     }
                 }
             }

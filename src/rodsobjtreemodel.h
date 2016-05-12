@@ -115,6 +115,9 @@ public:
     // Interface for adding an additional rods mount point to the object model.
     void addMountPoint(const std::string &path);
 
+    // Interface for resolving a rods path to an Kanki::RodsObjEntryPtr
+    Kanki::RodsObjEntryPtr resolvePathToEntry(const std::string &path);
+
 public slots:
 
     // Interface for requesting the model to refresh at a certain index.
