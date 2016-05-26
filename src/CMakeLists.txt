@@ -68,8 +68,13 @@ qt5_use_modules(irodsclient Core Gui Svg Xml)
 add_library(jansson STATIC IMPORTED)
 set_property(TARGET jansson PROPERTY IMPORTED_LOCATION ${iRODS_DIR}/external/${iRODS_Jansson}/src/.libs/libjansson.a)
 
+# needed for linkage in OSX with iRODS 4.1.8+
+add_library(client_exec STATIC IMPORTED)
+set_property(TARGET client_exec PROPERTY IMPORTED_LOCATION ${iRODS_DIR}/iRODS/lib/client_exec/obj/irods_client_rule_execution_manager_factory.o)
+
 target_link_libraries(
 	irodsclient
+	client_exec
 	RodsAPIs 
 	boost_filesystem
 	boost_regex
