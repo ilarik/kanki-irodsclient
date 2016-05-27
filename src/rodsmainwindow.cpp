@@ -85,7 +85,7 @@ RodsMainWindow::~RodsMainWindow()
 
 void RodsMainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
-    event->acceptProposedAction();
+  //  event->acceptProposedAction();
 }
 
 void RodsMainWindow::dropEvent(QDropEvent *event)
