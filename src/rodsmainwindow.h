@@ -74,9 +74,6 @@ public:
     // Qt event handler for a drag enter event. Overrides superclass virtual function.
     void dragEnterEvent(QDragEnterEvent *event);
 
-    // Qt event handler for a drag move event. Overrides superclass virtual function.
-    void dragMoveEvent(QDragMoveEvent *event);
-
     // Qt event handler for a drop event. Overrides superclass virtual function.
     void dropEvent(QDropEvent *event);
 

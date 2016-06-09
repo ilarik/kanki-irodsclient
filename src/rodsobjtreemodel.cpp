@@ -488,6 +488,40 @@ void RodsObjTreeModel::refreshAtPath(QString path)
         this->refreshAtIndex(curIndex);
 }
 
+Kanki::RodsObjEntryPtr RodsObjTreeModel::resolvePathToEntry(const std::string &path)
+{
+    QModelIndex curIndex;
+    RodsObjTreeItem *curItem = this->rootItem;
+    std::string curPath;
+    boost::char_separator<char> separator("/");
+    boost::tokenizer< boost::char_separator<char> > tokens(path, separator);
+
+    // iterate path tokens to find item
+    for (boost::tokenizer< boost::char_separator<char> >::iterator iter = tokens.begin();
+         iter != tokens.end(); iter++)
+    {
+        curPath += "/" + *iter;
+
+        for (int i = 0; i < curItem->childCount(); i++)
+        {
+            RodsObjTreeItem *childItem = curItem->child(i);
+            Kanki::RodsObjEntryPtr objEntry = childItem->getObjEntryPtr();
+
+            // if we found an item matching path token, we break from loop
+            if (!objEntry || !objEntry->getObjectFullPath().compare(curPath))
+            {
+                curItem = childItem;
+                curIndex = this->index(i, 0, curIndex);
+
+                break;
+            }
+        }
+    }
+
+    return (curItem->getObjEntryPtr());
+}
+
+
 Qt::DropActions RodsObjTreeModel::supportedDropActions() const
 {
     // we support copy and move actions
@@ -497,27 +531,120 @@ Qt::DropActions RodsObjTreeModel::supportedDropActions() const
 bool RodsObjTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
                                     int row, int column, const QModelIndex &parent)
 {
-    (void)data;
-    (void)action;
-    (void)row;
-    (void)column;
-    (void)parent;
+    // check if we are to go forward with the drop
+    if (parent.isValid() && this->canDropMimeData(data, action, row, column, parent))
+    {
+        if (data->hasFormat("application/vnd.kanki.drag"))
+        {
+            // drop destination (parent item)
+            RodsObjTreeItem *parentItem = static_cast<RodsObjTreeItem*>(parent.internalPointer());
+            std::string destColl;
 
-    // TODO: implement drag&drop interface
+            if (parentItem->getObjEntryPtr())
+                destColl = parentItem->getObjEntryPtr()->getObjectFullPath();
+
+            else
+                destColl = parentItem->mountPoint();
+
+            // encoded drop items
+            QByteArray encoded = data->data("application/vnd.kanki.drag");
+            QDataStream encodedStream(&encoded, QIODevice::ReadOnly);
+            QStringList objPathList;
+
+            std::cout << __FUNCTION__ << ": received application internal drop" << std::endl << std::flush;
+
+            while (!encodedStream.atEnd())
+            {
+                QString objPath;
+
+                encodedStream >> objPath;
+                objPathList << objPath;
+
+                if (objPath.length())
+                {
+                    std::string objPathStr = objPath.toStdString();
+                    std::string srcColl = objPathStr.substr(0, objPathStr.find_last_of('/'));
+
+                    // we move only if src and dest differ
+                    if (srcColl.compare(destColl))
+                    {
+                        Kanki::RodsObjEntryPtr sourceEntryPtr = this->resolvePathToEntry(objPath.toStdString());
+
+                        // if we have a valid object to move
+                        if (sourceEntryPtr)
+                        {
+                            int status = 0;
+
+                            if (status = this->rodsConn->moveObjToColl(sourceEntryPtr, destColl))
+                            {
+                                // report error
+                            }
+
+                            else {
+                                this->refreshAtPath(srcColl.c_str());
+                                this->refreshAtPath(destColl.c_str());
+
+                                return (true);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // by default we didn't drop anything
     return (false);
 }
 
 bool RodsObjTreeModel::canDropMimeData(const QMimeData *data, Qt::DropAction action,
                                        int row, int column, const QModelIndex &parent) const
 {
-    (void)data;
     (void)action;
     (void)row;
     (void)column;
     (void)parent;
 
-    // TODO: implement drag&drop interface
+    // we handle drops from the application itself
+    if (data->hasFormat("application/vnd.kanki.drag"))
+    {
+        return (true);
+    }
+
+    // we deny dropping otherwise
     return (false);
+}
+
+QMimeData* RodsObjTreeModel::mimeData(const QModelIndexList &indexes) const
+{
+    QMimeData *dragData = new QMimeData();
+    QByteArray encoded;
+
+    // we encode thru a stream for convenience
+    QDataStream encodeStream(&encoded, QIODevice::WriteOnly);
+
+    // handle multiple drop items
+    for (QModelIndexList::const_iterator i = indexes.begin(); i != indexes.end(); i++)
+    {
+        QModelIndex index = *i;
+
+        // sanity check(s)
+        if (index.isValid() && index.column() == 0)
+        {
+            RodsObjTreeItem *item = static_cast<RodsObjTreeItem*>(index.internalPointer());
+            Kanki::RodsObjEntryPtr entry = item->getObjEntryPtr();
+
+            // for internal drops we simply encode the rods object path
+            if (entry)
+            {
+                std::cout << __FUNCTION__ << ": encoding " << entry->getObjectFullPath() << std::endl << std::flush;
+                encodeStream << QString(entry->getObjectFullPath().c_str());
+            }
+        }
+    }
+
+    dragData->setData("application/vnd.kanki.drag", encoded);
+    return (dragData);
 }
 
 void RodsObjTreeModel::addMountPoint(const std::string &path)

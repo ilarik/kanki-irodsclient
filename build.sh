@@ -11,7 +11,7 @@ echo "-q sets Qt root directory path"
 
 # initialize parameters with defaults
 PLATFORM=`uname`
-VERSION=1.1.0b1
+VERSION=1.1.0b2
 OSRELEASE=unknown
 
 # reset POSIX option index variable

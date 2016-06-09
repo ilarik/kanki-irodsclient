@@ -1,6 +1,6 @@
 # kanki-irodsclient.pro
 # Kanki irodsclient Qt project file
-# (C) 2014-2015 University of Jyväskylä. All rights reserved.
+# (C) 2014-2016 University of Jyväskylä. All rights reserved.
 # See LICENSE file for more information.
 
 include(../config/build.pri)
@@ -102,75 +102,70 @@ macx {
     SCHEMA_XML.files = schema.xml
     SCHEMA_XML.path = Contents/Resources
 
-    IRODS_PLUGINS_AUTH.files = \
-        $$OSX_IRODS_BUILD/plugins/auth/libnative.so \
-        $$OSX_IRODS_BUILD/plugins/auth/libosauth.so \
-        $$OSX_IRODS_BUILD/plugins/auth/libpam.so
-    IRODS_PLUGINS_AUTH.path = Contents/PlugIns/irods/auth
+    IRODS_PLUGINS_AUTH = libnative.so libosauth.so libpam.so
+    IRODS_PLUGINS_AUTH_LIBS.path = Contents/PlugIns/irods/auth
 
-    IRODS_PLUGINS_NETWORK.files = \
-        $$OSX_IRODS_BUILD/plugins/network/libtcp.so \
-        $$OSX_IRODS_BUILD/plugins/network/libssl.so
-    IRODS_PLUGINS_NETWORK.path = Contents/PlugIns/irods/network
+    for (plugin, IRODS_PLUGINS_AUTH) {
+        IRODS_PLUGINS_AUTH_LIBS.files += $$OSX_IRODS_BUILD/plugins/auth/$$plugin
+    }
 
-    IRODS_ICOMMANDS_BIN.files = \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/genOSAuth \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iadmin \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iapitest \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ibun \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/icd \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ichksum \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ichmod \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/icp \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/idbug \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ienv \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ierror \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iexecmd \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iexit \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ifsck \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iget \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/igetwild \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/igroupadmin \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ihelp \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iinit \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ilocate \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ils \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ilsresc \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/imcoll \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/imeta \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/imiscsvrinfo \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/imkdir \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/imv \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ipasswd \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iphybun \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iphymv \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ips \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iput \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ipwd \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iqdel \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iqmod \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iqstat \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iquest \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iquota \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ireg \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irepl \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irm \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irmtrash \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irods-grid \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irsync \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/irule \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iscan \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/isysmeta \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iticket \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/itrim \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/iuserinfo \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/ixmsg \
-        $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/izonereport
+    IRODS_PLUGINS_NETWORK = libtcp.so libssl.so
+    IRODS_PLUGINS_NETWORK_LIBS.path = Contents/PlugIns/irods/network
+
+    for (plugin, IRODS_PLUGINS_NETWORK) {
+        IRODS_PLUGINS_NETWORK_LIBS.files += $$OSX_IRODS_BUILD/plugins/network/$$plugin
+    }
+
+    IRODS_ICOMMANDS =   genOSAuth iadmin iapitest ibun icd ichksum ichmod icp idbug ienv ierror iexecmd \
+                        iexit ifsck iget igetwild igroupadmin ihelp iinit ilocate ils ilsresc imcoll \
+                        imeta imiscsvrinfo imkdir imv ipasswd iphybun iphymv ips iput ipwd iqdel iqmod \
+                        iqstat iquest iquota ireg irepl irm irmtrash irods-grid irsync irule iscan isysmeta \
+                        iticket itrim iuserinfo ixmsg izonereport
     IRODS_ICOMMANDS_BIN.path = Contents/PlugIns/irods/icommands
 
+    for (icommand, IRODS_ICOMMANDS) {
+        IRODS_ICOMMANDS_BIN.files += $$OSX_IRODS_BUILD/iRODS/clients/icommands/bin/$$icommand
+    }
+
+    for (plugin, IRODS_PLUGINS_AUTH) {
+        target_auth_plugins.commands += install_name_tool -change \
+        /usr/local/opt/openssl/lib/libssl.1.0.0.dylib \
+        @executable_path/../../../Frameworks/libssl.1.0.0.dylib \
+        $${TARGET}.app/$$IRODS_PLUGINS_AUTH_LIBS.path/$$plugin;
+        target_auth_plugins.commands += install_name_tool -change \
+        /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib \
+        @executable_path/../../../Frameworks/libcrypto.1.0.0.dylib \
+        $${TARGET}.app/$$IRODS_PLUGINS_AUTH_LIBS.path/$$plugin;
+    }
+
+    for (plugin, IRODS_PLUGINS_NETWORK) {
+        target_network_plugins.commands += install_name_tool -change \
+        /usr/local/opt/openssl/lib/libssl.1.0.0.dylib \
+        @executable_path/../../../Frameworks/libssl.1.0.0.dylib \
+        $${TARGET}.app/$$IRODS_PLUGINS_NETWORK_LIBS.path/$$plugin;
+        target_network_plugins.commands += install_name_tool -change \
+        /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib \
+        @executable_path/../../../Frameworks/libcrypto.1.0.0.dylib \
+        $${TARGET}.app/$$IRODS_PLUGINS_NETWORK_LIBS.path/$$plugin;
+    }
+
+    for (icommand, IRODS_ICOMMANDS) {
+        target_icommands.commands += install_name_tool -change \
+        /usr/local/opt/openssl/lib/libssl.1.0.0.dylib \
+        @executable_path/../../../Frameworks/libssl.1.0.0.dylib \
+        $${TARGET}.app/$$IRODS_ICOMMANDS_BIN.path/$$icommand;
+        target_icommands.commands += install_name_tool -change \
+        /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib \
+        @executable_path/../../../Frameworks/libcrypto.1.0.0.dylib \
+        $${TARGET}.app/$$IRODS_ICOMMANDS_BIN.path/$$icommand;
+    }
+
+    QMAKE_EXTRA_TARGETS += target_icommands #target_auth_plugins target_network_plugins
+    PRE_TARGETDEPS += target_icommands #target_auth_plugins target_network_plugins
+
     QMAKE_BUNDLE_DATA += SCHEMA_XML
-    QMAKE_BUNDLE_DATA += IRODS_PLUGINS_AUTH
-    QMAKE_BUNDLE_DATA += IRODS_PLUGINS_NETWORK
+    QMAKE_BUNDLE_DATA += IRODS_PLUGINS_AUTH_LIBS
+    QMAKE_BUNDLE_DATA += IRODS_PLUGINS_NETWORK_LIBS
     QMAKE_BUNDLE_DATA += IRODS_ICOMMANDS_BIN
 }
 
@@ -221,6 +216,7 @@ macx {
 
 macx {
     LIBS += -lc++
+    LIBS += $$OSX_IRODS_BUILD/iRODS/lib/client_exec/obj/irods_client_rule_execution_manager_factory.o
     LIBS += $$OSX_IRODS_BUILD/iRODS/lib/core/obj/libRodsAPIs.a
     LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_filesystem.a
     LIBS += $$OSX_IRODS_BUILD/external/$$OSX_IRODS_BOOST/stage/lib/libboost_regex.a
