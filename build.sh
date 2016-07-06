@@ -92,7 +92,7 @@ else
 
     # build a makefile and make
     echo "building executable..."
-    (cd src; $QTROOT/bin/qmake && make)
+    (cd src; QT_SELECT=5 $QTROOT/bin/qmake && make)
 
    # continue build only if make was successful
     if [ $? -ne "0" ]; then
