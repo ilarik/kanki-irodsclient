@@ -87,7 +87,7 @@ else
     
     # if no Qt path was provided, set to default
     if [ "$QTROOT" == "" ]; then
-	QTROOT=/usr/lib64/qt5
+	QTROOT=`qtpaths --install-prefix`
     fi
 
     # build a makefile and make
