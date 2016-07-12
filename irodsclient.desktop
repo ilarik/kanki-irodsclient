@@ -1,12 +1,9 @@
-
 [Desktop Entry]
 Name=iRODS Client
 GenericName=Kanki iRODS Client
 Comment=Browse an iRODS Data Grid
 Exec=irodsclient
-Icon=irodsclient.png
+Icon=irodsclient
 Type=Application
 Terminal=false
-Categories=Application;Accessories
-Encoding=UTF-8
 
