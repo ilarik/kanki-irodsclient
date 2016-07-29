@@ -210,6 +210,9 @@ private slots:
     // qt slot which connects to about action triggered signal
     void on_actionAbout_triggered();
 
+    // qt slot which connects to quit action triggered signal
+    void on_actionQuit_triggered();
+
     // qt slot which connects to upload directory triggered signal
     void on_actionUploadDirectory_triggered();
 

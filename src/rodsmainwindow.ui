@@ -276,6 +276,7 @@
     <addaction name="actionDisconnect"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
+    <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuIRODS"/>
   </widget>
@@ -558,6 +559,14 @@
    </property>
    <property name="toolTip">
     <string>Available when errors have been reported</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>
