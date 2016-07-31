@@ -37,8 +37,6 @@ endif()
 
 
 set(iRODS_LIBS
-  dl
-  pthread
   irods_client_api
   irods_client
   boost_filesystem
@@ -56,7 +54,16 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   # needed for linkage in OSX with iRODS 4.1.8+
   add_library(client_exec STATIC IMPORTED)
   set_property(TARGET client_exec PROPERTY IMPORTED_LOCATION ${iRODS_SRC_DIR}/iRODS/lib/client_exec/obj/irods_client_rule_execution_manager_factory.o)
-  list(PREPEND iRODS_LIBS client_exec)
+  set(iRODS_LIBS
+    client_exec
+    ${iRODS_LIBS})
+  
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+  set(iRODS_LIBS
+    dl
+    pthread
+    ${iRODS_LIBS})
 
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
