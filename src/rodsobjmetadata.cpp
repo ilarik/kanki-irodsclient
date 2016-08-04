@@ -146,10 +146,10 @@ int RodsObjMetadata::addAttribute(std::string attrName, std::string attrValue, s
     mod.arg3 = (char*)attrName.c_str();
     mod.arg4 = (char*)attrValue.c_str();
     mod.arg5 = (char*)attrUnit.c_str();
-    mod.arg6 = "";
-    mod.arg7 = "";
-    mod.arg8 = "";
-    mod.arg9 = "";
+    mod.arg6 = (char*)"";
+    mod.arg7 = (char*)"";
+    mod.arg8 = (char*)"";
+    mod.arg9 = (char*)"";
 
     // execute metadata add thru rods api
     if ((status = rcModAVUMetadata(this->conn->commPtr(), &mod)) < 0)
@@ -199,17 +199,17 @@ int RodsObjMetadata::modifyAttribute(std::string attrName, std::string valueStr,
         mod.arg5 = (char*)unitStr.c_str();
         mod.arg6 = (char*)valueArg.c_str();
         mod.arg7 = (char*)unitArg.c_str();
-        mod.arg8 = "";
-        mod.arg9 = "";
+        mod.arg8 = (char*)"";
+        mod.arg9 = (char*)"";
     }
 
     // otherwise just the value is modified
     else {
         mod.arg5 = (char*)valueArg.c_str();
-        mod.arg6 = "";
-        mod.arg7 = "";
-        mod.arg8 = "";
-        mod.arg9 = "";
+        mod.arg6 = (char*)"";
+        mod.arg7 = (char*)"";
+        mod.arg8 = (char*)"";
+        mod.arg9 = (char*)"";
     }
 
     // execute metadata update thru rods api
@@ -265,10 +265,10 @@ int RodsObjMetadata::removeAttribute(std::string attrName, std::string valueStr,
     remove.arg3 = (char*)attrName.c_str();
     remove.arg4 = (char*)valueStr.c_str();
     remove.arg5 = (char*)unitStr.c_str();
-    remove.arg6 = "";
-    remove.arg7 = "";
-    remove.arg8 = "";
-    remove.arg9 = "";
+    remove.arg6 = (char*)"";
+    remove.arg7 = (char*)"";
+    remove.arg8 = (char*)"";
+    remove.arg9 = (char*)"";
 
     // execute metadata removal thru rods api
     if ((status = rcModAVUMetadata(this->conn->commPtr(), &remove)) < 0)

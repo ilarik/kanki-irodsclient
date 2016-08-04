@@ -1012,3 +1012,9 @@ void RodsMainWindow::on_actionFind_triggered()
 {
     this->openFindWindow();
 }
+
+void RodsMainWindow::on_actionQuit_triggered()
+{
+    // call Qt to quit application (exit event loop)
+    qApp->quit();
+}
