@@ -32,7 +32,8 @@ target_link_libraries(
   )
 
 install(TARGETS irodsclient
-  RUNTIME DESTINATION bin)
+  RUNTIME DESTINATION bin
+  BUNDLE DESTINATION /Applications)
 
 install(FILES icons/irodsclient.png
   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps)

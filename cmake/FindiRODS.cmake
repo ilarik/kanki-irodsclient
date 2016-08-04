@@ -20,11 +20,19 @@ set(iRODS_INCLUDE_DIRS 	${iRODS_SRC_DIR}/external/${iRODS_Boost}
   ${iRODS_PREFIX}/include/irods
   )
 
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
  set(iRODS_LIBS_DIRS ${iRODS_SRC_DIR}/external/${iRODS_Boost}/stage/lib
   ${iRODS_SRC_DIR}/external/${iRODS_Jansson}/src/.libs
   ${iRODS_SRC_DIR}/iRODS/lib/core/obj
-  ${iRODS_PREFIX}/lib/irods/externals
   )
+
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+  set(iRODS_LIBS_DIRS ${iRODS_PREFIX}/lib/irods/externals)
+
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 add_library(jansson STATIC IMPORTED)
 set(JANSSON_SRC_LIB "${iRODS_SRC_DIR}/external/${iRODS_Jansson}/src/.libs/libjansson.a")
@@ -37,8 +45,6 @@ endif()
 
 
 set(iRODS_LIBS
-  irods_client_api
-  irods_client
   boost_filesystem
   boost_regex
   boost_system
@@ -55,12 +61,15 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   add_library(client_exec STATIC IMPORTED)
   set_property(TARGET client_exec PROPERTY IMPORTED_LOCATION ${iRODS_SRC_DIR}/iRODS/lib/client_exec/obj/irods_client_rule_execution_manager_factory.o)
   set(iRODS_LIBS
+    RodsAPIs
     client_exec
     ${iRODS_LIBS})
   
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
   set(iRODS_LIBS
+    irods_client_api
+    irods_client
     dl
     pthread
     ${iRODS_LIBS})
