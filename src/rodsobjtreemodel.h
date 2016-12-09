@@ -5,6 +5,9 @@
  * The class RodsObjTreeModel extends the Qt model class QAbstractItemModel
  * and implements a model for the iRODS object tree.
  *
+ * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * License: The BSD 3-Clause License, see LICENSE file for details.
+ *
  * Copyright (C) 2014-2015 University of Jyväskylä. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *

@@ -5,6 +5,9 @@
  * The RodsConnection class in Kanki provides an interface to the
  * to an iRODS protocol connection and iRODS protocol operations.
  *
+ * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * License: The BSD 3-Clause License, see LICENSE file for details.
+ *
  * Copyright (C) 2014-2015 University of Jyväskylä. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
