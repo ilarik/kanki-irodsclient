@@ -20,6 +20,13 @@ RodsDataInStream::RodsDataInStream(RodsConnection *theConn, RodsObjEntryPtr theO
     : RodsDataStream(theConn)
 {
     this->entPtr = theObjEntry;
+    this->portalParams = NULL;
+}
+
+RodsDataInStream::~RodsDataInStream()
+{
+    if (this->portalParams)
+        std::free(this->portalParams);
 }
 
 int RodsDataInStream::openDataObj()
@@ -80,7 +87,7 @@ int RodsDataInStream::getOprInit()
         this->rodsL1Inx = portalOpr->l1descInx;
         this->objChecksum = portalOpr->chksum;
 
-        std::free(portalOpr);
+        this->portalParams = portalOpr;
     }
 
     // free possibly allocated buffer

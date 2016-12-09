@@ -34,6 +34,8 @@ public:
 
     RodsDataInStream(RodsConnection *theConn, RodsObjEntryPtr theObjEntry);
 
+    ~RodsDataInStream();
+
     // Overrides superclass virtual function, open the iRODS data object
     // for reading.
     int openDataObj();
@@ -77,6 +79,9 @@ private:
 
     // adaptive read size parameter
     size_t adaptiveSize;
+
+    // parallel transfer portal parameters
+    portalOprOut_t *portalParams;
 
     // container for the last measured I/O operation durations
     std::vector<std::chrono::milliseconds> dt_;
