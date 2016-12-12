@@ -1,5 +1,6 @@
 # kanki-irodsclient.pro
 # Kanki irodsclient Qt project file
+# (C) 2016 KTH Royal Institute of Technology. All rights reserved.
 # (C) 2014-2016 University of Jyväskylä. All rights reserved.
 # See LICENSE file for more information.
 
