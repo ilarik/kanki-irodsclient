@@ -196,11 +196,11 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
 
     // TODO: do parellel transfer if necessary
     if (inStream.parallelXferPortalAvail())
-        status = transferFileParallel();
+        status = transferFileParallel(obj, inStream, localFile);
 
     // otherwise we simply use the rods protocol stream I/O
     else
-        status = transferFileStream(obj, inStream, localFile) < 0;
+        status = transferFileStream(obj, inStream, localFile);
 
     // close local file and rods data stream
     localFile.close();
@@ -278,7 +278,7 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, Kanki::Ro
     return (status);
 }
 
-int RodsDownloadThread::transferFileParallel()
+int RodsDownloadThread::transferFileParallel(Kanki::RodsObjEntryPtr obj, Kanki::RodsDataInStream &inStream, QFile &localFile)
 {
 
 }
