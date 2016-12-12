@@ -8,7 +8,7 @@
  * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
- * Copyright (C) 2014-2015 University of Jyväskylä. All rights reserved.
+ * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * @author Ilari Korhonen
@@ -171,11 +171,8 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
                                      bool verifyChecksum, bool allowOverwrite)
 {
     Kanki::RodsDataInStream inStream(this->conn, obj);
-    long int status = 0, lastRead = 0, totalRead = 0;
     QFile localFile(localPath.c_str());
-    long int readSize = __KANKI_BUFSIZE_MAX;
-    void *buffer = std::malloc(readSize), *buffer2 = std::malloc(readSize);
-    boost::thread *writer = NULL;
+    long int status = 0;
 
     // check if we're allowed to proceed
     if (localFile.exists() && !allowOverwrite)
@@ -192,66 +189,83 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     if ((status = inStream.openDataObj()) < 0)
         return (status);
 
-    else {
-        // update status display only on large enough objects
-        if (obj->objSize > __KANKI_BUFSIZE_INIT)
-            setupSubProgressDisplay("Transferring...", 0, 100);
 
-        std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+    // update status display only on large enough objects
+    if (obj->objSize > __KANKI_BUFSIZE_INIT)
+        setupSubProgressDisplay("Transferring...", 0, 100);
 
-        while ((lastRead = inStream.readAdaptive(buffer, readSize)) > 0)
-        {
-            std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-            std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+    // TODO: do parellel transfer if necessary
+    if (inStream.parallelXferPortalAvail())
+        status = transferFileParallel();
 
-            totalRead += lastRead;
-
-            // if we had something to write, wait for it
-            if (writer)
-            {
-                writer->join();
-                delete (writer);
-
-                // check for write errors
-                if (localFile.error() == QFile::WriteError)
-                {
-                    reportError("Download failed", "Write error", -1);
-                    verifyChecksum = false;
-
-                    break;
-                }
-            }
-
-            // (re)new writer thread
-            writer = new boost::thread(boost::bind(&QFile::write, &localFile, (const char*)buffer, lastRead));
-
-            // XOR swap buffer pointers
-            buffer = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
-            buffer2 = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
-            buffer = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
-
-            // compute and signal statistics to UI
-            double speed = ((double)totalRead / 1048576) / ((double)diff.count() / 1000);
-            double percentage = ceil(((double)totalRead / (double)obj->objSize) * 100);
-
-            QString statusStr = "Transferring... " + QVariant((int)percentage).toString() + "%";
-            statusStr += " at " + QString::number(speed, 'f', 2) + " MB/s";
-
-            if (obj->objSize > __KANKI_BUFSIZE_INIT)
-                subProgressUpdate(statusStr, (int)percentage);
-        }
-    }
+    // otherwise we simply use the rods protocol stream I/O
+    else
+        status = transferFileStream(obj, inStream, localFile) < 0;
 
     // close local file and rods data stream
     localFile.close();
     status = inStream.closeDataObj();
     inStream.getOprEnd();
 
-    // if verify checksum was required
-    if (verifyChecksum && strlen(inStream.checksum()))
+    // if we have a successful transfer and if verify checksum was required
+    if (status >= 0 && verifyChecksum && strlen(inStream.checksum()))
     {
         subProgressUpdate("Verifying Checksum...", 100);
         status = verifyChksumLocFile((char*)localPath.c_str(), (char*)inStream.checksum(), NULL);
+    }
+
+    return (status);
+ }
+
+int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, Kanki::RodsDataInStream &inStream, QFile &localFile)
+{
+    long int status = 0, lastRead = 0, totalRead = 0;
+    long int readSize = __KANKI_BUFSIZE_MAX;
+    void *buffer = std::malloc(readSize), *buffer2 = std::malloc(readSize);
+    boost::thread *writer = NULL;
+
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+
+    while ((lastRead = inStream.readAdaptive(buffer, readSize)) > 0)
+    {
+        std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+        std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+
+        totalRead += lastRead;
+
+        // if we had something to write, wait for it
+        if (writer)
+        {
+            writer->join();
+            delete (writer);
+
+            // check for write errors
+            if (localFile.error() == QFile::WriteError)
+            {
+                reportError("Download failed", "Write error", -1);
+                status = -1;
+
+                break;
+            }
+        }
+
+        // (re)new writer thread
+        writer = new boost::thread(boost::bind(&QFile::write, &localFile, (const char*)buffer, lastRead));
+
+        // XOR swap buffer pointers
+        buffer = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
+        buffer2 = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
+        buffer = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
+
+        // compute and signal statistics to UI
+        double speed = ((double)totalRead / 1048576) / ((double)diff.count() / 1000);
+        double percentage = ceil(((double)totalRead / (double)obj->objSize) * 100);
+
+        QString statusStr = "Transferring... " + QVariant((int)percentage).toString() + "%";
+        statusStr += " at " + QString::number(speed, 'f', 2) + " MB/s";
+
+        if (obj->objSize > __KANKI_BUFSIZE_INIT)
+            subProgressUpdate(statusStr, (int)percentage);
     }
 
     // free everything we have allocated
@@ -262,4 +276,9 @@ int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string loc
     std::free(buffer2);
 
     return (status);
+}
+
+int RodsDownloadThread::transferFileParallel()
+{
+
 }

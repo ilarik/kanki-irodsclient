@@ -8,7 +8,7 @@
  * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
- * Copyright (C) 2014-2015 University of Jyväskylä. All rights reserved.
+ * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * @author Ilari Korhonen
@@ -82,11 +82,17 @@ private:
     // Constructs the list of objects to be downloaded in a recursive manner.
     int makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs);
 
+    // Download one rods data object, launching parallel transfer if necessary
+    int downloadFile(Kanki::RodsObjEntryPtr obj, std::string localPath,
+                     bool verifyChecksum = false, bool allowOverwrite = true);
+
     // Implements double-buffered rods object download using Kanki::RodsDataInStream
     // and its adaptive rods i/o request size scaling for best resposniveness and
     // connection throughput utilization.
-    int downloadFile(Kanki::RodsObjEntryPtr obj, std::string localPath,
-                     bool verifyChecksum = false, bool allowOverwrite = true);
+    int transferFileStream(Kanki::RodsObjEntryPtr obj, Kanki::RodsDataInStream &inStream, QFile &localFile);
+
+    // Launches parallel transfer for maximum performance and direct I/O to rods resource servers
+    int transferFileParallel();
 
     // pointer to the rods connection object
     Kanki::RodsConnection *conn;

@@ -8,7 +8,7 @@
  * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
- * Copyright (C) 2014-2015 University of Jyväskylä. All rights reserved.
+ * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * @author Ilari Korhonen
@@ -57,6 +57,9 @@ public:
 
     // End iRODS API get operation to signal iRODS that GET_OPR is completed.
     void getOprEnd();
+
+    // Interface to inquire parallel tranfer capabilities
+    bool parallelXferPortalAvail() const;
 
     // Interface for accessing the data object checksum string provided
     // by the iRODS server.
