@@ -126,10 +126,11 @@ public:
     // Puts a local file at localPath into iRODS as a data object at objPath to resource rodsResc
     // optionally using multithreaded iRODS transfer mode, defaults to one transfer thread.
     int putFile(const std::string &localPath, const std::string &objPath, const std::string &rodsResc,
-                unsigned int numThreads = 1);
+                bool verifyChecksum, bool allowOverwrite, unsigned int numThreads = 1);
 
     // Puts a local file at localPAth into iRODS at objPath to the default resc
-    int putFile(const std::string &localPath, const std::string &objPath, unsigned int numThreads = 1);
+    int putFile(const std::string &localPath, const std::string &objPath, bool verifyChecksum,
+                bool allowOverwrite, unsigned int numThreads = 1);
 
     // Gets an iRODS data object at objPath into a file located at localPath, optionally verifies
     // checksum and overwrites an existing file, defaults to one transfer thread.

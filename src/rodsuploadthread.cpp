@@ -18,7 +18,8 @@
 #include "rodsuploadthread.h"
 
 RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths,
-                                   std::string destColl, std::string rodsResc)
+                                   std::string destColl, std::string rodsResc,
+                                   bool verifyChecksum, bool allowOverwrite)
     : QThread()
 {
     this->conn = new Kanki::RodsConnection(theConn);
@@ -26,10 +27,14 @@ RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList f
     this->filePathList = filePaths;
     this->destCollPath = destColl;
     this->targetResc = rodsResc;
+
+    this->verify = verifyChecksum;
+    this->overwrite = allowOverwrite;
 }
 
 RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath,
-                                   std::string destColl, std::string rodsResc)
+                                   std::string destColl, std::string rodsResc,
+                                   bool verifyChecksum, bool allowOverwrite)
     : QThread()
 {
     this->conn = new Kanki::RodsConnection(theConn);
@@ -37,6 +42,9 @@ RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string b
     this->basePath = baseDirPath;
     this->destCollPath = destColl;
     this->targetResc = rodsResc;
+
+    this->verify = verifyChecksum;
+    this->overwrite = allowOverwrite;
 }
 
 void RodsUploadThread::run()
@@ -120,7 +128,8 @@ void RodsUploadThread::run()
             progressUpdate(statusStr.c_str(), c);
 
             // try to put file and report possible error to user
-            if ((status = this->conn->putFile(fileName.toStdString(), objPath, this->targetResc)) < 0)
+            if ((status = this->conn->putFile(fileName.toStdString(), objPath, this->targetResc,
+                                              this->verify, this->overwrite)) < 0)
                 reportError("iRODS put file error", objPath.c_str(), status);
         }
 

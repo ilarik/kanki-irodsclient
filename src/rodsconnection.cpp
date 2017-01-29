@@ -293,7 +293,7 @@ int RodsConnection::removeColl(const std::string &collPath)
 }
 
 int RodsConnection::putFile(const std::string &localPath, const std::string &objPath, const std::string &rodsResc,
-                            unsigned int numThreads)
+                            bool verifyChecksum, bool allowOverwrite, unsigned int numThreads)
 {
     dataObjInp_t putParam;
     char filePath[MAX_NAME_LEN];
@@ -322,6 +322,12 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
     // for now, we use the generic data type
     addKeyVal(&putParam.condInput, DATA_TYPE_KW, "generic");
 
+    if (verifyChecksum)
+        addKeyVal(&putParam.condInput, VERIFY_CHKSUM_KW, "");
+
+    if (allowOverwrite)
+        addKeyVal(&putParam.condInput, FORCE_FLAG_KW, "");
+
     // target storage resource, if defined
     if (rodsResc.length())
         addKeyVal(&putParam.condInput, DEST_RESC_NAME_KW, rodsResc.c_str());
@@ -338,11 +344,12 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
     return (status);
 }
 
-int RodsConnection::putFile(const std::string &localPath, const std::string &objPath, unsigned int numThreads)
+int RodsConnection::putFile(const std::string &localPath, const std::string &objPath, bool verifyChecksum,
+                            bool allowOverwrite, unsigned int numThreads)
 {
     // do put file to user default resource
     std::string defResc = this->rodsDefResc();
-    return (this->putFile(localPath, objPath, defResc, numThreads));
+    return (this->putFile(localPath, objPath, defResc, verifyChecksum, allowOverwrite, numThreads));
 }
 
 int RodsConnection::removeObj(const std::string &objPath)

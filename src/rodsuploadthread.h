@@ -41,12 +41,14 @@ public:
     // Constructor initializes the upload worker thread and sets its parameters for execution,
     // requires a rods conn pointer, file paths list and dest coll path.
     RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths,
-                     std::string destColl, std::string rodsResc);
+                     std::string destColl, std::string rodsResc,
+                     bool verifyChecksum = false, bool allowOverwrite = false);
 
     // Constructor initializes the upload worker thread and sets its parameters for execution,
     // requires a rods conn pointer, base path for recursive upload and dest coll path.
     RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath,
-                     std::string destColl, std::string rodsResc);
+                     std::string destColl, std::string rodsResc,
+                     bool verifyChecksum = false, bool allowOverwrite = false);
 
 signals:
 
@@ -88,5 +90,8 @@ private:
 
     // destination rods collection path
     std::string destCollPath, basePath, targetResc;
+
+    // settings for the download operation, verify checksum and allow overwrite
+    bool verify, overwrite;
 };
 #endif // RODSUPLODADTHREAD_H

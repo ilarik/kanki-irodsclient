@@ -472,10 +472,11 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
 
     if (uploadDirectory)
         uploadWorker = new RodsUploadThread(this->conn, fileNames.at(0).toStdString(),
-                                            destCollPath, this->currentResc);
+                                            destCollPath, this->currentResc,
+                                            this->verifyChecksum, this->allowOverwrite);
     else
-        uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath,
-                                            this->currentResc);
+        uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath, this->currentResc,
+                                            this->verifyChecksum, this->allowOverwrite);
 
     QString title = QString("Uploading to '") + destCollPath.c_str() + "'";
     RodsTransferWindow *transferWindow = new RodsTransferWindow(title);
