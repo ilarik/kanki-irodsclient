@@ -46,8 +46,7 @@ void RodsConnectThread::run()
         // try to authenticate while reporting error trough ui
         if ((status = newConn->login()) < 0)
         {
-            reportError("iRODS login error, try using 'iinit' command", newConn->lastErrorMsg().c_str(),
-                        newConn->lastError());
+            reportError("iRODS login error, try using 'iinit' command", "iRODS API Error", status);
 
             delete(newConn);
 
