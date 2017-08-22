@@ -47,6 +47,17 @@ RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string b
     this->overwrite = allowOverwrite;
 }
 
+RodsUploadThread::~RodsUploadThread()
+{
+    delete(this->conn);
+}
+
+void RodsUploadThread::finalize()
+{
+    // signal out a request for ui to refresh itself
+    refreshObjectModel(QString(this->destCollPath.c_str()));
+}
+
 void RodsUploadThread::run()
 {
     QString statusStr = "Initializing...";
@@ -79,8 +90,12 @@ void RodsUploadThread::run()
         std::string destColl = this->destCollPath + this->basePath.substr(this->basePath.find_last_of('/'));
         if ((status = this->conn->makeColl(destColl, false)) < 0)
         {
-            reportError("Upload failed!", "iRODS make collection failed", status);
-            return;
+            // we don't complain about existing dest when overwrite
+            if (!this->overwrite || status != -809000)
+            {
+                reportError("Upload failed!", "iRODS make collection failed", status);
+                return;
+            }
         }
     }
 
@@ -117,8 +132,10 @@ void RodsUploadThread::run()
             statusStr += name.c_str();
             progressUpdate(statusStr, c);
 
+            // we don't complain about existing dest when overwrite
             if ((status = this->conn->makeColl(objPath, false)) < 0)
-                reportError("iRODS make collection error", "Put failed", status);
+                if (!this->overwrite || status != -809000)
+                    reportError("iRODS make collection error", "Put failed", status);
         }
 
         // if the file is a regular file with read permissions, upload
@@ -135,13 +152,6 @@ void RodsUploadThread::run()
 
         c++;
     }
-
-    // cleanly disconnect parallel connection
-    this->conn->disconnect();
-    delete(this->conn);
-
-    // signal out a request for ui to refresh itself
-    refreshObjectModel(QString(this->destCollPath.c_str()));
 }
 
 void RodsUploadThread::makeBillOfMaterials(const QString &dirPath, QStringList *filePaths)

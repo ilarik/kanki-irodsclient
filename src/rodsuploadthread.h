@@ -50,6 +50,9 @@ public:
                      std::string destColl, std::string rodsResc,
                      bool verifyChecksum = false, bool allowOverwrite = false);
 
+    // Destructor, cleans up after competion of task
+    ~RodsUploadThread();
+
 signals:
 
     // Qt signal for initializing a progress bar display, it signals out
@@ -71,6 +74,12 @@ signals:
     // Qt signal for requesing a rods object tree model refresh,
     // at a given index (after upload complete, signals ui).
     void refreshObjectModel(QString path);
+
+
+public slots:
+
+    // Qt slot for cleaning up when done, or terminated.
+    void finalize();
 
 private:
 
