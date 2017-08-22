@@ -52,6 +52,9 @@ public:
     // respect to the parameters of the conn object pointed by argument connPtr.
     RodsConnection(RodsConnection *connPtr = NULL);
 
+    // Destructor to disconnect and clean up.
+    ~RodsConnection();
+
     // Establishes an iRODS protocol connection to an iRODS server. Also configures the
     // connection object for connection parameters from the iRODS user environment if
     // no connection parameters have been provided.
@@ -62,7 +65,7 @@ public:
     int login();
 
     // Disconnects from the iRODS server.
-    int disconnect();
+    int disconnect(bool force = false);
 
     // Interface for querying whether the connection object is fully ready to be used, i.e.
     // connection was successful and user authentication is complete.

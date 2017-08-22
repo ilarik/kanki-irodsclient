@@ -41,6 +41,13 @@ RodsConnection::RodsConnection(RodsConnection *connPtr)
     }
 }
 
+RodsConnection::~RodsConnection()
+{
+    // forcefully disconnect if we are connected to rods
+    if (this->rodsCommPtr)
+        this->disconnect(true);
+}
+
 int RodsConnection::connect()
 {
     int status = 0;
@@ -94,14 +101,16 @@ int RodsConnection::login()
     return (status);
 }
 
-int RodsConnection::disconnect()
+int RodsConnection::disconnect(bool force)
 {
     int status = 0;
 
     // only if there is a connection (conn pointer set)
     if (this->rodsCommPtr)
     {
-        this->mutexLock();
+        // wait mutex if not force disconnect
+        if (!force)
+            this->mutexLock();
 
         // do rods api disconnect and set comm ptr to null
         status = rcDisconnect(this->rodsCommPtr);
