@@ -497,6 +497,9 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
     connect(uploadWorker, &RodsUploadThread::refreshObjectModel, this->model,
             &RodsObjTreeModel::refreshAtPath);
 
+    // connect thread finished signal to finalize slot of upload threaad (for cleanup when terminate)
+    connect(uploadWorker, &RodsUploadThread::finished, uploadWorker, &RodsUploadThread::finalize);
+
     // connect thread finished signal to Qt object deletion mechanisms
     connect(uploadWorker, &RodsUploadThread::finished, &QObject::deleteLater);
     connect(uploadWorker, &RodsUploadThread::finished, transferWindow,
