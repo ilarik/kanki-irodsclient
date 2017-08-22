@@ -57,17 +57,12 @@
           <item>
            <widget class="QPushButton" name="condAdd">
             <property name="text">
-             <string>Add</string>
+             <string/>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="resetButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Reset</string>
+            <property name="icon">
+             <iconset>
+              <normalon>:/tango/icons/list-add.svg</normalon>
+             </iconset>
             </property>
            </widget>
           </item>
@@ -114,7 +109,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1322</width>
+            <width>1328</width>
             <height>213</height>
            </rect>
           </property>
@@ -126,20 +121,52 @@
          </widget>
         </widget>
        </item>
-       <item alignment="Qt::AlignLeft">
-        <widget class="QPushButton" name="executeButton">
-         <property name="enabled">
-          <bool>false</bool>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string/>
          </property>
-         <property name="text">
-          <string>Execute</string>
-         </property>
-         <property name="autoDefault">
-          <bool>true</bool>
-         </property>
-         <property name="default">
-          <bool>true</bool>
-         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QPushButton" name="executeButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Execute</string>
+            </property>
+            <property name="autoDefault">
+             <bool>true</bool>
+            </property>
+            <property name="default">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="resetButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Reset</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>

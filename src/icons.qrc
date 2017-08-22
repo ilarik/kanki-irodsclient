@@ -20,6 +20,8 @@
         <file>icons/text-x-generic.png</file>
         <file>icons/applications-internet.svg</file>
         <file>icons/dialog-warning.svg</file>
+        <file>icons/list-add.svg</file>
+        <file>icons/list-remove.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/irodsclient.png</file>

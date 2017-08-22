@@ -160,7 +160,7 @@ void RodsFindWindow::executeSearch()
         // report errors
         if (status < 0)
         {
-
+            // TODO: FIXME!
         }
 
         // when successful, report results

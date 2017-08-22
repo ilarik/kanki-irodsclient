@@ -26,7 +26,8 @@ RodsConditionWidget::RodsConditionWidget(QWidget *parent) :
     this->layout->setMargin(4);
     this->layout->setAlignment(Qt::AlignLeft);
 
-    this->remove = new QPushButton("Remove");
+    this->remove = new QPushButton(this);
+    this->remove->setIcon(QIcon(":/tango/icons/list-remove.svg"));
     this->layout->addWidget(remove);
 
     connect(this->remove, &QPushButton::clicked, this, &RodsConditionWidget::invokeUnregister);
