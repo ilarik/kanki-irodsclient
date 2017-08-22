@@ -135,6 +135,11 @@
             <property name="text">
              <string>Execute</string>
             </property>
+            <property name="icon">
+             <iconset>
+              <normalon>:/tango/icons/view-refresh.svg</normalon>
+             </iconset>
+            </property>
             <property name="autoDefault">
              <bool>true</bool>
             </property>
