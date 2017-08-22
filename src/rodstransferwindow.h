@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QGroupBox>
 
 class RodsTransferWindow : public QWidget
 {
@@ -75,6 +76,12 @@ private:
 
     // Qt UI layout instance
     QVBoxLayout *layout;
+
+    // Qt group box for progress displays
+    QGroupBox *box;
+
+    // Qt layout for the group box
+    QVBoxLayout *boxLayout;
 
     // Qt labels for displaying progress messages
     QLabel *mainProgressMsg, *subProgressMsg;

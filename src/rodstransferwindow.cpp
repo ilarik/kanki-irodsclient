@@ -22,24 +22,33 @@ RodsTransferWindow::RodsTransferWindow(QString title) :
 {
     this->progressMax = this->subProgressMax = 0;
     this->setWindowTitle(title);
-    this->setFixedWidth(600);
+    this->setMinimumWidth(600);
+    this->setFixedHeight(190);
+    this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
 
     this->layout = new QVBoxLayout(this);
 
+    this->box = new QGroupBox(this);
+    this->boxLayout = new QVBoxLayout(box);
+
     this->mainProgressMsg = new QLabel(this);
-    this->layout->addWidget(this->mainProgressMsg);
+    boxLayout->addWidget(this->mainProgressMsg);
 
     this->mainProgressBar = new QProgressBar(this);
     this->mainProgressBar->setMaximum(0);
-    this->layout->addWidget(this->mainProgressBar);
+    boxLayout->addWidget(this->mainProgressBar);
 
     this->subProgressMsg = new QLabel(this);
-    this->layout->addWidget(this->subProgressMsg);
+    boxLayout->addWidget(this->subProgressMsg);
     this->subProgressBar = new QProgressBar(this);
     this->subProgressBar->setMaximum(0);
-    this->layout->addWidget(this->subProgressBar);
+    boxLayout->addWidget(this->subProgressBar);
 
     this->cancelButton = new QPushButton("Cancel", this);
+    this->cancelButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    this->cancelButton->setShortcut(Qt::Key_Escape);
+
+    this->layout->addWidget(box);
     this->layout->addWidget(this->cancelButton);
 
     connect(this->cancelButton, &QPushButton::pressed, this, &RodsTransferWindow::invokeCancel);
@@ -65,9 +74,10 @@ void RodsTransferWindow::setupMainProgressBar(QString initialMsg, int value, int
 
 void RodsTransferWindow::updateMainProgress(QString currentMsg, int value)
 {
-    QString progMsg = currentMsg;
-    progMsg +=  " (object " + QVariant(value).toString();
-    progMsg += " of " + QVariant(this->progressMax).toString() + ")";
+    QString progMsg = "Processing object ";
+    progMsg += QVariant(value).toString() + " of ";
+    progMsg += QVariant(this->progressMax).toString() + ": ";
+    progMsg += currentMsg;
 
     this->mainProgressMsg->setText(progMsg);
     this->mainProgressBar->setValue(value);
