@@ -143,7 +143,7 @@ void RodsMetadataWindow::addAttribute()
     int status = 0;
 
     attrs = this->schema->getAttributeList();
-    selection = attrName.getItem(this, "Select Schema Attribute", "Attribute:", attrs, 0, true, &ok);
+    selection = attrName.getItem(this, "Add Metadata Attribute", "Attribute Name (enter or select from schema):", attrs, 0, true, &ok);
 
     // if user didn't press cancel and entered a proper attribute string
     if (ok && selection.length())
