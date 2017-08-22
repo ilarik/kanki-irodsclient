@@ -77,9 +77,7 @@ RodsMainWindow::~RodsMainWindow()
          i != this->metaEditors.end(); i++)
     {
         RodsMetadataWindow *window = i->second;
-
         delete (window);
-        this->metaEditors.erase(i);
     }
 
     // tear down ui
