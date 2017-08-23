@@ -199,6 +199,18 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -210,16 +222,31 @@
    <addaction name="actionRefresh"/>
   </widget>
   <action name="actionAddAttribute">
+   <property name="icon">
+    <iconset>
+     <normalon>:/tango/icons/list-add.svg</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>Add Attribute</string>
    </property>
   </action>
   <action name="actionRemove_Attribute">
+   <property name="icon">
+    <iconset>
+     <normalon>:/tango/icons/list-remove.svg</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>Remove Attribute</string>
    </property>
   </action>
   <action name="actionRefresh">
+   <property name="icon">
+    <iconset>
+     <normalon>:/tango/icons/view-refresh.svg</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>Refresh</string>
    </property>
