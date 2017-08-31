@@ -878,12 +878,20 @@ void RodsMainWindow::openErrorLog()
 
 void RodsMainWindow::errorsReported(unsigned int errorCount)
 {
-    this->ui->actionErrorLog->setDisabled(false);
-    this->ui->actionErrorLog->setToolTip("Errors reported in this session (" +
-                                         QVariant(errorCount).toString() + ")");
+    if (errorCount)
+    {
+        this->ui->actionErrorLog->setDisabled(false);
+        this->ui->actionErrorLog->setToolTip("Errors reported in this session (" +
+                                             QVariant(errorCount).toString() + ")");
 
-    this->ui->statusBar->showMessage("Errors reported, see error log!");
-    this->ui->actionErrorLog->setText("Error Log (NEW!)");
+        this->ui->statusBar->showMessage("Errors reported, see error log!");
+        this->ui->actionErrorLog->setText(QString ("Error Log (") + QVariant(errorCount).toString() + ")");
+    }
+
+    else {
+        this->ui->actionErrorLog->setDisabled(true);
+        this->ui->actionErrorLog->setText("Error Log");
+    }
 }
 
 void RodsMainWindow::openFindWindow()

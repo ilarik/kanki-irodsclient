@@ -27,6 +27,12 @@ RodsErrorLogWindow::RodsErrorLogWindow() :
     this->errorLog = new QListWidget(this);
     this->layout->addWidget(this->errorLog);
 
+    this->clearButton = new QPushButton("Clear Error Log", this);
+    this->layout->addWidget(this->clearButton);
+
+    connect(this->clearButton, &QPushButton::pressed, this, &RodsErrorLogWindow::clearLog);
+    this->clearButton->setDisabled(true);
+
     this->warnIcon = QIcon(":/tango/icons/dialog-warning.svg");
 }
 
@@ -50,5 +56,21 @@ void RodsErrorLogWindow::logError(QString msgStr, QString detailStr, int errorCo
     this->errorLog->insertItem(0, item);
     this->errorLog->scrollToItem(item);
 
+    this->clearButton->setDisabled(false);
     this->errorsPresent(this->errorLog->count());
+}
+
+void RodsErrorLogWindow::clearLog()
+{
+    // take out items and delete objects
+    while (this->errorLog->count())
+    {
+        QListWidgetItem *ptr = this->errorLog->takeItem(0);
+        delete (ptr);
+    }
+
+    this->clearButton->setDisabled(true);
+
+    // signal main window of zero error count
+    this->errorsPresent(0);
 }

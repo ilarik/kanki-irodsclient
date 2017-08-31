@@ -45,6 +45,9 @@ public slots:
     // detail string detailStr and rods api error errorCode.
     void logError(QString msgStr, QString detailStr, int errorCode);
 
+    // Qt slot for clearing the error log
+    void clearLog();
+
 signals:
 
     // Qt signal for signaling out that we have errors with
@@ -58,6 +61,9 @@ private:
 
     // qt listwidget provides the error log
     QListWidget *errorLog;
+
+    // qt push button for clearing the log
+    QPushButton *clearButton;
 
     // qt icon resource for the warning icon
     QIcon warnIcon;
