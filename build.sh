@@ -84,10 +84,13 @@ if [ "$PLATFORM" = "Darwin" ]; then
 	$PKG_FILE
 else
     echo "Building for Linux:"
+
+    # use qt chooser if possible
+    QTROOT=`qtpaths --install-prefix`
     
     # if no Qt path was provided, set to default
     if [ "$QTROOT" == "" ]; then
-	QTROOT=`qtpaths --install-prefix`
+	QTROOT="/usr/lib64/qt5"
     fi
 
     # build a makefile and make
