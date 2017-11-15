@@ -121,6 +121,9 @@ void RodsMainWindow::enterConnectedState()
     std::string statusMsg = "Connected to iRODS server ";
     statusMsg += this->conn->rodsHost();
 
+    // display authentication scheme used
+    statusMsg += " - authentication scheme: " + this->conn->rodsAuthScheme();
+
     // if the connection is SSL enabled, get info
     if (conn->isSSL())
     {
@@ -146,7 +149,7 @@ void RodsMainWindow::enterConnectedState()
         statusMsg += " - SSL security disabled!";
     }
 
-    this->ui->statusBar->showMessage(statusMsg.c_str(), 10000);
+    this->ui->statusBar->showMessage(statusMsg.c_str(), 30000);
     this->setWindowTitle(this->windowTitle() + " (Zone: " + QString(this->conn->rodsZone().c_str()) + ")");
 
     // if there exists a previous model, delete it
@@ -567,6 +570,14 @@ void RodsMainWindow::doRodsConnect()
     connect(connThread, &RodsConnectThread::failure, this,
             &RodsMainWindow::enterDisconnectedState);
 
+    // handle authentication failure differently
+    connect(connThread, &RodsConnectThread::authFailure, this,
+            &RodsMainWindow::endModalProgressDialog);
+    connect(connThread, &RodsConnectThread::authFailure, this,
+            &RodsMainWindow::enterDisconnectedState);
+    connect(connThread, &RodsConnectThread::authFailure, this,
+            &RodsMainWindow::handleAuthFailure);
+
     // when connect thread was successful, enter connected state
     connect(connThread, &RodsConnectThread::success, this,
             &RodsMainWindow::endModalProgressDialog);
@@ -928,6 +939,23 @@ void RodsMainWindow::unregisterFindWindow()
 void RodsMainWindow::selectRodsObject(QString objPath)
 {
 
+}
+
+void RodsMainWindow::handleAuthFailure()
+{
+    bool ok = false;
+    QString password = QInputDialog::getText(this, "Enter iRODS Password", "Authentication failed. Enter iRODS password: ",
+                                             QLineEdit::Password, QString(""), &ok);
+
+    // if user didn't cancel
+    if (ok && !password.isEmpty())
+    {
+        // use iRODS client library to save password
+        obfSavePw(0, 0, 0, password.toStdString().c_str());
+
+        // reinvoke connect action
+        this->doRodsConnect();
+    }
 }
 
 void RodsMainWindow::on_actionConnect_triggered()

@@ -169,6 +169,9 @@ public slots:
     // Qt slot for selecting an object in the browser window.
     void selectRodsObject(QString objPath);
 
+    // Qt slot for handling authentication failure.
+    void handleAuthFailure();
+
 private slots:
 
     // qt slot which connects to connect action triggered signal
