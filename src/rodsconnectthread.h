@@ -45,6 +45,9 @@ signals:
     // Qt signal for signaling out a failed connection process.
     void failure();
 
+    // Qt signal for signaling out an authentication failure.
+    void authFailure();
+
     // Qt signal for signaling out a connection object pointer for
     // a successful iRODS connection.
     void setConnection(Kanki::RodsConnection *conn);

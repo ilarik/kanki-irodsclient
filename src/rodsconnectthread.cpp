@@ -46,12 +46,10 @@ void RodsConnectThread::run()
         // try to authenticate while reporting error trough ui
         if ((status = newConn->login()) < 0)
         {
-            reportError("iRODS login error, try using 'iinit' command", "iRODS API Error", status);
-
             delete(newConn);
 
             setConnection(NULL);
-            failure();
+            authFailure();
         }
 
         // on success, signal out the newly created connection object
