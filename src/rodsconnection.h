@@ -22,6 +22,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 // OpenSSL library headers
 #include <openssl/ssl.h>
@@ -37,6 +38,17 @@
 #include "irods_client_api_table.hpp"
 #include "irods_pack_table.hpp"
 #include "checksum.hpp"
+
+#include "irods_auth_object.hpp"
+#include "irods_auth_factory.hpp"
+#include "irods_auth_plugin.hpp"
+#include "irods_auth_manager.hpp"
+#include "irods_auth_constants.hpp"
+#include "irods_native_auth_object.hpp"
+#include "irods_pam_auth_object.hpp"
+#include "authPluginRequest.h"
+#include "irods_kvp_string_parser.hpp"
+
 
 // Kanki iRODS C++ class library headers
 #include "rodsobjentry.h"
@@ -62,7 +74,7 @@ public:
 
     // For an established connection, executes iRODS protocol user authentication procedure
     // according to provided credentials. By default uses iRODS user environment.
-    int login();
+    int login(const std::string &authScheme = "", const std::string &userName = "", const std::string &password = "");
 
     // Disconnects from the iRODS server.
     int disconnect(bool force = false);
@@ -100,6 +112,10 @@ public:
     // Interface for querying the iRODS default resource of the user, provides a C++ std string
     // copy of the rods api provided C string.
     std::string rodsDefResc() const;
+
+    // Interface for querying the iRODS authentication scheme used, provides a C++ std string copy
+    // of the rods api provided C string.
+    std::string rodsAuthScheme() const;
 
     // Interface for querying the last rods api provided error message, provides a C++ std string
     // copy of the rods api provided C string.
@@ -153,6 +169,9 @@ public:
     int renameObj(Kanki::RodsObjEntryPtr objEntry, const std::string &newName);
 
 private:
+
+    // Authenticates the user against the iRODS server in a new connection.
+    int authenticate(const std::string &authScheme = "", const std::string &userName = "", const std::string &password = "");
 
     // we deny assignments and copying of the object
     RodsConnection(RodsConnection &);

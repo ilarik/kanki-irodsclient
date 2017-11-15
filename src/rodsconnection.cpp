@@ -75,7 +75,7 @@ int RodsConnection::connect()
     return (status);
 }
 
-int RodsConnection::login()
+int RodsConnection::login(const std::string &authScheme, const std::string &userName, const std::string &password)
 {
     int status = 0;
 
@@ -89,7 +89,7 @@ int RodsConnection::login()
         this->mutexLock();
 
         // try to authenticate client to the iRODS server
-        if ((status = clientLogin (this->rodsCommPtr)) != 0)
+        if ((status = this->authenticate(authScheme, userName, password)) != 0)
         {
             rcDisconnect(this->rodsCommPtr);
             this->rodsCommPtr = NULL;
@@ -99,6 +99,84 @@ int RodsConnection::login()
     }
 
     return (status);
+}
+
+int RodsConnection::authenticate(const std::string &authScheme, const std::string &userName, const std::string &password)
+{
+    std::string scheme;
+    irods::error status;
+    std::string context;
+
+    if (this->commPtr() == NULL)
+        return (-1);
+
+    if (this->commPtr()->loggedIn)
+        return (0);
+
+    if (authScheme.empty())
+        scheme = this->rodsUserEnv.rodsAuthScheme;
+    else
+        scheme = authScheme;
+
+    std::transform(scheme.begin(), scheme.end(), scheme.begin(), ::tolower);
+
+    irods::auth_object_ptr authObj;
+    status = irods::auth_factory(scheme, this->rodsCommPtr->rError, authObj);
+
+    if (!status.ok())
+        return (status.code());
+
+    irods::plugin_ptr pluginPtr;
+    status = authObj->resolve(irods::AUTH_INTERFACE, pluginPtr);
+
+    if (!status.ok())
+        return (status.code());
+
+    irods::auth_ptr authPlugin = boost::dynamic_pointer_cast<irods::auth>(pluginPtr);
+
+    // handle native auth special case (password scramble)
+    if (scheme == "native" && !password.empty())
+        obfSavePw(0, 0, 0, password.c_str());
+
+
+    // handle PAM auth special case (inject password into plugin context)
+    else if (scheme == "pam")
+    {
+        irods::kvp_map_t keyValues;
+
+        keyValues[irods::AUTH_TTL_KEY] = 3600;
+        keyValues[irods::AUTH_PASSWORD_KEY] = password;
+
+        context = irods::escaped_kvp_string(keyValues);
+       //irods::pam_auth_object_ptr pamPtr = boost::dynamic_pointer_cast<
+    }
+
+    status = authPlugin->call<rcComm_t*, const char*>(NULL, irods::AUTH_CLIENT_START, authObj, this->rodsCommPtr, context.c_str());
+
+    if (!status.ok())
+        return (status.code());
+
+    status = authPlugin->call<rcComm_t*>(NULL, irods::AUTH_CLIENT_AUTH_REQUEST, authObj, this->rodsCommPtr);
+
+    if (!status.ok())
+        return (status.code());
+
+    status = authPlugin->call(NULL, irods::AUTH_ESTABLISH_CONTEXT, authObj);
+
+    if (!status.ok())
+        return (status.code());
+
+    status = authPlugin->call<rcComm_t*>(NULL, irods::AUTH_CLIENT_AUTH_RESPONSE, authObj, this->rodsCommPtr);
+
+    if (!status.ok())
+        return (status.code());
+
+
+    // if we got here, success
+    this->rodsCommPtr->loggedIn = 1;
+    return (0);
+
+    //return (clientLogin(this->rodsCommPtr));
 }
 
 int RodsConnection::disconnect(bool force)
@@ -190,6 +268,11 @@ std::string RodsConnection::rodsZone() const
 std::string RodsConnection::rodsDefResc() const
 {
     return std::string(this->rodsUserEnv.rodsDefResource);
+}
+
+std::string RodsConnection::rodsAuthScheme() const
+{
+    return std::string(this->rodsUserEnv.rodsAuthScheme);
 }
 
 std::string RodsConnection::lastErrorMsg() const
