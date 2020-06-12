@@ -576,9 +576,7 @@ bool RodsObjTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action
                         // if we have a valid object to move
                         if (sourceEntryPtr)
                         {
-                            int status = 0;
-
-                            if (status = this->rodsConn->moveObjToColl(sourceEntryPtr, destColl))
+                            if (int status = this->rodsConn->moveObjToColl(sourceEntryPtr, destColl); status)
                             {
                                 // report error
                             }
