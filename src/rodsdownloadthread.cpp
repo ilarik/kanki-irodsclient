@@ -280,5 +280,5 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, Kanki::Ro
 
 int RodsDownloadThread::transferFileParallel(Kanki::RodsObjEntryPtr obj, Kanki::RodsDataInStream &inStream, QFile &localFile)
 {
-
+  return 0;
 }
