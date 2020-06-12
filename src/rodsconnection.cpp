@@ -140,16 +140,16 @@ int RodsConnection::authenticate(const std::string &authScheme, const std::strin
 
 
     // handle PAM auth special case (inject password into plugin context)
-    else if (scheme == "pam")
-    {
-        irods::kvp_map_t keyValues;
+    // else if (scheme == "pam")
+    // {
+    //     irods::kvp_map_t keyValues;
 
-        keyValues[irods::AUTH_TTL_KEY] = 3600;
-        keyValues[irods::AUTH_PASSWORD_KEY] = password;
+    //     keyValues[irods::AUTH_TTL_KEY] = 3600;
+    //     keyValues[irods::AUTH_PASSWORD_KEY] = password;
 
-        context = irods::escaped_kvp_string(keyValues);
-       //irods::pam_auth_object_ptr pamPtr = boost::dynamic_pointer_cast<
-    }
+    //     context = irods::escaped_kvp_string(keyValues);
+    //    //irods::pam_auth_object_ptr pamPtr = boost::dynamic_pointer_cast<
+    // }
 
     status = authPlugin->call<rcComm_t*, const char*>(NULL, irods::AUTH_CLIENT_START, authObj, this->rodsCommPtr, context.c_str());
 
