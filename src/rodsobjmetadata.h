@@ -27,6 +27,12 @@
 #include "rodsClient.h"
 #include "rodsPath.h"
 
+// new-age iRODS headers
+#include "query_builder.hpp"
+
+// fmt library
+#include "fmt/format.h"
+
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
 #include "rodsobjentry.h"

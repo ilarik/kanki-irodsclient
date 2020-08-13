@@ -31,57 +31,87 @@ RodsObjMetadata::RodsObjMetadata(Kanki::RodsConnection *theConn, RodsObjEntryPtr
 
 int RodsObjMetadata::refresh()
 {
-    Kanki::RodsGenQuery metaQuery(this->conn);
+//    Kanki::RodsGenQuery metaQuery(this->conn);
     int status = 0;
+    std::string queryString;
 
-    // if the object in question is a data object
     if (this->objEntry->objType == DATA_OBJ_T)
-    {
-        metaQuery.addQueryAttribute(COL_META_DATA_ATTR_NAME);
-        metaQuery.addQueryAttribute(COL_META_DATA_ATTR_VALUE);
-        metaQuery.addQueryAttribute(COL_META_DATA_ATTR_UNITS);
-    }
+    	queryString = fmt::format("SELECT META_DATA_ATTR_NAME, "
+				  "META_DATA_ATTR_VALUE, "
+				  "META_DATA_ATTR_UNITS "
+				  "WHERE DATA_NAME = '{}' AND COLL_NAME = '{}'",
+				  this->objEntry->objName,
+				  this->objEntry->collPath);
+   
+    else
+	queryString = fmt::format("SELECT META_COLL_ATTR_NAME, "
+				  "META_COLL_ATTR_VALUE, "
+				  "META_COLL_ATTR_UNITS "
+				  "WHERE COLL_NAME = '{}'",
+				  this->objEntry->collPath);
 
-    else if (this->objEntry->objType == COLL_OBJ_T)
-    {
-        metaQuery.addQueryAttribute(COL_META_COLL_ATTR_NAME);
-        metaQuery.addQueryAttribute(COL_META_COLL_ATTR_VALUE);
-        metaQuery.addQueryAttribute(COL_META_COLL_ATTR_UNITS);
-    }
+    using qb = irods::experimental::query_builder;
 
-    // set query condition, object name
-    metaQuery.addQueryCondition(this->objEntry->objType == DATA_OBJ_T ? COL_DATA_NAME : COL_COLL_NAME,
-                                Kanki::RodsGenQuery::isEqual, this->objEntry->objName);
-
-    // if we are querying a data object, specify collection path
-    if (this->objEntry->objType == DATA_OBJ_T)
-        metaQuery.addQueryCondition(COL_COLL_NAME, Kanki::RodsGenQuery::isEqual, this->objEntry->collPath);
-
-    // execute the genquery for object metadata
-    if ((status = metaQuery.execute()) < 0)
-    {
-        // in the case of a failure, return error code from rods api to caller
-        return (status);
-    }
-
-    // otherwise we update our internal metadata structures
-    else {
-        // clear hashtables
+    try {
         this->attrValues.clear();
         this->attrUnits.clear();
 
-        // retrieve results from the genquery
-        std::vector<std::string> names = metaQuery.getResultSet(0);
-        std::vector<std::string> values = metaQuery.getResultSet(1);
-        std::vector<std::string> units = metaQuery.getResultSet(2);
-
-        // add the relational result set into internal structures
-        for (unsigned int i = 0; i < names.size() && i < values.size() && i < units.size(); i++)
-            this->addToStore(names.at(i), values.at(i), units.at(i));
+	for (const std::vector<std::string> &row : qb().build(*(this->conn->commPtr()), queryString))
+	    this->addToStore(row.at(0), row.at(1), row.at(2));
+    } catch (const irods::exception &e) {
+	status = e.code();
+    } catch (const std::exception &e) {
+	status = SYS_INTERNAL_ERR;
     }
 
-    // the metadata refresh was successful
-    return (0);
+    // // if the object in question is a data object
+    // if (this->objEntry->objType == DATA_OBJ_T)
+    // {
+    //     metaQuery.addQueryAttribute(COL_META_DATA_ATTR_NAME);
+    //     metaQuery.addQueryAttribute(COL_META_DATA_ATTR_VALUE);
+    //     metaQuery.addQueryAttribute(COL_META_DATA_ATTR_UNITS);
+    // }
+
+    // else if (this->objEntry->objType == COLL_OBJ_T)
+    // {
+    //     metaQuery.addQueryAttribute(COL_META_COLL_ATTR_NAME);
+    //     metaQuery.addQueryAttribute(COL_META_COLL_ATTR_VALUE);
+    //     metaQuery.addQueryAttribute(COL_META_COLL_ATTR_UNITS);
+    // }
+
+    // // set query condition, object name
+    // metaQuery.addQueryCondition(this->objEntry->objType == DATA_OBJ_T ? COL_DATA_NAME : COL_COLL_NAME,
+    //                             Kanki::RodsGenQuery::isEqual, this->objEntry->objName);
+
+    // // if we are querying a data object, specify collection path
+    // if (this->objEntry->objType == DATA_OBJ_T)
+    //     metaQuery.addQueryCondition(COL_COLL_NAME, Kanki::RodsGenQuery::isEqual, this->objEntry->collPath);
+
+    // // execute the genquery for object metadata
+    // if ((status = metaQuery.execute()) < 0)
+    // {
+    //     // in the case of a failure, return error code from rods api to caller
+    //     return (status);
+    // }
+
+    // // otherwise we update our internal metadata structures
+    // else {
+    //     // clear hashtables
+    //     this->attrValues.clear();
+    //     this->attrUnits.clear();
+
+    //     // retrieve results from the genquery
+    //     std::vector<std::string> names = metaQuery.getResultSet(0);
+    //     std::vector<std::string> values = metaQuery.getResultSet(1);
+    //     std::vector<std::string> units = metaQuery.getResultSet(2);
+
+    //     // add the relational result set into internal structures
+    //     for (unsigned int i = 0; i < names.size() && i < values.size() && i < units.size(); i++)
+    //         this->addToStore(names.at(i), values.at(i), units.at(i));
+    // }
+
+    // the metadata refresh status is returned
+    return (status);
 }
 
 void RodsObjMetadata::addToStore(std::string name, std::string value, std::string unit)
