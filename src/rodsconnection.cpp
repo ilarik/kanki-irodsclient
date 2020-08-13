@@ -311,45 +311,63 @@ int RodsConnection::makeColl(const std::string &collPath, bool makeRecursive)
 
 int RodsConnection::readColl(const std::string &collPath, std::vector<RodsObjEntryPtr> *collObjs)
 {
-    collHandle_t rodsColl;
-    collEnt_t rodsCollEntry;
-    char collPathIn[MAX_NAME_LEN], collPathOut[MAX_NAME_LEN];
+    // collHandle_t rodsColl;
+    // collEnt_t rodsCollEntry;
+    // char collPathIn[MAX_NAME_LEN], collPathOut[MAX_NAME_LEN];
     int status = 0;
 
     // sanity checks for arguments
     if (!collObjs || collPath.empty())
         return (-1);
 
-    // take a temp copy of the coll path string
-    strcpy(collPathIn, collPath.c_str());
+    // // take a temp copy of the coll path string
+    // strcpy(collPathIn, collPath.c_str());
 
     std::lock_guard mutexGuard(this->commMutex);
 
-    // first the path string must be parsed by iRODS
-    if ((status = parseRodsPathStr(collPathIn, &this->rodsUserEnv, collPathOut) < 0))
-        return (status);
+    // // first the path string must be parsed by iRODS
+    // if ((status = parseRodsPathStr(collPathIn, &this->rodsUserEnv, collPathOut) < 0))
+    //     return (status);
 
-    // try to open collection from iRODS
-    if ((status = rclOpenCollection(this->rodsCommPtr, collPathOut, 0, &rodsColl)) < 0)
-        return (status);
+    // // try to open collection from iRODS
+    // if ((status = rclOpenCollection(this->rodsCommPtr, collPathOut, 0, &rodsColl)) < 0)
+    //     return (status);
+    
+    namespace fs = irods::experimental::filesystem;
 
-    // read collection while there are objects to loop over
-    do {
-        status = rclReadCollection(this->rodsCommPtr, &rodsColl, &rodsCollEntry);
+    for (fs::collection_entry const &entry : fs::client::collection_iterator(*(this->commPtr()), collPath))
+    {
+	Kanki::RodsObjEntryPtr newEntry(new Kanki::RodsObjEntry(entry.is_data_object() ? entry.path().object_name().c_str() : entry.path().c_str(),
+								entry.is_data_object() ? entry.path().parent_path().c_str() : entry.path().c_str(),
+								std::to_string(entry.creation_time().time_since_epoch().count()),
+								std::to_string(entry.last_write_time().time_since_epoch().count()),
+								entry.is_data_object() ? DATA_OBJ_T : COLL_OBJ_T,
+								0,
+								1,
+								entry.is_data_object() ? const_cast<fs::collection_entry&>(entry).data_object_size() : 0));
+	// TODO: fix with emplace_back!
+	collObjs->push_back(newEntry);
+    }
 
-        if (status >= 0)
-        {
-            Kanki::RodsObjEntryPtr newEntry(new Kanki::RodsObjEntry(rodsCollEntry.objType == DATA_OBJ_T ? rodsCollEntry.dataName : rodsCollEntry.collName,
-            rodsCollEntry.collName, rodsCollEntry.createTime, rodsCollEntry.modifyTime, rodsCollEntry.objType, rodsCollEntry.replNum,
-            rodsCollEntry.replStatus, rodsCollEntry.dataSize));
+    // // read collection while there are objects to loop over
+    // do {
+      
 
-            collObjs->push_back(newEntry);
-        }
+    //     // status = rclReadCollection(this->rodsCommPtr, &rodsColl, &rodsCollEntry);
 
-    } while (status >= 0);
+    //     // if (status >= 0)
+    //     // {
+    //     //     Kanki::RodsObjEntryPtr newEntry(new Kanki::RodsObjEntry(rodsCollEntry.objType == DATA_OBJ_T ? rodsCollEntry.dataName : rodsCollEntry.collName,
+    //     //     rodsCollEntry.collName, rodsCollEntry.createTime, rodsCollEntry.modifyTime, rodsCollEntry.objType, rodsCollEntry.replNum,
+    //     //     rodsCollEntry.replStatus, rodsCollEntry.dataSize));
+
+    //     //     collObjs->push_back(newEntry);
+    //     // }
+
+    // } while (status >= 0);
 
     // close the collection handle
-    status = rclCloseCollection(&rodsColl);
+    //status = rclCloseCollection(&rodsColl);
 
     return (status);
 }
