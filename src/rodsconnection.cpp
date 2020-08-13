@@ -46,6 +46,8 @@ RodsConnection::~RodsConnection()
     // forcefully disconnect if we are connected to rods
     if (this->rodsCommPtr)
         this->disconnect(true);
+
+    this->mutexUnlock();
 }
 
 int RodsConnection::connect()
@@ -56,7 +58,7 @@ int RodsConnection::connect()
     if (this->rodsCommPtr)
         return (status);
 
-    this->mutexLock();
+    std::lock_guard mutexGuard(this->commMutex);
 
     // get user iRODS environment
     if ((status = getRodsEnv(&this->rodsUserEnv)) < 0)
@@ -67,11 +69,9 @@ int RodsConnection::connect()
                                 this->rodsUserEnv.rodsUserName, this->rodsUserEnv.rodsZone,
                                  0, &this->lastErrMsg)) == NULL)
     {
-        this->mutexUnlock();
         return(-1);
     }
 
-    this->mutexUnlock();
     return (status);
 }
 
@@ -86,16 +86,14 @@ int RodsConnection::login(const std::string &authScheme, const std::string &user
     // login only if not already logged in
     if (!this->isReady())
     {
-        this->mutexLock();
-
-        // try to authenticate client to the iRODS server
-        if ((status = this->authenticate(authScheme, userName, password)) != 0)
+      std::lock_guard commGuard(this->commMutex);
+      
+      // try to authenticate client to the iRODS server
+      if ((status = this->authenticate(authScheme, userName, password)) != 0)
         {
-            rcDisconnect(this->rodsCommPtr);
-            this->rodsCommPtr = NULL;
+	  rcDisconnect(this->rodsCommPtr);
+	  this->rodsCommPtr = NULL;
         }
-
-        this->mutexUnlock();
     }
 
     return (status);
@@ -186,15 +184,21 @@ int RodsConnection::disconnect(bool force)
     // only if there is a connection (conn pointer set)
     if (this->rodsCommPtr)
     {
+	const auto _disconnect = [&status, this] { 
+	    // do rods api disconnect and set comm ptr to null
+	    status = rcDisconnect(this->rodsCommPtr);
+	    this->rodsCommPtr = nullptr;
+	};
+
         // wait mutex if not force disconnect
         if (!force)
-            this->mutexLock();
+	{
+	    std::lock_guard commGuard(this->commMutex); 
+	    _disconnect();
+	}
 
-        // do rods api disconnect and set comm ptr to null
-        status = rcDisconnect(this->rodsCommPtr);
-        this->rodsCommPtr = NULL;
-
-        this->mutexUnlock();
+	else
+	    _disconnect();
     }
 
     // return rods api status
@@ -290,7 +294,7 @@ int RodsConnection::makeColl(const std::string &collPath, bool makeRecursive)
     collInp_t theColl;
     int status = 0;
 
-    this->mutexLock();
+    std::lock_guard mutexGuard(this->commMutex);
 
     // initialize rods api coll struct
     memset(&theColl, 0, sizeof (collInp_t));
@@ -302,8 +306,6 @@ int RodsConnection::makeColl(const std::string &collPath, bool makeRecursive)
 
     // call rods api to make collection
     status = rcCollCreate(this->rodsCommPtr, &theColl);
-
-    this->mutexUnlock();
 
     // return status to caller
     return (status);
@@ -323,7 +325,7 @@ int RodsConnection::readColl(const std::string &collPath, std::vector<RodsObjEnt
     // take a temp copy of the coll path string
     strcpy(collPathIn, collPath.c_str());
 
-    this->mutexLock();
+    std::lock_guard mutexGuard(this->commMutex);
 
     // first the path string must be parsed by iRODS
     if ((status = parseRodsPathStr(collPathIn, &this->rodsUserEnv, collPathOut) < 0))
@@ -351,8 +353,6 @@ int RodsConnection::readColl(const std::string &collPath, std::vector<RodsObjEnt
     // close the collection handle
     status = rclCloseCollection(&rodsColl);
 
-    this->mutexUnlock();
-
     return (status);
 }
 
@@ -365,7 +365,7 @@ int RodsConnection::removeColl(const std::string &collPath)
     if (collPath.empty() || collPath.find_first_of('/') != 0)
         return (-1);
 
-    this->mutexLock();
+    std::lock_guard mutexGuard(this->commMutex);
 
     // initialize rods api struct
     memset(&theColl, 0, sizeof (collInp_t));
@@ -377,8 +377,6 @@ int RodsConnection::removeColl(const std::string &collPath)
 
     // call for rods api to remove collection
     status = rcRmColl(this->rodsCommPtr, &theColl, false);
-
-    this->mutexUnlock();
 
     // return status to caller
     return (status);
@@ -398,7 +396,7 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
     size = fileStream.tellg();
     fileStream.close();
 
-    this->mutexLock();
+    std::lock_guard mutexGuard(this->commMutex);
 
     // zero rods api input params structure
     memset(&putParam, 0, sizeof(dataObjInp_t));
@@ -430,8 +428,6 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
     // call rods api
     status = rcDataObjPut(this->rodsCommPtr, &putParam, filePath);
 
-    this->mutexUnlock();
-
     // return rods api status
     return (status);
 }
@@ -453,7 +449,7 @@ int RodsConnection::removeObj(const std::string &objPath)
     if (objPath.empty() || objPath.find_first_of('/') != 0)
         return (-1);
 
-    this->mutexLock();
+    std::lock_guard mutexGuard(this->commMutex);
 
     // initialize rods api struct
     memset(&theObj, 0, sizeof (dataObjInp_t));
@@ -464,8 +460,6 @@ int RodsConnection::removeObj(const std::string &objPath)
 
     // call for rods api to remove data object
     status = rcDataObjUnlink(this->rodsCommPtr, &theObj);
-
-    this->mutexUnlock();
 
     // return status to caller
     return (status);
@@ -481,7 +475,7 @@ int RodsConnection::getFile(const std::string &localPath, const std::string &obj
     if (objPath.empty() || objPath.find_first_of('/') != 0)
         return (-1);
 
-    this->mutexLock();
+    std::lock_guard mutexGuard(this->commMutex);
 
     // zero rods api param struct
     memset(&getParam, 0, sizeof (dataObjInp_t));
@@ -501,8 +495,6 @@ int RodsConnection::getFile(const std::string &localPath, const std::string &obj
 
     // execute data object get
     status = rcDataObjGet(this->rodsCommPtr, &getParam, (char*)localPath.c_str());
-
-    this->mutexUnlock();
 
     // return rods api status
     return (status);
@@ -584,6 +576,9 @@ int RodsConnection::renameObj(RodsObjEntryPtr objEntry, const std::string &newNa
     // set source and target object paths
     rstrcpy(objRenameInp.srcDataObjInp.objPath, objEntry->getObjectFullPath().c_str(), MAX_NAME_LEN);
     rstrcpy(objRenameInp.destDataObjInp.objPath, newObjPath.c_str(), MAX_NAME_LEN);
+
+    // we need a lock here
+    std::lock_guard mutexGuard(this->commMutex);
 
     // try to execute rods api call
     if ((status = rcDataObjRename(this->rodsCommPtr, &objRenameInp)) >= 0)

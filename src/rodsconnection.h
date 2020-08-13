@@ -23,13 +23,13 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <mutex>
 
 // OpenSSL library headers
 #include <openssl/ssl.h>
 
 // boost library headers
 #include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/system/error_code.hpp>
 
 // iRODS client library headers
@@ -177,8 +177,8 @@ private:
     RodsConnection(RodsConnection &);
     RodsConnection& operator=(RodsConnection &);
 
-    // a boost mutex to provide locking for the TCP connection data stream
-    boost::mutex commMutex;
+    // a mutex to provide locking for the TCP connection data stream
+    std::mutex commMutex;
 
     // rods api communications pointer
     rcComm_t *rodsCommPtr;
