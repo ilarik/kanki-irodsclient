@@ -290,6 +290,10 @@ int RodsConnection::makeColl(const std::string &collPath, bool makeRecursive)
 {
     int status = 0;
 
+    // sanity check, input argument string must be nonempty and begin with /
+    if (collPath.empty() || collPath.find_first_of('/') != 0)
+        return (-1);
+
     std::lock_guard mutexGuard(this->commMutex);
 
     namespace fs = irods::experimental::filesystem;
