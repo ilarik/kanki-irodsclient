@@ -289,21 +289,29 @@ int RodsConnection::lastError() const
 
 int RodsConnection::makeColl(const std::string &collPath, bool makeRecursive)
 {
-    collInp_t theColl;
+//    collInp_t theColl;
     int status = 0;
 
     std::lock_guard mutexGuard(this->commMutex);
 
-    // initialize rods api coll struct
-    memset(&theColl, 0, sizeof (collInp_t));
-    rstrcpy(theColl.collName, collPath.c_str(), MAX_NAME_LEN);
+    namespace fs = irods::experimental::filesystem;
 
-    // if a recursive operation is asked for, specify it
-    if (makeRecursive)
-        addKeyVal(&theColl.condInput, RECURSIVE_OPR__KW, "");
+    try {
+	fs::client::create_collection(*(this->commPtr()), collPath);
+    } catch (fs::filesystem_error &e) {
+	status = e.code().value();
+    }
 
-    // call rods api to make collection
-    status = rcCollCreate(this->rodsCommPtr, &theColl);
+    // // initialize rods api coll struct
+    // memset(&theColl, 0, sizeof (collInp_t));
+    // rstrcpy(theColl.collName, collPath.c_str(), MAX_NAME_LEN);
+
+    // // if a recursive operation is asked for, specify it
+    // if (makeRecursive)
+    //     addKeyVal(&theColl.condInput, RECURSIVE_OPR__KW, "");
+
+    // // call rods api to make collection
+    // status = rcCollCreate(this->rodsCommPtr, &theColl);
 
     // return status to caller
     return (status);
