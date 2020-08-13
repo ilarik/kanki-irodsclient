@@ -4,10 +4,11 @@ cmake_minimum_required(VERSION 3.5)
 # find Qt CMake packages
 find_package(Qt5 5.4.0 CONFIG REQUIRED Widgets Xml Svg)
 
+# find iRODS packages
 find_package(IRODS 4.2.8 EXACT REQUIRED CONFIG)
 
-# set(CMAKE_C_COMPILER ${IRODS_EXTERNALS_FULLPATH_CLANG}/bin/clang)
-# set(CMAKE_CXX_COMPILER ${IRODS_EXTERNALS_FULLPATH_CLANG}/bin/clang++)
+set(CMAKE_C_COMPILER ${IRODS_EXTERNALS_FULLPATH_CLANG}/bin/clang)
+set(CMAKE_CXX_COMPILER ${IRODS_EXTERNALS_FULLPATH_CLANG}/bin/clang++)
 
 set(CMAKE_EXE_LINKER_FLAGS_INIT "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
 
@@ -67,6 +68,7 @@ target_link_libraries(
     ${IRODS_EXTERNALS_FULLPATH_BOOST}/lib/libboost_system.so
     ${IRODS_EXTERNALS_FULLPATH_BOOST}/lib/libboost_thread.so
     ${IRODS_EXTERNALS_FULLPATH_ZMQ}/lib/libzmq.so
+    ${IRODS_EXTERNALS_FULLPATH_FMT}/lib/libfmt.so
     pthread
     ssl
     crypto
@@ -82,6 +84,7 @@ target_include_directories(
     ${IRODS_EXTERNALS_FULLPATH_CPPZMQ}/include
     ${IRODS_EXTERNALS_FULLPATH_ZMQ}/include
     ${IRODS_EXTERNALS_FULLPATH_JSON}/include
+    ${IRODS_EXTERNALS_FULLPATH_FMT}/include
     )
 
 target_compile_definitions(irodsclient PRIVATE ${IRODS_COMPILE_DEFINITIONS} BOOST_SYSTEM_NO_DEPRECATED)
