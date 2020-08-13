@@ -46,8 +46,6 @@ RodsConnection::~RodsConnection()
     // forcefully disconnect if we are connected to rods
     if (this->rodsCommPtr)
         this->disconnect(true);
-
-    this->mutexUnlock();
 }
 
 int RodsConnection::connect()
