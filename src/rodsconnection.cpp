@@ -343,18 +343,24 @@ int RodsConnection::readColl(const std::string &collPath, std::vector<RodsObjEnt
     
     namespace fs = irods::experimental::filesystem;
 
-    for (fs::collection_entry const &entry : fs::client::collection_iterator(*(this->commPtr()), collPath))
+    try {
+	for (fs::collection_entry const &entry : fs::client::collection_iterator(*(this->commPtr()), collPath))
+	{
+	    Kanki::RodsObjEntryPtr newEntry(new Kanki::RodsObjEntry(entry.is_data_object() ? entry.path().object_name().c_str() : entry.path().c_str(),
+								    entry.is_data_object() ? entry.path().parent_path().c_str() : entry.path().c_str(),
+								    std::to_string(entry.creation_time().time_since_epoch().count()),
+								    std::to_string(entry.last_write_time().time_since_epoch().count()),
+								    entry.is_data_object() ? DATA_OBJ_T : COLL_OBJ_T,
+								    0,
+								    1,
+								    entry.is_data_object() ? const_cast<fs::collection_entry&>(entry).data_object_size() : 0));
+
+	    // TODO: fix with emplace_back!
+	    collObjs->push_back(newEntry);
+	}
+    } catch (fs::filesystem_error &e)
     {
-	Kanki::RodsObjEntryPtr newEntry(new Kanki::RodsObjEntry(entry.is_data_object() ? entry.path().object_name().c_str() : entry.path().c_str(),
-								entry.is_data_object() ? entry.path().parent_path().c_str() : entry.path().c_str(),
-								std::to_string(entry.creation_time().time_since_epoch().count()),
-								std::to_string(entry.last_write_time().time_since_epoch().count()),
-								entry.is_data_object() ? DATA_OBJ_T : COLL_OBJ_T,
-								0,
-								1,
-								entry.is_data_object() ? const_cast<fs::collection_entry&>(entry).data_object_size() : 0));
-	// TODO: fix with emplace_back!
-	collObjs->push_back(newEntry);
+	status = e.code().value();
     }
 
     // // read collection while there are objects to loop over
