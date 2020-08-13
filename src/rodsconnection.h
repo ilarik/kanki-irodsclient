@@ -49,6 +49,8 @@
 #include "authPluginRequest.h"
 #include "irods_kvp_string_parser.hpp"
 
+// new-age iRODS headers
+#include "filesystem.hpp"
 
 // Kanki iRODS C++ class library headers
 #include "rodsobjentry.h"
