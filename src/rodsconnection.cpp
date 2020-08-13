@@ -67,7 +67,7 @@ int RodsConnection::connect()
                                 this->rodsUserEnv.rodsUserName, this->rodsUserEnv.rodsZone,
                                  0, &this->lastErrMsg)) == NULL)
     {
-        return(-1);
+        return (-1);
     }
 
     return (status);
@@ -188,15 +188,14 @@ int RodsConnection::disconnect(bool force)
 	    this->rodsCommPtr = nullptr;
 	};
 
-        // wait mutex if not force disconnect
+        // wait mutex (if needed) and disconnect
         if (!force)
 	{
 	    std::lock_guard commGuard(this->commMutex); 
 	    _disconnect();
 	}
 
-	else
-	    _disconnect();
+	else _disconnect();
     }
 
     // return rods api status
@@ -289,7 +288,6 @@ int RodsConnection::lastError() const
 
 int RodsConnection::makeColl(const std::string &collPath, bool makeRecursive)
 {
-//    collInp_t theColl;
     int status = 0;
 
     std::lock_guard mutexGuard(this->commMutex);
@@ -302,44 +300,19 @@ int RodsConnection::makeColl(const std::string &collPath, bool makeRecursive)
 	status = e.code().value();
     }
 
-    // // initialize rods api coll struct
-    // memset(&theColl, 0, sizeof (collInp_t));
-    // rstrcpy(theColl.collName, collPath.c_str(), MAX_NAME_LEN);
-
-    // // if a recursive operation is asked for, specify it
-    // if (makeRecursive)
-    //     addKeyVal(&theColl.condInput, RECURSIVE_OPR__KW, "");
-
-    // // call rods api to make collection
-    // status = rcCollCreate(this->rodsCommPtr, &theColl);
-
     // return status to caller
     return (status);
 }
 
 int RodsConnection::readColl(const std::string &collPath, std::vector<RodsObjEntryPtr> *collObjs)
 {
-    // collHandle_t rodsColl;
-    // collEnt_t rodsCollEntry;
-    // char collPathIn[MAX_NAME_LEN], collPathOut[MAX_NAME_LEN];
     int status = 0;
 
     // sanity checks for arguments
     if (!collObjs || collPath.empty())
         return (-1);
 
-    // // take a temp copy of the coll path string
-    // strcpy(collPathIn, collPath.c_str());
-
     std::lock_guard mutexGuard(this->commMutex);
-
-    // // first the path string must be parsed by iRODS
-    // if ((status = parseRodsPathStr(collPathIn, &this->rodsUserEnv, collPathOut) < 0))
-    //     return (status);
-
-    // // try to open collection from iRODS
-    // if ((status = rclOpenCollection(this->rodsCommPtr, collPathOut, 0, &rodsColl)) < 0)
-    //     return (status);
     
     namespace fs = irods::experimental::filesystem;
 
@@ -362,26 +335,6 @@ int RodsConnection::readColl(const std::string &collPath, std::vector<RodsObjEnt
     {
 	status = e.code().value();
     }
-
-    // // read collection while there are objects to loop over
-    // do {
-      
-
-    //     // status = rclReadCollection(this->rodsCommPtr, &rodsColl, &rodsCollEntry);
-
-    //     // if (status >= 0)
-    //     // {
-    //     //     Kanki::RodsObjEntryPtr newEntry(new Kanki::RodsObjEntry(rodsCollEntry.objType == DATA_OBJ_T ? rodsCollEntry.dataName : rodsCollEntry.collName,
-    //     //     rodsCollEntry.collName, rodsCollEntry.createTime, rodsCollEntry.modifyTime, rodsCollEntry.objType, rodsCollEntry.replNum,
-    //     //     rodsCollEntry.replStatus, rodsCollEntry.dataSize));
-
-    //     //     collObjs->push_back(newEntry);
-    //     // }
-
-    // } while (status >= 0);
-
-    // close the collection handle
-    //status = rclCloseCollection(&rodsColl);
 
     return (status);
 }

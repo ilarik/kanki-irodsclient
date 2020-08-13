@@ -5,7 +5,7 @@
  * The Kanki class RodsObjMetadata implements a container for iRODS
  * object AVU metadata and interfaces for metadata updates.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -31,7 +31,6 @@ RodsObjMetadata::RodsObjMetadata(Kanki::RodsConnection *theConn, RodsObjEntryPtr
 
 int RodsObjMetadata::refresh()
 {
-//    Kanki::RodsGenQuery metaQuery(this->conn);
     int status = 0;
     std::string queryString;
 
@@ -63,52 +62,6 @@ int RodsObjMetadata::refresh()
     } catch (const std::exception &e) {
 	status = SYS_INTERNAL_ERR;
     }
-
-    // // if the object in question is a data object
-    // if (this->objEntry->objType == DATA_OBJ_T)
-    // {
-    //     metaQuery.addQueryAttribute(COL_META_DATA_ATTR_NAME);
-    //     metaQuery.addQueryAttribute(COL_META_DATA_ATTR_VALUE);
-    //     metaQuery.addQueryAttribute(COL_META_DATA_ATTR_UNITS);
-    // }
-
-    // else if (this->objEntry->objType == COLL_OBJ_T)
-    // {
-    //     metaQuery.addQueryAttribute(COL_META_COLL_ATTR_NAME);
-    //     metaQuery.addQueryAttribute(COL_META_COLL_ATTR_VALUE);
-    //     metaQuery.addQueryAttribute(COL_META_COLL_ATTR_UNITS);
-    // }
-
-    // // set query condition, object name
-    // metaQuery.addQueryCondition(this->objEntry->objType == DATA_OBJ_T ? COL_DATA_NAME : COL_COLL_NAME,
-    //                             Kanki::RodsGenQuery::isEqual, this->objEntry->objName);
-
-    // // if we are querying a data object, specify collection path
-    // if (this->objEntry->objType == DATA_OBJ_T)
-    //     metaQuery.addQueryCondition(COL_COLL_NAME, Kanki::RodsGenQuery::isEqual, this->objEntry->collPath);
-
-    // // execute the genquery for object metadata
-    // if ((status = metaQuery.execute()) < 0)
-    // {
-    //     // in the case of a failure, return error code from rods api to caller
-    //     return (status);
-    // }
-
-    // // otherwise we update our internal metadata structures
-    // else {
-    //     // clear hashtables
-    //     this->attrValues.clear();
-    //     this->attrUnits.clear();
-
-    //     // retrieve results from the genquery
-    //     std::vector<std::string> names = metaQuery.getResultSet(0);
-    //     std::vector<std::string> values = metaQuery.getResultSet(1);
-    //     std::vector<std::string> units = metaQuery.getResultSet(2);
-
-    //     // add the relational result set into internal structures
-    //     for (unsigned int i = 0; i < names.size() && i < values.size() && i < units.size(); i++)
-    //         this->addToStore(names.at(i), values.at(i), units.at(i));
-    // }
 
     // the metadata refresh status is returned
     return (status);
