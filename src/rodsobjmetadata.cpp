@@ -55,7 +55,9 @@ int RodsObjMetadata::refresh()
         this->attrValues.clear();
         this->attrUnits.clear();
 
-	for (const std::vector<std::string> &row : qb().build(*(this->conn->commPtr()), queryString))
+	using row_type = irods::query<rcComm_t>::value_type;
+
+	for (const row_type &row : qb().build(*(this->conn->commPtr()), queryString))
 	    this->addToStore(row.at(0), row.at(1), row.at(2));
     } catch (const irods::exception &e) {
 	status = e.code();
