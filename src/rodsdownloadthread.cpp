@@ -34,6 +34,9 @@ void RodsDownloadThread::run()
     int status = 0;
     QString statusStr = "Initializing...";
 
+    irods::thread_pool tank(32);
+    auto conn_pool = irods::make_connection_pool(32);
+
     // signal ui to setup progress display
     progressMarquee(statusStr);
 
@@ -84,9 +87,15 @@ void RodsDownloadThread::run()
                     statusStr += curObj->getObjectName().c_str();
                     progressUpdate(statusStr, i+1);
 
-                    // try to do a rods get operation
-                    if ((status = this->downloadFile(curObj, dstPath, this->verify, this->overwrite)) < 0)
-                        reportError("iRODS get file error", curObj->getObjectFullPath().c_str(), status);
+                    // // try to do a rods get operation
+		    irods::thread_pool::post(tank, [=, &status] {
+			    auto conn = conn_pool->get_connection();			    
+			    if ((status = this->downloadFile(conn, curObj, dstPath, this->verify, this->overwrite)) < 0)
+				reportError("iRODS get file error", curObj->getObjectFullPath().c_str(), status);
+			});
+
+                    // if ((status = this->downloadFile(curObj, dstPath, this->verify, this->overwrite)) < 0)
+                    //     reportError("iRODS get file error", curObj->getObjectFullPath().c_str(), status);
                 }
 
                 // for collection objects we create the corresponding directory
@@ -119,10 +128,14 @@ void RodsDownloadThread::run()
         std::string dstPath = this->destPath + "/" + this->objEntry->getObjectName();
         setupProgressDisplay(statusStr, 1, 1);
 
+	auto conn = conn_pool->get_connection();
+
         // try to do a rods get operation
-        if ((status = this->downloadFile(objEntry, dstPath, this->verify, this->overwrite)) < 0)
-            reportError("Download failed", "Kanki data stream error", status);
+        if ((status = this->downloadFile(conn, objEntry, dstPath, this->verify, this->overwrite)) < 0)
+            reportError("Download failed", "iRODS data stream error", status);
     }
+
+    tank.join();
 
     this->conn->disconnect();
     delete(this->conn);
@@ -167,95 +180,122 @@ int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<
     return (status);
 }
 
-int RodsDownloadThread::downloadFile(Kanki::RodsObjEntryPtr obj, std::string localPath,
+int RodsDownloadThread::downloadFile(irods::connection_pool::connection_proxy &conn,
+				     Kanki::RodsObjEntryPtr obj, std::string localPath,
                                      bool verifyChecksum, bool allowOverwrite)
 {
-    Kanki::RodsDataInStream inStream(this->conn, obj);
-    QFile localFile(localPath.c_str());
+    //   Kanki::RodsDataInStream inStream(this->conn, obj);
     long int status = 0;
 
-    // check if we're allowed to proceed
-    if (localFile.exists() && !allowOverwrite)
+    namespace io = irods::experimental::io;
+
+    if (boost::filesystem::exists(localPath) && !allowOverwrite)
         return (OVERWRITE_WITHOUT_FORCE_FLAG);
 
-    // try to open local file and the rods data stream
-    if (!localFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        return (-1);
+    // // check if we're allowed to proceed
+    // if (localFile.exists() && !allowOverwrite)
+    
+    io::client::default_transport xport(conn);
+    io::idstream inStream(xport, obj->getObjectFullPath());
 
-    // try to initiate get operation and open data stream
-    if ((status = inStream.getOprInit()) < 0)
-        return (status);
+    if (!inStream)
+	return (SYS_API_INPUT_ERR);
 
-    if ((status = inStream.openDataObj()) < 0)
-        return (status);
+    //QFile localFile(localPath.c_str());
+    std::ofstream outStream(localPath, std::ofstream::binary | std::ofstream::out);
+    
+    if (!outStream)
+	return (FILE_OPEN_ERR);
 
+    // // try to open local file and the rods data stream
+    // if (!localFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    //     return (-1);
+
+    // // try to initiate get operation and open data stream
+    // if ((status = inStream.getOprInit()) < 0)
+    //     return (status);
+
+    // if ((status = inStream.openDataObj()) < 0)
+    //     return (status);
 
     // update status display only on large enough objects
     if (obj->objSize > __KANKI_BUFSIZE_INIT)
         setupSubProgressDisplay("Transferring...", 0, 100);
 
-    // TODO: do parellel transfer if necessary
-    if (inStream.parallelXferPortalAvail())
-        status = transferFileParallel(obj, inStream, localFile);
+    // // TODO: do parellel transfer if necessary
+    // if (inStream.parallelXferPortalAvail())
+    //     status = transferFileParallel(obj, inStream, localFile);
 
-    // otherwise we simply use the rods protocol stream I/O
-    else
-        status = transferFileStream(obj, inStream, localFile);
+    // // otherwise we simply use the rods protocol stream I/O
+    // else
 
+    status = transferFileStream(obj, inStream, outStream);
+    
     // close local file and rods data stream
-    localFile.close();
-    status = inStream.closeDataObj();
-    inStream.getOprEnd();
-
-    // if we have a successful transfer and if verify checksum was required
-    if (status >= 0 && verifyChecksum && strlen(inStream.checksum()))
-    {
-        subProgressUpdate("Verifying Checksum...", 100);
-        status = verifyChksumLocFile((char*)localPath.c_str(), (char*)inStream.checksum(), NULL);
-    }
+    outStream.close();
+    inStream.close();
+    
+    //inStream.getOprEnd();
+    
+    // // if we have a successful transfer and if verify checksum was required
+    // if (status >= 0 && verifyChecksum && strlen(inStream.checksum()))
+    // {
+    //     subProgressUpdate("Verifying Checksum...", 100);
+    //     status = verifyChksumLocFile((char*)localPath.c_str(), (char*)inStream.checksum(), NULL);
+    // }
 
     return (status);
  }
 
-int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, Kanki::RodsDataInStream &inStream, QFile &localFile)
+int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream)
 {
     long int status = 0, lastRead = 0, totalRead = 0;
     long int readSize = __KANKI_BUFSIZE_MAX;
-    void *buffer = std::malloc(readSize), *buffer2 = std::malloc(readSize);
-    boost::thread *writer = NULL;
+    char *buffer = (char*)std::malloc(readSize), *buffer2 = (char*)std::malloc(readSize);
+    std::thread *writer = NULL;
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
-    while ((lastRead = inStream.readAdaptive(buffer, readSize)) > 0)
+    // while ((lastRead = inStream.readAdaptive(buffer, readSize)) > 0)
+    // {
+    
+    while (inStream && outStream)
     {
+	inStream.read(buffer, __KANKI_BUFSIZE_MAX);
+	lastRead = inStream.gcount();
+
         std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
         std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
 
         totalRead += lastRead;
 
-        // if we had something to write, wait for it
+	// if we had something to write, wait for it
         if (writer)
         {
             writer->join();
             delete (writer);
 
-            // check for write errors
-            if (localFile.error() == QFile::WriteError)
-            {
-                reportError("Download failed", "Write error", -1);
-                status = -1;
+            // // check for write errors
+            // if (localFile.error() == QFile::WriteError)
+            // {
+            //     reportError("Download failed", "Write error", -1);
+            //     status = -1;
 
-                break;
-            }
+            //     break;
+            // }
         }
 
         // (re)new writer thread
-        writer = new boost::thread(boost::bind(&QFile::write, &localFile, (const char*)buffer, lastRead));
+        writer = new std::thread([&outStream, buffer, &lastRead] { 
+		outStream.write(buffer, lastRead);
+	    }); 
+	
+	//std::bind(&ofstream::write, &localFile, (const char*)buffer, lastRead));
 
         // XOR swap buffer pointers
-        buffer = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
-        buffer2 = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
-        buffer = (void*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
+        buffer = (char*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
+        buffer2 = (char*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
+        buffer = (char*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
 
         // compute and signal statistics to UI
         double speed = ((double)totalRead / 1048576) / ((double)diff.count() / 1000);
@@ -270,7 +310,10 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, Kanki::Ro
 
     // free everything we have allocated
     if (writer)
-        delete (writer);
+    {
+	writer->join();
+	delete (writer);
+    }
 
     std::free(buffer);
     std::free(buffer2);

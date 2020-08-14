@@ -22,6 +22,7 @@
 
 // boost library headers
 #include <boost/thread/thread.hpp>
+#include <boost/filesystem.hpp>
 
 // Qt framework headers
 #include <QThread>
@@ -31,6 +32,12 @@
 #include <QVariant>
 #include <QDir>
 #include <QFile>
+
+// new-age iRODS headers
+#include "dstream.hpp"
+#include "transport/default_transport.hpp"
+#include "thread_pool.hpp"
+#include "connection_pool.hpp"
 
 // Kanki iRODS C++ class library headers
 #include "rodsconnection.h"
@@ -83,13 +90,14 @@ private:
     int makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs);
 
     // Download one rods data object, launching parallel transfer if necessary
-    int downloadFile(Kanki::RodsObjEntryPtr obj, std::string localPath,
+    int downloadFile(irods::connection_pool::connection_proxy &conn,
+		     Kanki::RodsObjEntryPtr obj, std::string localPath,
                      bool verifyChecksum = false, bool allowOverwrite = true);
 
     // Implements double-buffered rods object download using Kanki::RodsDataInStream
     // and its adaptive rods i/o request size scaling for best resposniveness and
     // connection throughput utilization.
-    int transferFileStream(Kanki::RodsObjEntryPtr obj, Kanki::RodsDataInStream &inStream, QFile &localFile);
+    int transferFileStream(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream);
 
     // Launches parallel transfer for maximum performance and direct I/O to rods resource servers
     int transferFileParallel(Kanki::RodsObjEntryPtr obj, Kanki::RodsDataInStream &inStream, QFile &localFile);
