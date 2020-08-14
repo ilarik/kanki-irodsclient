@@ -28,11 +28,12 @@ RodsConnection::RodsConnection(RodsConnection *connPtr)
     memset(&this->rodsUserEnv, 0, sizeof (rodsEnv));
     memset(&this->lastErrMsg, 0, sizeof (rErrMsg_t));
 
-    // initialize iRODS 4 API tables
-    irods::api_entry_table &api_table = irods::get_client_api_table();
-    irods::pack_entry_table &pack_table = irods::get_pack_table();
+    // initialize iRODS 4.2 API tables new-age style
+    load_client_api_plugins();
 
-    init_api_table(api_table, pack_table);
+    // irods::api_entry_table &api_table = irods::get_client_api_table();
+    // irods::pack_entry_table &pack_table = irods::get_pack_table();
+    // init_api_table(api_table, pack_table);
 
     // if we have a 'parent' connection pointer
     if (connPtr)
@@ -300,7 +301,8 @@ int RodsConnection::makeColl(const std::string &collPath, bool makeRecursive)
 
     try {
 	fs::client::create_collection(*(this->commPtr()), collPath);
-    } catch (fs::filesystem_error &e) {
+    }
+    catch (fs::filesystem_error &e) {
 	status = e.code().value();
     }
 
@@ -335,7 +337,8 @@ int RodsConnection::readColl(const std::string &collPath, std::vector<RodsObjEnt
 	    // TODO: fix with emplace_back!
 	    collObjs->push_back(newEntry);
 	}
-    } catch (fs::filesystem_error &e)
+    }
+    catch (fs::filesystem_error &e)
     {
 	status = e.code().value();
     }
@@ -345,7 +348,7 @@ int RodsConnection::readColl(const std::string &collPath, std::vector<RodsObjEnt
 
 int RodsConnection::removeColl(const std::string &collPath)
 {
-    collInp_t theColl;
+    //collInp_t theColl;
     int status = 0;
 
     // sanity check, input argument string must be nonempty and begin with /
@@ -354,16 +357,26 @@ int RodsConnection::removeColl(const std::string &collPath)
 
     std::lock_guard mutexGuard(this->commMutex);
 
-    // initialize rods api struct
-    memset(&theColl, 0, sizeof (collInp_t));
-    rstrcpy(theColl.collName, collPath.c_str(), MAX_NAME_LEN);
+    namespace fs = irods::experimental::filesystem;
 
-    // initialize parameters for remove operation
-    addKeyVal(&theColl.condInput, RECURSIVE_OPR__KW, "");
-    addKeyVal(&theColl.condInput, FORCE_FLAG_KW, "");
+    try {
+	fs::client::remove_all(*(this->commPtr()), collPath, fs::remove_options::no_trash); 
+    }
+    catch (fs::filesystem_error &e)
+    {
+	status = e.code().value();
+    }
 
-    // call for rods api to remove collection
-    status = rcRmColl(this->rodsCommPtr, &theColl, false);
+    // // initialize rods api struct
+    // memset(&theColl, 0, sizeof (collInp_t));
+    // rstrcpy(theColl.collName, collPath.c_str(), MAX_NAME_LEN);
+
+    // // initialize parameters for remove operation
+    // addKeyVal(&theColl.condInput, RECURSIVE_OPR__KW, "");
+    // addKeyVal(&theColl.condInput, FORCE_FLAG_KW, "");
+
+    // // call for rods api to remove collection
+    // status = rcRmColl(this->rodsCommPtr, &theColl, false);
 
     // return status to caller
     return (status);
