@@ -442,24 +442,39 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
 
 int RodsConnection::removeObj(const std::string &objPath)
 {
-    dataObjInp_t theObj;
+//    dataObjInp_t theObj;
     int status = 0;
 
-    // sanity check, input argument string must be nonempty and begin with /
-    if (objPath.empty() || objPath.find_first_of('/') != 0)
-        return (-1);
+    namespace fs = irods::experimental::filesystem;
+
+    fs::path thePath(objPath);
+    
+    if (!thePath.is_absolute())
+	return (USER_INPUT_PATH_ERR);
+
+    // // sanity check, input argument string must be nonempty and begin with /
+    // if (objPath.empty() || objPath.find_first_of('/') != 0)
+    //     return (-1);
 
     std::lock_guard mutexGuard(this->commMutex);
 
-    // initialize rods api struct
-    memset(&theObj, 0, sizeof (dataObjInp_t));
-    rstrcpy(theObj.objPath, objPath.c_str(), MAX_NAME_LEN);
+    try {
+	fs::client::remove(*(this->commPtr()), thePath, fs::remove_options::no_trash); 
+    }
+    catch (fs::filesystem_error &e)
+    {
+	status = e.code().value();
+    }
 
-    // initialize remove params
-    addKeyVal(&theObj.condInput, FORCE_FLAG_KW, "");
+    // // initialize rods api struct
+    // memset(&theObj, 0, sizeof (dataObjInp_t));
+    // rstrcpy(theObj.objPath, objPath.c_str(), MAX_NAME_LEN);
 
-    // call for rods api to remove data object
-    status = rcDataObjUnlink(this->rodsCommPtr, &theObj);
+    // // initialize remove params
+    // addKeyVal(&theObj.condInput, FORCE_FLAG_KW, "");
+
+    // // call for rods api to remove data object
+    // status = rcDataObjUnlink(this->rodsCommPtr, &theObj);
 
     // return status to caller
     return (status);
