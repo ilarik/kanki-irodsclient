@@ -278,7 +278,7 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istr
             }
         }
 
-        // (re)new writer thread and push an lambda function into it
+        // (re)new writer thread and push a lambda function into it
         writer = new std::thread([&outStream, buffer, &lastRead] { 
 		outStream.write(buffer, lastRead);
 	    }); 
