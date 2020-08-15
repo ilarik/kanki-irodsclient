@@ -24,6 +24,7 @@
 #include <fstream>
 #include <algorithm>
 #include <mutex>
+#include <cstdint>
 
 // OpenSSL library headers
 #include <openssl/ssl.h>
@@ -170,6 +171,12 @@ public:
     // Renames an iRODS object to newName.
     int renameObj(Kanki::RodsObjEntryPtr objEntry, const std::string &newName);
 
+    // 
+    static const uint32_t numThreads = 32;
+
+    //
+    static const uint64_t xferBlkSize = 16777216;
+    
 private:
 
     // Authenticates the user against the iRODS server in a new connection.
