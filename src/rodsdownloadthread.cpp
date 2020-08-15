@@ -94,8 +94,10 @@ void RodsDownloadThread::run()
 
                     // get a connection and a thread to execute a lambda
 		    irods::thread_pool::post(tank, [=, &status] {
-			    connection_proxy conn = conn_pool->get_connection();			    
-			    if ((status = this->getObject(conn, curObj, dstPath, this->verify, this->overwrite)) < 0)
+			    connection_proxy conn = conn_pool->get_connection();
+			    if (!conn)
+				reportError("iRODS connection failure", curObj->getObjectFullPath().c_str(), SYS_SOCK_CONNECT_ERR);
+			    else if ((status = this->getObject(conn, curObj, dstPath, this->verify, this->overwrite)) < 0)
 				reportError("iRODS get file error", curObj->getObjectFullPath().c_str(), status);
 			});
                 }
@@ -130,10 +132,13 @@ void RodsDownloadThread::run()
         std::string dstPath = this->destPath + "/" + this->objEntry->getObjectName();
         setupProgressDisplay(statusStr, 1, 1);
 
+	// acquire a free connection from the pool
 	connection_proxy conn = conn_pool->get_connection();
-
+	
         // try to do a rods get operation
-        if ((status = this->getObject(conn, objEntry, dstPath, this->verify, this->overwrite)) < 0)
+	if (!conn)
+	    reportError("iRODS connection failure", this->objEntry->getObjectFullPath().c_str(), SYS_SOCK_CONNECT_ERR);
+        else if ((status = this->getObject(conn, objEntry, dstPath, this->verify, this->overwrite)) < 0)
             reportError("Download failed", "iRODS data stream error", status);
     }
 
