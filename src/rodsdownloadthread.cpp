@@ -251,48 +251,55 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istr
 {
     long int status = 0, lastRead = 0, totalRead = 0;
     long int readSize = __KANKI_BUFSIZE_MAX;
+
     char *buffer = (char*)std::malloc(readSize), *buffer2 = (char*)std::malloc(readSize);
-    std::thread *writer = NULL;
+    std::thread *writer = nullptr;
 
-    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+    // take namespaces and types
+    namespace chrono = std::chrono;
+    using clock = chrono::high_resolution_clock;
 
-    // while ((lastRead = inStream.readAdaptive(buffer, readSize)) > 0)
-    // {
-    
+    using millisec_type = chrono::milliseconds;
+    using timepoint_type = clock::time_point;
+
+    // we measure time from the get-go
+    timepoint_type t0 = clock::now();
+
     while (inStream && outStream)
     {
 	inStream.read(buffer, __KANKI_BUFSIZE_MAX);
 	lastRead = inStream.gcount();
 
-        std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-        std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+	// time diff after block transfer
+        timepoint_type t1 = clock::now();
+        millisec_type diff = chrono::duration_cast<millisec_type>(t1 - t0);
 
         totalRead += lastRead;
 
-	// if we had something to write, wait for it
+	// if we had a thread for writing, wait for it
         if (writer)
         {
             writer->join();
+
             delete (writer);
+	    writer = nullptr;
 
-            // // check for write errors
-            // if (localFile.error() == QFile::WriteError)
-            // {
-            //     reportError("Download failed", "Write error", -1);
-            //     status = -1;
+            // check for write errors
+            if (outStream.rdstate () & std::ofstream::badbit)
+            {
+		status = FILE_WRITE_ERR;
+                reportError("Download failed", "Write error", status);
 
-            //     break;
-            // }
+                break;
+            }
         }
 
-        // (re)new writer thread
+        // (re)new writer thread and push an lambda function into it
         writer = new std::thread([&outStream, buffer, &lastRead] { 
 		outStream.write(buffer, lastRead);
 	    }); 
 	
-	//std::bind(&ofstream::write, &localFile, (const char*)buffer, lastRead));
-
-        // XOR swap buffer pointers
+        // XOR swap buffer pointers for double buffering
         buffer = (char*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
         buffer2 = (char*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
         buffer = (char*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
