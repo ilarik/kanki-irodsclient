@@ -401,16 +401,18 @@ void RodsMainWindow::doDownload()
             RodsTransferWindow *transferWindow = new RodsTransferWindow(title);
 
             // connect worker thread signals to transfer window slots
-            connect(downloadWorker, &RodsDownloadThread::setupProgressDisplay, transferWindow,
+            connect(downloadWorker, &RodsDownloadThread::setupMainProgress, transferWindow,
                     &RodsTransferWindow::setupMainProgressBar);
-            connect(downloadWorker, &RodsDownloadThread::progressUpdate, transferWindow,
+            connect(downloadWorker, &RodsDownloadThread::mainProgressUpdate, transferWindow,
                     &RodsTransferWindow::updateMainProgress);
-            connect(downloadWorker, &RodsDownloadThread::setupSubProgressDisplay, transferWindow,
+	    connect(downloadWorker, &RodsDownloadThread::mainProgressMarquee, transferWindow,
+		    &RodsTransferWindow::setMainProgressMarquee);
+            connect(downloadWorker, &RodsDownloadThread::setupSubProgress, transferWindow,
                     &RodsTransferWindow::setupSubProgressBar);
             connect(downloadWorker, &RodsDownloadThread::subProgressUpdate, transferWindow,
                     &RodsTransferWindow::updateSubProgress);
-            connect(downloadWorker, &RodsDownloadThread::progressMarquee, transferWindow,
-                    &RodsTransferWindow::progressMarquee);
+            connect(downloadWorker, &RodsDownloadThread::subProgressMarquee, transferWindow,
+                    &RodsTransferWindow::setSubProgressMarquee);
 
             // error reporting signal connects to the error log window slot
             connect(downloadWorker, &RodsDownloadThread::reportError, this->errorLogWindow,
@@ -486,7 +488,7 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
     connect(uploadWorker, &RodsUploadThread::setupProgressDisplay, transferWindow,
             &RodsTransferWindow::setupMainProgressBar);
     connect(uploadWorker, &RodsUploadThread::progressMarquee, transferWindow,
-            &RodsTransferWindow::progressMarquee);
+            &RodsTransferWindow::setMainProgressMarquee);
     connect(uploadWorker, &RodsUploadThread::progressUpdate, transferWindow,
             &RodsTransferWindow::updateMainProgress);
 

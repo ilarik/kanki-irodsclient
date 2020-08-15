@@ -72,6 +72,12 @@ void RodsTransferWindow::setupMainProgressBar(QString initialMsg, int value, int
     this->updateMainProgress(initialMsg, value);
 }
 
+void RodsTransferWindow::setMainProgressMarquee(QString text)
+{
+    this->mainProgressBar->setMaximum(0);
+    this->mainProgressMsg->setText(text);
+}
+
 void RodsTransferWindow::updateMainProgress(QString currentMsg, int value)
 {
     QString progMsg = "Processing object ";
@@ -83,24 +89,24 @@ void RodsTransferWindow::updateMainProgress(QString currentMsg, int value)
     this->mainProgressBar->setValue(value);
 
     // when main is updated, sub is set to marquee
-    this->setupSubProgressBar("In Progress...", 0, 0);
+    this->setupSubProgressBar("In Progress...", "In Progress...", 0, 0);
 }
 
-void RodsTransferWindow::setupSubProgressBar(QString initialMsg, int value, int maxValue)
+void RodsTransferWindow::setupSubProgressBar(QString itemName, QString initialMsg, int value, int maxValue)
 {
     this->subProgressMax = maxValue;
 
     this->subProgressBar->setMaximum(maxValue);
-    this->updateSubProgress(initialMsg, value);
+    this->updateSubProgress(itemName, initialMsg, value);
 }
 
-void RodsTransferWindow::updateSubProgress(QString currentMsg, int value)
+void RodsTransferWindow::updateSubProgress(QString itemName, QString currentMsg, int value)
 {
     this->subProgressMsg->setText(currentMsg);
     this->subProgressBar->setValue(value);
 }
 
-void RodsTransferWindow::progressMarquee(QString currentMsg)
+void RodsTransferWindow::setSubProgressMarquee(QString itemName, QString currentMsg)
 {
     this->mainProgressBar->setMaximum(0);
     this->subProgressBar->setMaximum(0);

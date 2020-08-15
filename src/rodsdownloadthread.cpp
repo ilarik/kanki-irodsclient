@@ -56,7 +56,7 @@ void RodsDownloadThread::run()
 
     // setup progress display
     QString statusStr = "Initializing...";
-    progressMarquee(statusStr);
+    mainProgressMarquee(statusStr);
 
     // in the case of downloading a collection, do it recursively
     if (this->objEntry->objType == COLL_OBJ_T)
@@ -70,7 +70,7 @@ void RodsDownloadThread::run()
         if (!(status = makeCollObjList(this->objEntry, &collObjs)))
         {
             // notify ui of progress bar state (object count)
-            setupProgressDisplay(statusStr, 0, collObjs.size());
+            setupMainProgress(statusStr, 0, collObjs.size());
 
             // iterate thru object list
             for (unsigned int i = 0; i < collObjs.size(); i++)
@@ -89,7 +89,7 @@ void RodsDownloadThread::run()
                     // notify ui of current operation and progress
                     statusStr = "Downloading ";
                     statusStr += curObj->getObjectName().c_str();
-                    progressUpdate(statusStr, i+1);
+                    mainProgressUpdate(statusStr, i+1);
 
                     // get a connection and a thread to execute a lambda
 		    irods::thread_pool::post(thr_tank, [=, &status] {
@@ -110,7 +110,7 @@ void RodsDownloadThread::run()
                     // notify ui
                     statusStr = "Creating directory ";
                     statusStr += dirName.c_str();
-                    progressUpdate(statusStr, i+1);
+                    mainProgressUpdate(statusStr, i+1);
 
                     // check if directory exists and if not, make it
                     QDir dstDir(dstPath.c_str());
@@ -132,7 +132,7 @@ void RodsDownloadThread::run()
         statusStr += this->objEntry->getObjectName().c_str();
 
         std::string dstPath = this->destPath + "/" + this->objEntry->getObjectName();
-        setupProgressDisplay(statusStr, 1, 1);
+        setupMainProgress(statusStr, 1, 1);
 
 	// acquire a free connection from the pool
 	connection_proxy conn = conn_tank->get_connection();
@@ -171,7 +171,7 @@ int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<
 
                 // notify ui
                 QString statusStr = "Building a list of objects (" + QVariant((int)objs->size()).toString() + ")...";
-                progressMarquee(statusStr);
+                mainProgressMarquee(statusStr);
 
                 // recurse on collection objects
                 if (curObj->objType == COLL_OBJ_T)
@@ -217,7 +217,7 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
 
     // update status display only on large enough objects
     if (obj->objSize > __KANKI_BUFSIZE_INIT)
-        setupSubProgressDisplay("Transferring...", 0, 100);
+        setupSubProgress(obj->getObjectFullPath().c_str(), "Downloading...", 0, 100);
 
     // TODO: do parellel transfer if requested
     status = transferFileStream(obj, inStream, outStream);
@@ -225,6 +225,8 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
     // close the local stream and rods data stream
     outStream.close();
     inStream.close();
+
+    subProgressFinalize(obj->getObjectFullPath().c_str());
 
     // TODO: FIXME!
     //inStream.getOprEnd();
@@ -305,7 +307,7 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istr
         statusStr += " at " + QString::number(speed, 'f', 2) + " MB/s";
 
         if (obj->objSize > __KANKI_BUFSIZE_INIT)
-            subProgressUpdate(statusStr, (int)percentage);
+            subProgressUpdate(obj->getObjectFullPath().c_str(), statusStr, (int)percentage);
     }
 
     // free everything we have allocated

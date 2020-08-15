@@ -54,17 +54,20 @@ public slots:
     // for current message and current value.
     void updateMainProgress(QString currentMsg, int value);
 
+    // Qt slot for setting the main progress bar into marquee mode
+    void setMainProgressMarquee(QString text);
+
     // Qt slot for configuring the transfer window secondary progress bar
     // for its initial message, initial value and maxValue.
-    void setupSubProgressBar(QString initialMsg, int value, int maxValue);
+    void setupSubProgressBar(QString itemName, QString initialMsg, int value, int maxValue);
 
     // Qt slot for updating the transfer window main progress bar
     // for current message and current value.
-    void updateSubProgress(QString currentMsg, int value);
+    void updateSubProgress(QString itemName, QString currentMsg, int value);
 
     // Qt slot for entering the transfer window progress bars into
     // marquee mode.
-    void progressMarquee(QString currentMsg);
+    void setSubProgressMarquee(QString itemName, QString currentMsg);
 
     // Qt slot for UI cancel action invoking cancel requested signal.
     void invokeCancel();

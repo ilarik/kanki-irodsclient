@@ -58,23 +58,31 @@ signals:
 
     // Qt signal for initializing a progress bar display, it signals out
     // the initial message text, initial value and maximum value.
-    void setupProgressDisplay(QString text, int value, int maxValue);
+    void setupMainProgress(QString text, int value, int maxValue);
 
     // Qt signal for updating the progress bar display, it signals out
     // the current message text and current progress value.
-    void progressUpdate(QString text, int progress);
-
-    // Qt signal for initializing the progress bar display subprogress
-    // display, signals out initial message, initial value and max value
-    void setupSubProgressDisplay(QString text, int value, int maxValue);
-
-    // Qt signal for updating the secondary progress bar display,
-    // it signals out the current secondary status msg and progress value
-    void subProgressUpdate(QString text, int progress);
+    void mainProgressUpdate(QString text, int progress);
 
     // Qt signal for setting the progress bar display in marquee mode,
     // it signals out the current text message.
-    void progressMarquee(QString text);
+    void mainProgressMarquee(QString text);
+
+    // Qt signal for initializing the progress bar display subprogress
+    // display, signals out initial message, initial value and max value
+    void setupSubProgress(QString itemName, QString text, int value, int maxValue);
+
+    // Qt signal for updating the secondary progress bar display,
+    // it signals out the current secondary status msg and progress value
+    void subProgressUpdate(QString itemName, QString text, int progress);
+
+    // Qt signal for setting a sub progress bar display in marquee mode,
+    // it gets the sub progress identifier and a string to display
+    void subProgressMarquee(QString itemName, QString text); 
+
+    // Qt signal to finalize a sub progress bar display,
+    // it receives only the sub progress identifier
+    void subProgressFinalize(QString itemName);
 
     // Qt signal for reporting errors to ui, it signals out a message,
     // an error string and an error code.
