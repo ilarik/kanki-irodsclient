@@ -32,26 +32,31 @@ RodsDownloadThread::RodsDownloadThread(Kanki::RodsConnection *theConn, Kanki::Ro
 void RodsDownloadThread::run()
 {
     int status = 0;
+
+    // // open the parallel connection for transfer and authenticate
+    // if ((status = this->conn->connect()) < 0)
+    // {
+    //     reportError("Download failed", "Open parallel connection failed", status);
+    //     return;
+    // }
+
+    // else if ((status = this->conn->login()) < 0)
+    // {
+    //     reportError("Download failed", "Authentication failed", status);
+    //     return;
+    // }
+    
+    // get me some types
+    using connection_pool_ptr = std::shared_ptr<irods::connection_pool>;
+    using connection_proxy = irods::connection_pool::connection_proxy;
+
+    // acquire thread and connection pools
+    irods::thread_pool tank(Kanki::RodsConnection::numThreads);
+    connection_pool_ptr conn_pool = irods::make_connection_pool(Kanki::RodsConnection::numThreads);
+
+    // setup progress display
     QString statusStr = "Initializing...";
-
-    irods::thread_pool tank(32);
-    auto conn_pool = irods::make_connection_pool(32);
-
-    // signal ui to setup progress display
     progressMarquee(statusStr);
-
-    // open the parallel connection for transfer and authenticate
-    if ((status = this->conn->connect()) < 0)
-    {
-        reportError("Download failed", "Open parallel connection failed", status);
-        return;
-    }
-
-    else if ((status = this->conn->login()) < 0)
-    {
-        reportError("Download failed", "Authentication failed", status);
-        return;
-    }
 
     // in the case of downloading a collection, do it recursively
     if (this->objEntry->objType == COLL_OBJ_T)
@@ -87,15 +92,12 @@ void RodsDownloadThread::run()
                     statusStr += curObj->getObjectName().c_str();
                     progressUpdate(statusStr, i+1);
 
-                    // // try to do a rods get operation
+                    // get a connection and a thread to execute a lambda
 		    irods::thread_pool::post(tank, [=, &status] {
-			    auto conn = conn_pool->get_connection();			    
-			    if ((status = this->downloadFile(conn, curObj, dstPath, this->verify, this->overwrite)) < 0)
+			    connection_proxy conn = conn_pool->get_connection();			    
+			    if ((status = this->getObject(conn, curObj, dstPath, this->verify, this->overwrite)) < 0)
 				reportError("iRODS get file error", curObj->getObjectFullPath().c_str(), status);
 			});
-
-                    // if ((status = this->downloadFile(curObj, dstPath, this->verify, this->overwrite)) < 0)
-                    //     reportError("iRODS get file error", curObj->getObjectFullPath().c_str(), status);
                 }
 
                 // for collection objects we create the corresponding directory
@@ -123,22 +125,22 @@ void RodsDownloadThread::run()
     else if (this->objEntry->objType == DATA_OBJ_T)
     {
         QString statusStr = "Downloading file: ";
-
         statusStr += this->objEntry->getObjectName().c_str();
+
         std::string dstPath = this->destPath + "/" + this->objEntry->getObjectName();
         setupProgressDisplay(statusStr, 1, 1);
 
-	auto conn = conn_pool->get_connection();
+	connection_proxy conn = conn_pool->get_connection();
 
         // try to do a rods get operation
-        if ((status = this->downloadFile(conn, objEntry, dstPath, this->verify, this->overwrite)) < 0)
+        if ((status = this->getObject(conn, objEntry, dstPath, this->verify, this->overwrite)) < 0)
             reportError("Download failed", "iRODS data stream error", status);
     }
 
-    tank.join();
+    // this->conn->disconnect();
+    // delete(this->conn);
 
-    this->conn->disconnect();
-    delete(this->conn);
+    tank.join();
 }
 
 int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs)
@@ -180,9 +182,9 @@ int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<
     return (status);
 }
 
-int RodsDownloadThread::downloadFile(irods::connection_pool::connection_proxy &conn,
-				     Kanki::RodsObjEntryPtr obj, std::string localPath,
-                                     bool verifyChecksum, bool allowOverwrite)
+int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn,
+				  Kanki::RodsObjEntryPtr obj, std::string localPath,
+				  bool verifyChecksum, bool allowOverwrite)
 {
     int status = 0;
 

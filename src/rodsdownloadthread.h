@@ -89,10 +89,10 @@ private:
     // Constructs the list of objects to be downloaded in a recursive manner.
     int makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs);
 
-    // Download one rods data object, launching parallel transfer if necessary
-    int downloadFile(irods::connection_pool::connection_proxy &conn,
-		     Kanki::RodsObjEntryPtr obj, std::string localPath,
-                     bool verifyChecksum = false, bool allowOverwrite = true);
+    // Get (download) one rods data object, launching parallel transfer if necessary
+    int getObject(irods::connection_pool::connection_proxy &conn,
+		  Kanki::RodsObjEntryPtr obj, std::string localPath,
+		  bool verifyChecksum = false, bool allowOverwrite = true);
 
     // Implements double-buffered rods object download using Kanki::RodsDataInStream
     // and its adaptive rods i/o request size scaling for best resposniveness and
