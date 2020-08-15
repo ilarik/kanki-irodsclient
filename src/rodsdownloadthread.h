@@ -100,7 +100,7 @@ private:
     int transferFileStream(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream);
 
     // Launches parallel transfer for maximum performance and direct I/O to rods resource servers
-    int transferFileParallel(Kanki::RodsObjEntryPtr obj, Kanki::RodsDataInStream &inStream, QFile &localFile);
+    int transferFileParallel(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream);
 
     // pointer to the rods connection object
     Kanki::RodsConnection *conn;
