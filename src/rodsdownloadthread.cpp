@@ -184,59 +184,43 @@ int RodsDownloadThread::downloadFile(irods::connection_pool::connection_proxy &c
 				     Kanki::RodsObjEntryPtr obj, std::string localPath,
                                      bool verifyChecksum, bool allowOverwrite)
 {
-    //   Kanki::RodsDataInStream inStream(this->conn, obj);
-    long int status = 0;
+    int status = 0;
 
-    namespace io = irods::experimental::io;
-
+    // check if we're allowed to proceed
     if (boost::filesystem::exists(localPath) && !allowOverwrite)
         return (OVERWRITE_WITHOUT_FORCE_FLAG);
 
-    // // check if we're allowed to proceed
-    // if (localFile.exists() && !allowOverwrite)
-    
+    // take up namespaces
+    namespace io = irods::experimental::io;
+
+    // bring in a transport and a stream
     io::client::default_transport xport(conn);
     io::idstream inStream(xport, obj->getObjectFullPath());
 
     if (!inStream)
 	return (SYS_API_INPUT_ERR);
 
-    //QFile localFile(localPath.c_str());
-    std::ofstream outStream(localPath, std::ofstream::binary | std::ofstream::out);
+    std::ofstream outStream(localPath, std::ofstream::binary | 
+			    std::ofstream::out);
     
     if (!outStream)
 	return (FILE_OPEN_ERR);
-
-    // // try to open local file and the rods data stream
-    // if (!localFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    //     return (-1);
-
-    // // try to initiate get operation and open data stream
-    // if ((status = inStream.getOprInit()) < 0)
-    //     return (status);
-
-    // if ((status = inStream.openDataObj()) < 0)
-    //     return (status);
 
     // update status display only on large enough objects
     if (obj->objSize > __KANKI_BUFSIZE_INIT)
         setupSubProgressDisplay("Transferring...", 0, 100);
 
-    // // TODO: do parellel transfer if necessary
-    // if (inStream.parallelXferPortalAvail())
-    //     status = transferFileParallel(obj, inStream, localFile);
-
-    // // otherwise we simply use the rods protocol stream I/O
-    // else
-
+    // TODO: do parellel transfer if requested
     status = transferFileStream(obj, inStream, outStream);
     
-    // close local file and rods data stream
+    // close the local stream and rods data stream
     outStream.close();
     inStream.close();
-    
+
+    // TODO: FIXME!
     //inStream.getOprEnd();
     
+    // TODO: FIXME!
     // // if we have a successful transfer and if verify checksum was required
     // if (status >= 0 && verifyChecksum && strlen(inStream.checksum()))
     // {
@@ -328,7 +312,7 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istr
     return (status);
 }
 
-int RodsDownloadThread::transferFileParallel(Kanki::RodsObjEntryPtr obj, Kanki::RodsDataInStream &inStream, QFile &localFile)
+int RodsDownloadThread::transferFileParallel(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream)
 {
     // TODO: FIXME!
     return (SYS_NOT_SUPPORTED);
