@@ -120,6 +120,9 @@ void RodsDownloadThread::run()
                 }
             }
         }
+
+	else
+	    reportError("Download failed", this->objEntry->getObjectFullPath().c_str(), status);
     }
 
     // in the case of downloading a single data object, a simple get operation
@@ -138,7 +141,7 @@ void RodsDownloadThread::run()
 	if (!conn)
 	    reportError("iRODS connection failure", this->objEntry->getObjectFullPath().c_str(), SYS_SOCK_CONNECT_ERR);
         else if ((status = this->getObject(conn, objEntry, dstPath, this->verify, this->overwrite)) < 0)
-            reportError("Download failed", "iRODS data stream error", status);
+            reportError("iRODS data stream error", this->objEntry->getObjectFullPath().c_str(), status);
     }
 
     this->conn->disconnect();
