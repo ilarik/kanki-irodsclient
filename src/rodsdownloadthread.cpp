@@ -19,40 +19,41 @@
 
 RodsDownloadThread::RodsDownloadThread(Kanki::RodsSession *theSession, Kanki::RodsObjEntryPtr theObj,
                                        const std::string &theDestPath, bool verifyChecksum, bool allowOverwrite)
-    : QThread()
+    : QThread(),
+      session(theSession),
+      objEntry(theObj),
+      destPath(theDestPath),
+      verify(verifyChecksum),
+      overwrite(allowOverwrite)
 {
-    this->session = new Kanki::RodsSession(theSession);
-    this->objEntry = theObj;
-    this->destPath = theDestPath;
-
-    this->verify = verifyChecksum;
-    this->overwrite = allowOverwrite;
 }
 
 void RodsDownloadThread::run()
 {
     int status = 0;
 
-    // open up new connection 
-    if ((status = this->session->connect()) < 0)
-    {
-        reportError("Download failed", "iRODS connection failed", status);
-        return;
-    }
+    // // open up new connection 
+    // if ((status = this->session->connect()) < 0)
+    // {
+    //     reportError("Download failed", "iRODS connection failed", status);
+    //     return;
+    // }
 
-    else if ((status = this->session->login()) < 0)
-    {
-        reportError("Download failed", "iRODS authentication failed", status);
-        return;
-    }
-    
-    // get me some types
-    using connection_pool_ptr = std::shared_ptr<irods::connection_pool>;
-    using connection_proxy = irods::connection_pool::connection_proxy;
+    // else if ((status = this->session->login()) < 0)
+    // {
+    //     reportError("Download failed", "iRODS authentication failed", status);
+    //     return;
+    // }
 
-    // acquire thread and connection pools
+    // // get me some types
+    // using connection_pool_ptr = std::shared_ptr<irods::connection_pool>;
+    // using connection_proxy = irods::connection_pool::connection_proxy;
+
+    // // acquire thread and connection pools
+    // irods::thread_pool thr_tank(Kanki::RodsSession::numThreads);
+    // connection_pool_ptr conn_tank = irods::make_connection_pool(Kanki::RodsSession::numThreads);
+
     irods::thread_pool thr_tank(Kanki::RodsSession::numThreads);
-    connection_pool_ptr conn_tank = irods::make_connection_pool(Kanki::RodsSession::numThreads);
 
     // setup progress display
     QString statusStr = "Initializing...";
@@ -97,7 +98,7 @@ void RodsDownloadThread::run()
 
                     // get a connection and a thread to execute a lambda
 		    irods::thread_pool::post(thr_tank, [=, &status] {
-			    connection_proxy conn = conn_tank->get_connection();
+			    Kanki::RodsSession::connection_proxy conn = this->session->getConnection();
 			    if (!conn)
 			    	reportError("iRODS connection failure", curObj->getObjectFullPath().c_str(), 
 					    SYS_SOCK_CONNECT_ERR);
@@ -137,7 +138,7 @@ void RodsDownloadThread::run()
         setupMainProgress(statusStr, 1, 1);
 
 	// acquire a free connection from the pool
-	connection_proxy conn = conn_tank->get_connection();
+	Kanki::RodsSession::connection_proxy conn = this->session->getConnection();
 	
         // try to do a rods get operation
 	if (!conn)
@@ -146,9 +147,6 @@ void RodsDownloadThread::run()
         else if ((status = this->getObject(conn, objEntry, dstPath, this->verify, this->overwrite)) < 0)
             reportError("iRODS data stream error", this->objEntry->getObjectFullPath().c_str(), status);
     }
-
-    this->session->disconnect();
-    delete(this->session);
 
     thr_tank.join();
 }
@@ -223,6 +221,7 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
 	return (FILE_OPEN_ERR);
 
     // update status display only on large enough objects
+    // TODO: FIXME: __KANKI_BUFSIZE_INIT !
     if (obj->objSize > __KANKI_BUFSIZE_INIT)
         setupSubProgress(obj->getObjectFullPath().c_str(), "Downloading...", 0, 100);
 
@@ -234,10 +233,26 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
     inStream.close();
 
     subProgressFinalize(obj->getObjectFullPath().c_str());
-
-    // TODO: FIXME?
-    //inStream.getOprEnd();
     
+    namespace filesystem = irods::experimental::filesystem;
+    using checksum = filesystem::checksum;
+
+    std::vector<checksum> chksums;
+    chksums = filesystem::client::data_object_checksum(conn, obj->getObjectFullPath(), 
+						       filesystem::replica_number::all);
+    
+    std::cout << "got checksums: " << chksums.size() << std::endl;
+
+    if (verifyChecksum && chksums.size())
+    {
+	checksum &first_chksum = chksums.front();
+	std::cout << "first checksum: " << first_chksum.value << std::endl;
+
+	subProgressUpdate("Verifying Checksum...", obj->getObjectFullPath().c_str(), 100);
+	status = verifyChksumLocFile((char*)localPath.c_str(), first_chksum.value.c_str(), NULL);
+	std::cout << "checksum verification done, status: " << status << std::endl;
+    }
+
     // TODO: FIXME!
     // // if we have a successful transfer and if verify checksum was required
     // if (status >= 0 && verifyChecksum && strlen(inStream.checksum()))
@@ -245,6 +260,9 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
     //     subProgressUpdate("Verifying Checksum...", 100);
     //     status = verifyChksumLocFile((char*)localPath.c_str(), (char*)inStream.checksum(), NULL);
     // }
+
+    // TODO: FIXME?
+    //inStream.getOprEnd();
 
     return (status);
  }
