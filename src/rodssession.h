@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <mutex>
 #include <cstdint>
+#include <memory>
 
 // OpenSSL library headers
 #include <openssl/ssl.h>
@@ -52,20 +53,29 @@
 
 // new-age iRODS headers
 #include "filesystem.hpp"
+#include "transport/default_transport.hpp"
+#include "thread_pool.hpp"
+#include "connection_pool.hpp"
 
 // Kanki iRODS C++ class library headers
 #include "rodsobjentry.h"
 
 namespace Kanki {
-
+    
 class RodsSession
 {
 
 public:
+    // some pointer types for irods objects
+    using connection_pool_ptr = std::shared_ptr<irods::connection_pool>;
+    using thread_pool_ptr = std::unique_ptr<irods::thread_pool>;
+    
+    // 
+    using connection_proxy = irods::connection_pool::connection_proxy;
 
     // Constructor for instantiating a new session object, optionally identical with
     // respect to the parameters of the conn object pointed by argument connPtr.
-    RodsSession(RodsSession *sessPtr = NULL);
+    RodsSession(RodsSession *sessPtr = nullptr);
 
     // Destructor to disconnect and clean up.
     ~RodsSession();
@@ -231,21 +241,52 @@ public:
     // Renames an iRODS object to newName.
     int renameObj(Kanki::RodsObjEntryPtr objEntry, const std::string &newName);
 
+    // Schedules a task to the thread pool
+    void scheduleTask(std::function<void()> callback);
+
+    // Returns a proxy object to an available iRODS connection from the pool
+    connection_proxy getConnection();
+
     // Default values for some tunables
-    static const uint32_t numThreads = 32;
-    static const uint64_t xferBlkSize = 16777216;
+    static constexpr uint32_t numThreads = 16;
+    static constexpr uint32_t refreshTime = 600;
+    static constexpr uint64_t xferBlkSize = 16777216;
+
+    // Client signature string passed via the iRODS RPC API
+    static constexpr char *signatureStr = "kanki";
 
     // we deny assignments, moving and copying of the object
     RodsSession(RodsSession &) = delete;
     RodsSession& operator=(RodsSession &) = delete;
 
 private:
+    
+    // // a Kory-advised wrapper to grab a hold of a proxy
+    // struct conn_proxy_wrapper 
+    // {
+    // 	// moves from an r-value of a proxy object
+    // 	conn_proxy_wrapper(connection_proxy &&proxy)
+    // 	    : conn(std::move(proxy)) {}
+	
+    // 	// a connection proxy for a single iRODS connection
+    // 	connection_proxy conn;
+    // };    
+    // using conn_proxy_wrapper_ptr = std::unique_ptr<conn_proxy_wrapper>; 
 
     // Authenticates the user against the iRODS server in a new connection.
     int authenticate(const std::string &authScheme = "", const std::string &userName = "", const std::string &password = "");
 
     // a mutex to provide locking for the TCP connection data stream
     std::mutex commMutex;
+
+    // a thread pool for worker threads
+    thread_pool_ptr thread_pool;
+
+    // a connection pool for iRODS connections
+    connection_pool_ptr conn_pool;
+
+    // // a connection wrapper for a single connection proxy
+    // conn_proxy_wrapper_ptr conn_wrapper;
 
     // rods api communications pointer
     rcComm_t *rodsCommPtr;

@@ -22,7 +22,7 @@ namespace Kanki {
 RodsSession::RodsSession(RodsSession *sessPtr)
 {
     // initially we have no comm ptr
-    this->rodsCommPtr = NULL;
+    this->rodsCommPtr = nullptr;
 
     // zero local rods api data structures
     memset(&this->rodsUserEnv, 0, sizeof (rodsEnv));
@@ -30,6 +30,12 @@ RodsSession::RodsSession(RodsSession *sessPtr)
 
     // initialize iRODS 4.2 API tables new-age style
     load_client_api_plugins();
+
+    // set client signature oldskool
+    mySetenvStr(SP_OPTION, Kanki::RodsSession::signatureStr);
+
+    // acquire thread pool
+    thread_pool = std::make_unique<irods::thread_pool>(Kanki::RodsSession::numThreads);
 
     // if we have a 'parent' connection pointer
     if (sessPtr)
@@ -59,13 +65,47 @@ int RodsSession::connect()
     if ((status = getRodsEnv(&this->rodsUserEnv)) < 0)
         return (status);
 
-    // rods api connect
-    if ((rodsCommPtr = rcConnect(this->rodsUserEnv.rodsHost, this->rodsUserEnv.rodsPort,
-                                this->rodsUserEnv.rodsUserName, this->rodsUserEnv.rodsZone,
-                                 0, &this->lastErrMsg)) == NULL)
-    {
-        return (-1);
+
+    try {
+	this->conn_pool = std::make_unique<irods::connection_pool>(Kanki::RodsSession::numThreads,
+								   this->rodsUserEnv.rodsHost,
+								   this->rodsUserEnv.rodsPort,
+								   this->rodsUserEnv.rodsUserName,
+								   this->rodsUserEnv.rodsZone,
+								   Kanki::RodsSession::refreshTime);
     }
+    catch (const std::runtime_error &e)
+    {
+	// TODO: FIXME!
+	return (SYS_INTERNAL_ERR);
+    }
+
+    this->rodsCommPtr = this->conn_pool->get_connection().release();
+    
+    // workaround for refreshing the connection pool
+    {
+	std::vector<connection_proxy> temp;
+	for (int i = 0; i < (int)Kanki::RodsSession::numThreads; i++)
+	{
+	    temp.push_back(this->conn_pool->get_connection());
+	
+	}
+    }
+    
+    // // take a hold of wrapper for a connection proxy and get a comms ptr
+    // this->conn_wrapper = std::make_unique<conn_proxy_wrapper>(this->conn_pool->get_connection());
+    // this->rodsCommPtr = static_cast<rcComm_t*>(this->conn_wrapper->conn);
+
+    // this->conn = this->conn_pool->get_connection();
+    // this->rodsCommPtr = static_cast<rcComm_t*>(this->conn);
+   
+    // // rods api connect
+    // if ((rodsCommPtr = rcConnect(this->rodsUserEnv.rodsHost, this->rodsUserEnv.rodsPort,
+    //                             this->rodsUserEnv.rodsUserName, this->rodsUserEnv.rodsZone,
+    //                              0, &this->lastErrMsg)) == NULL)
+    // {
+    //     return (-1);
+    // }
 
     return (status);
 }
@@ -533,5 +573,16 @@ void RodsSession::mutexUnlock()
 {
     this->commMutex.unlock();
 }
+    
+void RodsSession::scheduleTask(std::function<void()> callback)
+{
+    irods::thread_pool::post(*(this->thread_pool), callback);
+}
+    
+RodsSession::connection_proxy RodsSession::getConnection()
+{
+    return (this->conn_pool->get_connection());
+}
+
 
 } // namespace Kanki
