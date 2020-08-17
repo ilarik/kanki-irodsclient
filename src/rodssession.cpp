@@ -19,10 +19,14 @@
 
 namespace Kanki {
 
-RodsSession::RodsSession(RodsSession *sessPtr)
+RodsSession::RodsSession(const RodsSession *sessPtr)
 {
     // initially we have no comm ptr
     this->rodsCommPtr = nullptr;
+
+    // if we had a session to replicate
+    if (sessPtr)
+	memcpy(&(this->rodsUserEnv), &(sessPtr->rodsUserEnv), sizeof(rodsUserEnv));
 
     // zero local rods api data structures
     memset(&this->rodsUserEnv, 0, sizeof (rodsEnv));
@@ -36,12 +40,6 @@ RodsSession::RodsSession(RodsSession *sessPtr)
 
     // acquire thread pool
     thread_pool = std::make_unique<irods::thread_pool>(Kanki::RodsSession::numThreads);
-
-    // if we have a 'parent' connection pointer
-    if (sessPtr)
-    {
-        // TODO: copy connection parameters
-    }
 }
 
 RodsSession::~RodsSession()
@@ -65,7 +63,6 @@ int RodsSession::connect()
     if ((status = getRodsEnv(&this->rodsUserEnv)) < 0)
         return (status);
 
-
     try {
 	this->conn_pool = std::make_unique<irods::connection_pool>(Kanki::RodsSession::numThreads,
 								   this->rodsUserEnv.rodsHost,
@@ -73,40 +70,23 @@ int RodsSession::connect()
 								   this->rodsUserEnv.rodsUserName,
 								   this->rodsUserEnv.rodsZone,
 								   Kanki::RodsSession::refreshTime);
-    }
-    catch (const std::runtime_error &e)
+    } 
+    catch (const std::runtime_error &e) 
     {
 	// TODO: FIXME!
 	return (SYS_INTERNAL_ERR);
     }
 
+    // take out legacy "default" connection
     this->rodsCommPtr = this->conn_pool->get_connection().release();
-    
+
     // workaround for refreshing the connection pool
     {
 	std::vector<connection_proxy> temp;
 	for (int i = 0; i < (int)Kanki::RodsSession::numThreads; i++)
-	{
 	    temp.push_back(this->conn_pool->get_connection());
-	
-	}
     }
     
-    // // take a hold of wrapper for a connection proxy and get a comms ptr
-    // this->conn_wrapper = std::make_unique<conn_proxy_wrapper>(this->conn_pool->get_connection());
-    // this->rodsCommPtr = static_cast<rcComm_t*>(this->conn_wrapper->conn);
-
-    // this->conn = this->conn_pool->get_connection();
-    // this->rodsCommPtr = static_cast<rcComm_t*>(this->conn);
-   
-    // // rods api connect
-    // if ((rodsCommPtr = rcConnect(this->rodsUserEnv.rodsHost, this->rodsUserEnv.rodsPort,
-    //                             this->rodsUserEnv.rodsUserName, this->rodsUserEnv.rodsZone,
-    //                              0, &this->lastErrMsg)) == NULL)
-    // {
-    //     return (-1);
-    // }
-
     return (status);
 }
 
@@ -224,14 +204,14 @@ int RodsSession::disconnect(bool force)
 	    status = rcDisconnect(this->rodsCommPtr);
 	    this->rodsCommPtr = nullptr;
 	};
-
+	
         // wait mutex (if needed) and disconnect
         if (!force)
 	{
 	    std::lock_guard commGuard(this->commMutex); 
 	    _disconnect();
 	}
-
+	
 	else _disconnect();
     }
 
@@ -274,17 +254,21 @@ int RodsSession::readColl(const std::string &collPath, std::vector<RodsObjEntryP
     
     namespace fs = irods::experimental::filesystem;
 
-    try {
+    using ObjEntry = Kanki::RodsObjEntry;
+    using ObjEntryPtr = Kanki::RodsObjEntryPtr;
+
+    try 
+    {
 	for (fs::collection_entry const &entry : fs::client::collection_iterator(*(this->commPtr()), collPath))
 	{
-	    Kanki::RodsObjEntryPtr newEntry(new Kanki::RodsObjEntry(entry.is_data_object() ? entry.path().object_name().c_str() : entry.path().c_str(),
-								    entry.is_data_object() ? entry.path().parent_path().c_str() : entry.path().c_str(),
-								    std::to_string(entry.creation_time().time_since_epoch().count()),
-								    std::to_string(entry.last_write_time().time_since_epoch().count()),
-								    entry.is_data_object() ? DATA_OBJ_T : COLL_OBJ_T,
-								    0,
-								    1,
-								    entry.is_data_object() ? const_cast<fs::collection_entry&>(entry).data_object_size() : 0));
+	    ObjEntryPtr newEntry(new ObjEntry(entry.is_data_object() ? entry.path().object_name().c_str() : entry.path().c_str(),
+					      entry.is_data_object() ? entry.path().parent_path().c_str() : entry.path().c_str(),
+					      std::to_string(entry.creation_time().time_since_epoch().count()),
+					      std::to_string(entry.last_write_time().time_since_epoch().count()),
+					      entry.is_data_object() ? DATA_OBJ_T : COLL_OBJ_T,
+					      0,
+					      1,
+					      entry.is_data_object() ? const_cast<fs::collection_entry&>(entry).data_object_size() : 0));
 
 	    // TODO: fix with emplace_back!
 	    collObjs->push_back(newEntry);
@@ -300,7 +284,6 @@ int RodsSession::readColl(const std::string &collPath, std::vector<RodsObjEntryP
 
 int RodsSession::removeColl(const std::string &collPath)
 {
-    //collInp_t theColl;
     int status = 0;
 
     // sanity check, input argument string must be nonempty and begin with /
@@ -318,17 +301,6 @@ int RodsSession::removeColl(const std::string &collPath)
     {
 	status = e.code().value();
     }
-
-    // // initialize rods api struct
-    // memset(&theColl, 0, sizeof (collInp_t));
-    // rstrcpy(theColl.collName, collPath.c_str(), MAX_NAME_LEN);
-
-    // // initialize parameters for remove operation
-    // addKeyVal(&theColl.condInput, RECURSIVE_OPR__KW, "");
-    // addKeyVal(&theColl.condInput, FORCE_FLAG_KW, "");
-
-    // // call for rods api to remove collection
-    // status = rcRmColl(this->rodsCommPtr, &theColl, false);
 
     // return status to caller
     return (status);
@@ -394,19 +366,13 @@ int RodsSession::putFile(const std::string &localPath, const std::string &objPat
 
 int RodsSession::removeObj(const std::string &objPath)
 {
-//    dataObjInp_t theObj;
     int status = 0;
 
     namespace fs = irods::experimental::filesystem;
-
     fs::path thePath(objPath);
     
     if (!thePath.is_absolute())
 	return (USER_INPUT_PATH_ERR);
-
-    // // sanity check, input argument string must be nonempty and begin with /
-    // if (objPath.empty() || objPath.find_first_of('/') != 0)
-    //     return (-1);
 
     std::lock_guard mutexGuard(this->commMutex);
 
@@ -417,16 +383,6 @@ int RodsSession::removeObj(const std::string &objPath)
     {
 	status = e.code().value();
     }
-
-    // // initialize rods api struct
-    // memset(&theObj, 0, sizeof (dataObjInp_t));
-    // rstrcpy(theObj.objPath, objPath.c_str(), MAX_NAME_LEN);
-
-    // // initialize remove params
-    // addKeyVal(&theObj.condInput, FORCE_FLAG_KW, "");
-
-    // // call for rods api to remove data object
-    // status = rcDataObjUnlink(this->rodsCommPtr, &theObj);
 
     // return status to caller
     return (status);
@@ -563,26 +519,5 @@ int RodsSession::renameObj(RodsObjEntryPtr objEntry, const std::string &newName)
 
     return (status);
 }
-
-void RodsSession::mutexLock()
-{
-    this->commMutex.lock();
-}
-
-void RodsSession::mutexUnlock()
-{
-    this->commMutex.unlock();
-}
-    
-void RodsSession::scheduleTask(std::function<void()> callback)
-{
-    irods::thread_pool::post(*(this->thread_pool), callback);
-}
-    
-RodsSession::connection_proxy RodsSession::getConnection()
-{
-    return (this->conn_pool->get_connection());
-}
-
 
 } // namespace Kanki

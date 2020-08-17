@@ -66,23 +66,23 @@ class RodsSession
 {
 
 public:
-    // some pointer types for irods objects
+    // import types for connection pool
     using connection_pool_ptr = std::shared_ptr<irods::connection_pool>;
-    using thread_pool_ptr = std::unique_ptr<irods::thread_pool>;
-    
-    // 
     using connection_proxy = irods::connection_pool::connection_proxy;
 
+    // import types for thread pool
+    using thread_pool_ptr = std::unique_ptr<irods::thread_pool>;
+
     // Constructor for instantiating a new session object, optionally identical with
-    // respect to the parameters of the conn object pointed by argument connPtr.
-    RodsSession(RodsSession *sessPtr = nullptr);
+    // respect to the parameters of the session object pointed by argument sessPtr.
+    RodsSession(const RodsSession *sessPtr = nullptr);
 
     // Destructor to disconnect and clean up.
     ~RodsSession();
 
-    // Establishes an iRODS protocol connection to an iRODS server. Also configures the
-    // connection object for connection parameters from the iRODS user environment if
-    // no connection parameters have been provided.
+    // Establishes iRODS protocol connections to an iRODS grid. Also configures the
+    // session object for session parameters from the iRODS user environment if
+    // no session parameters have been provided.
     int connect();
 
     // For an established connection, executes iRODS protocol user authentication procedure
@@ -120,11 +120,11 @@ public:
 	return (false);
     }
 
-    // Interface for accessing the iRODS comm pointer, for bypassing the Kanki RodsSession
+    // Interface for accessing the iRODS comm pointer, for bypassing the Kanki::RodsSession
     // object interfaces - necessary for now.
     rcComm_t* commPtr() const
     {
-	// return rods api connection pointer
+	// simply return default connection ptr
 	return (this->rodsCommPtr);
     }
 
@@ -199,12 +199,18 @@ public:
 
     // Locks the connection specific mutex lock to prevent simultaneous use of the same iRODS
     // connection by two different threads.
-    void mutexLock();
+    void mutexLock()
+    {
+	this->commMutex.lock();
+    }
 
     // Frees the connection specific mutex lock to make the iRODS TCP connection data stream
     // available for other threads.
-    void mutexUnlock();
-
+    void mutexUnlock()
+    {
+	this->commMutex.unlock();
+    }
+    
     // Reads an iRODS collection from the iRODS server to memory using the locally cached version
     // of rods api read collection function, parses the collection into a vector of RodsObjEntry objs.
     int readColl(const std::string &collPath, std::vector<Kanki::RodsObjEntryPtr> *collObjs);
@@ -242,37 +248,32 @@ public:
     int renameObj(Kanki::RodsObjEntryPtr objEntry, const std::string &newName);
 
     // Schedules a task to the thread pool
-    void scheduleTask(std::function<void()> callback);
+    void scheduleTask(std::function<void()> callback)
+    {
+	irods::thread_pool::post(*(this->thread_pool), callback);
+    }
 
     // Returns a proxy object to an available iRODS connection from the pool
-    connection_proxy getConnection();
+    connection_proxy getConnection()
+    {
+	return (this->conn_pool->get_connection());
+    }
+
+    // We deny assignments, moving and copying of the object
+    RodsSession(RodsSession &) = delete;
+    RodsSession& operator=(RodsSession &) = delete;
+
 
     // Default values for some tunables
     static constexpr uint32_t numThreads = 16;
     static constexpr uint32_t refreshTime = 600;
     static constexpr uint64_t xferBlkSize = 16777216;
-
+    
     // Client signature string passed via the iRODS RPC API
     static constexpr char *signatureStr = "kanki";
 
-    // we deny assignments, moving and copying of the object
-    RodsSession(RodsSession &) = delete;
-    RodsSession& operator=(RodsSession &) = delete;
-
 private:
     
-    // // a Kory-advised wrapper to grab a hold of a proxy
-    // struct conn_proxy_wrapper 
-    // {
-    // 	// moves from an r-value of a proxy object
-    // 	conn_proxy_wrapper(connection_proxy &&proxy)
-    // 	    : conn(std::move(proxy)) {}
-	
-    // 	// a connection proxy for a single iRODS connection
-    // 	connection_proxy conn;
-    // };    
-    // using conn_proxy_wrapper_ptr = std::unique_ptr<conn_proxy_wrapper>; 
-
     // Authenticates the user against the iRODS server in a new connection.
     int authenticate(const std::string &authScheme = "", const std::string &userName = "", const std::string &password = "");
 
@@ -284,9 +285,6 @@ private:
 
     // a connection pool for iRODS connections
     connection_pool_ptr conn_pool;
-
-    // // a connection wrapper for a single connection proxy
-    // conn_proxy_wrapper_ptr conn_wrapper;
 
     // rods api communications pointer
     rcComm_t *rodsCommPtr;
