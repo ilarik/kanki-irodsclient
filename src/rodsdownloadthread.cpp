@@ -5,7 +5,7 @@
  * The RodsDownloadThread class extends the Qt thread management class
  * QThread and implements a worker thread for a download (get) operation.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -32,30 +32,10 @@ void RodsDownloadThread::run()
 {
     int status = 0;
 
-    // // open up new connection 
-    // if ((status = this->session->connect()) < 0)
-    // {
-    //     reportError("Download failed", "iRODS connection failed", status);
-    //     return;
-    // }
-
-    // else if ((status = this->session->login()) < 0)
-    // {
-    //     reportError("Download failed", "iRODS authentication failed", status);
-    //     return;
-    // }
-
-    // // get me some types
-    // using connection_pool_ptr = std::shared_ptr<irods::connection_pool>;
-    // using connection_proxy = irods::connection_pool::connection_proxy;
-
-    // // acquire thread and connection pools
-    // irods::thread_pool thr_tank(Kanki::RodsSession::numThreads);
-    // connection_pool_ptr conn_tank = irods::make_connection_pool(Kanki::RodsSession::numThreads);
-
+    // instantiate a worker thread pool for this task
     irods::thread_pool thr_tank(Kanki::RodsSession::numThreads);
 
-    // setup progress display
+    // setup progress display for the task
     QString statusStr = "Initializing...";
     mainProgressMarquee(statusStr);
 
@@ -91,9 +71,10 @@ void RodsDownloadThread::run()
                 // in the case of a data object, we do a get operation
                 if (curObj->objType == DATA_OBJ_T)
                 {
-                    // notify ui of current operation and progress
                     statusStr = "Downloading ";
                     statusStr += curObj->getObjectName().c_str();
+
+                    // notify ui of current operation and progress
                     mainProgressUpdate(statusStr, i+1);
 
                     // get a connection and a thread to execute a lambda
@@ -140,14 +121,17 @@ void RodsDownloadThread::run()
 	// acquire a free connection from the pool
 	Kanki::RodsSession::connection_proxy conn = this->session->getConnection();
 	
-        // try to do a rods get operation
+	// we check the connection
 	if (!conn)
 	    reportError("iRODS connection failure", this->objEntry->getObjectFullPath().c_str(),
 			SYS_SOCK_CONNECT_ERR);
+
+        // we try a rods get operation
         else if ((status = this->getObject(conn, objEntry, dstPath, this->verify, this->overwrite)) < 0)
             reportError("iRODS data stream error", this->objEntry->getObjectFullPath().c_str(), status);
     }
 
+    // wait for all workers to finish
     thr_tank.join();
 }
 
@@ -206,6 +190,7 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
 
     // take up namespaces
     namespace io = irods::experimental::io;
+    namespace fs = irods::experimental::filesystem;
 
     // bring in a transport and a stream
     io::client::default_transport xport(conn);
@@ -225,6 +210,7 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
     if (obj->objSize > __KANKI_BUFSIZE_INIT)
         setupSubProgress(obj->getObjectFullPath().c_str(), "Downloading...", 0, 100);
 
+    // transfer the object via the stream
     // TODO: do parellel transfer if requested
     status = transferFileStream(obj, inStream, outStream);
     
@@ -232,34 +218,21 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
     outStream.close();
     inStream.close();
 
-    subProgressFinalize(obj->getObjectFullPath().c_str());
-    
-    namespace filesystem = irods::experimental::filesystem;
-    using checksum = filesystem::checksum;
-
-    std::vector<checksum> chksums;
-    chksums = filesystem::client::data_object_checksum(conn, obj->getObjectFullPath(), 
-						       filesystem::replica_number::all);
-    
-    std::cout << "got checksums: " << chksums.size() << std::endl;
-
-    if (verifyChecksum && chksums.size())
+    // verify checksum if needed
+    if (verifyChecksum)
     {
-	checksum &first_chksum = chksums.front();
-	std::cout << "first checksum: " << first_chksum.value << std::endl;
-
-	subProgressUpdate("Verifying Checksum...", obj->getObjectFullPath().c_str(), 100);
-	status = verifyChksumLocFile((char*)localPath.c_str(), first_chksum.value.c_str(), NULL);
-	std::cout << "checksum verification done, status: " << status << std::endl;
+	std::vector<fs::checksum> chksums = fs::client::data_object_checksum(conn, obj->getObjectFullPath(), 
+									     fs::replica_number::all);
+	if (chksums.size())
+	{
+	    fs::checksum &first_chksum = chksums.front();
+	    
+	    subProgressMarquee(obj->getObjectFullPath().c_str(), "Verifying Checksum...");
+	    status = verifyChksumLocFile((char*)localPath.c_str(), first_chksum.value.c_str(), NULL);
+	}
     }
 
-    // TODO: FIXME!
-    // // if we have a successful transfer and if verify checksum was required
-    // if (status >= 0 && verifyChecksum && strlen(inStream.checksum()))
-    // {
-    //     subProgressUpdate("Verifying Checksum...", 100);
-    //     status = verifyChksumLocFile((char*)localPath.c_str(), (char*)inStream.checksum(), NULL);
-    // }
+    subProgressFinalize(obj->getObjectFullPath().c_str());
 
     // TODO: FIXME?
     //inStream.getOprEnd();
