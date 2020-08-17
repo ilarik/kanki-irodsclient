@@ -206,8 +206,7 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
 	return (FILE_OPEN_ERR);
 
     // update status display only on large enough objects
-    // TODO: FIXME: __KANKI_BUFSIZE_INIT !
-    if (obj->objSize > __KANKI_BUFSIZE_INIT)
+    if (obj->objSize > Kanki::RodsSession::minBlkSize)
         setupSubProgress(obj->getObjectFullPath().c_str(), "Downloading...", 0, 100);
 
     // transfer the object via the stream
@@ -243,7 +242,7 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
 int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream)
 {
     int status = 0;
-    long int lastRead = 0, totalRead = 0, readSize = __KANKI_BUFSIZE_MAX;
+    long int lastRead = 0, totalRead = 0, readSize = Kanki::RodsSession::xferBlkSize;
 
     std::thread *writer = nullptr;
     char *buffer = nullptr, *buffer2 = nullptr;
@@ -310,7 +309,7 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istr
         QString statusStr = "Transferring... " + QVariant((int)percentage).toString() + "%";
         statusStr += " at " + QString::number(speed, 'f', 2) + " MB/s";
 
-        if (obj->objSize > __KANKI_BUFSIZE_INIT)
+        if (obj->objSize > Kanki::RodsSession::minBlkSize)
             subProgressUpdate(obj->getObjectFullPath().c_str(), statusStr, (int)percentage);
     }
 
