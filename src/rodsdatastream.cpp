@@ -23,8 +23,8 @@ RodsDataStream::RodsDataStream(Kanki::RodsSession *theSession)
 {
     this->session = theSession;
 
-    this->memBuffer = std::malloc(__KANKI_BUFSIZE_INIT);
-    this->bufSize = __KANKI_BUFSIZE_INIT;
+    this->memBuffer = std::malloc(_KANKI_BUFSIZE_INIT);
+    this->bufSize = _KANKI_BUFSIZE_INIT;
     memset(this->memBuffer, 0, this->bufSize);
 }
 
@@ -68,8 +68,8 @@ int RodsDataStream::closeDataObj()
 
 size_t RodsDataStream::growBuffer(size_t newSize)
 {
-    if (newSize > __KANKI_BUFSIZE_MAX)
-        newSize = __KANKI_BUFSIZE_MAX;
+    if (newSize > _KANKI_BUFSIZE_MAX)
+        newSize = _KANKI_BUFSIZE_MAX;
 
     if (!(this->memBuffer = std::realloc(this->memBuffer, newSize)))
         newSize = 0;

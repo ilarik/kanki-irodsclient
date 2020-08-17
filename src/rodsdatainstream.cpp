@@ -37,7 +37,7 @@ int RodsDataInStream::openDataObj()
     dataObjInp_t openParam;
     int openResult = 0;
 
-    this->adaptiveSize = __KANKI_BUFSIZE_INIT;
+    this->adaptiveSize = _KANKI_BUFSIZE_INIT;
 
     std::memset(&openParam, 0, sizeof (openParam));
 
@@ -166,7 +166,7 @@ int RodsDataInStream::readAdaptive(void *bufPtr, size_t maxLen)
     this->speed_.push_back(speed);
 
     // and keep only n previous data points
-    if (this->dt_.size() > __KANKI_ADAPTIVE_INT && this->bytes_.size() > __KANKI_ADAPTIVE_INT)
+    if (this->dt_.size() > _KANKI_ADAPTIVE_INT && this->bytes_.size() > _KANKI_ADAPTIVE_INT)
     {
         this->dt_.erase(this->dt_.begin());
         this->bytes_.erase(this->bytes_.begin());
@@ -185,15 +185,15 @@ int RodsDataInStream::readAdaptive(void *bufPtr, size_t maxLen)
     // of our moving average is at all positive, we increase adaptive read size
     if ((avg > 0) && (std::abs(avg) > 1.0e3))
     {
-        if (this->adaptiveSize + __KANKI_BUFSIZE_INCR < maxLen)
-            this->adaptiveSize += __KANKI_BUFSIZE_INCR;
+        if (this->adaptiveSize + _KANKI_BUFSIZE_INCR < maxLen)
+            this->adaptiveSize += _KANKI_BUFSIZE_INCR;
     }
 
     // on a very negative average, we decrease the transfer size parameter
     if ((avg < 0) && (std::abs(avg) > 1.0e6))
     {
-        if (this->adaptiveSize > __KANKI_BUFSIZE_INCR)
-            this->adaptiveSize -= __KANKI_BUFSIZE_INCR;
+        if (this->adaptiveSize > _KANKI_BUFSIZE_INCR)
+            this->adaptiveSize -= _KANKI_BUFSIZE_INCR;
     }
 
     return (readResult);

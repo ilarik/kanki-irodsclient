@@ -26,7 +26,7 @@
 #include "rodsdatastream.h"
 
 // interval of last I/O operations to keep track of (adaptive)
-#define __KANKI_ADAPTIVE_INT    10
+#define _KANKI_ADAPTIVE_INT    10
 
 namespace Kanki {
 

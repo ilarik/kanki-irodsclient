@@ -24,13 +24,13 @@
 #include "rodssession.h"
 
 // initial I/O request/buffer size
-#define __KANKI_BUFSIZE_INIT    262144
+#define _KANKI_BUFSIZE_INIT    262144
 
 // increment size for I/O request scaling
-#define __KANKI_BUFSIZE_INCR    1048576
+#define _KANKI_BUFSIZE_INCR    1048576
 
 // maximum I/O request/buffer size
-#define __KANKI_BUFSIZE_MAX     33554432
+#define _KANKI_BUFSIZE_MAX     33554432
 
 namespace Kanki {
 
