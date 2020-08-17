@@ -171,10 +171,8 @@ public:
     // Renames an iRODS object to newName.
     int renameObj(Kanki::RodsObjEntryPtr objEntry, const std::string &newName);
 
-    // 
+    // Default values for some tunables
     static const uint32_t numThreads = 32;
-
-    //
     static const uint64_t xferBlkSize = 16777216;
 
     // we deny assignments, moving and copying of the object
