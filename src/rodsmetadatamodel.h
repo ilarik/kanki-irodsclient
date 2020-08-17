@@ -97,9 +97,6 @@ private:
     // qt icon objects used in the model
     QIcon nsIcon, attrIcon;
 
-    // rods session pointer
-//    Kanki::RodsSession *session;
-
     // managed pointer to a rods object entry
     Kanki::RodsObjEntryPtr objEntry;
 
