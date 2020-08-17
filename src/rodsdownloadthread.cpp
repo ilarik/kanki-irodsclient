@@ -67,8 +67,12 @@ void RodsDownloadThread::run()
         // first item to the download object list
         collObjs.push_back(this->objEntry);
 
-        if (!(status = makeCollObjList(this->objEntry, &collObjs)))
+        if ((status = makeCollObjList(this->objEntry, &collObjs)) < 0)
         {
+	    reportError("Download failed", this->objEntry->getObjectFullPath().c_str(), status);
+	}
+	
+	else {
             // notify ui of progress bar state (object count)
             setupMainProgress(statusStr, 0, collObjs.size());
 
@@ -95,9 +99,10 @@ void RodsDownloadThread::run()
 		    irods::thread_pool::post(thr_tank, [=, &status] {
 			    connection_proxy conn = conn_tank->get_connection();
 			    if (!conn)
-			    	reportError("iRODS connection failure", curObj->getObjectFullPath().c_str(), SYS_SOCK_CONNECT_ERR);
+			    	reportError("iRODS connection failure", curObj->getObjectFullPath().c_str(), 
+					    SYS_SOCK_CONNECT_ERR);
 			    if ((status = this->getObject(conn, curObj, dstPath, this->verify, this->overwrite)) < 0)
-				reportError("iRODS get file error", curObj->getObjectFullPath().c_str(), status);
+				reportError("iRODS data stream error", curObj->getObjectFullPath().c_str(), status);
 			});
                 }
 
@@ -119,10 +124,7 @@ void RodsDownloadThread::run()
                         dstDir.mkpath(dstPath.c_str());
                 }
             }
-        }
-
-	else
-	    reportError("Download failed", this->objEntry->getObjectFullPath().c_str(), status);
+        }	    
     }
 
     // in the case of downloading a single data object, a simple get operation
@@ -139,7 +141,8 @@ void RodsDownloadThread::run()
 	
         // try to do a rods get operation
 	if (!conn)
-	    reportError("iRODS connection failure", this->objEntry->getObjectFullPath().c_str(), SYS_SOCK_CONNECT_ERR);
+	    reportError("iRODS connection failure", this->objEntry->getObjectFullPath().c_str(),
+			SYS_SOCK_CONNECT_ERR);
         else if ((status = this->getObject(conn, objEntry, dstPath, this->verify, this->overwrite)) < 0)
             reportError("iRODS data stream error", this->objEntry->getObjectFullPath().c_str(), status);
     }
@@ -160,8 +163,12 @@ int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<
         std::vector<Kanki::RodsObjEntryPtr> curCollObjs;
 
         // try to read collection
-        if ((status = this->conn->readColl(obj->collPath, &curCollObjs)) >= 0)
-        {
+        if ((status = this->conn->readColl(obj->collPath, &curCollObjs)) < 0)
+	{
+	    return (status);
+	}
+        
+	else {
             // iterate thru current collection
             for (std::vector<Kanki::RodsObjEntryPtr>::iterator i = curCollObjs.begin(); i != curCollObjs.end(); i++)
             {
@@ -244,12 +251,18 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
 
 int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream)
 {
-    long int status = 0, lastRead = 0, totalRead = 0;
-    long int readSize = __KANKI_BUFSIZE_MAX;
+    int status = 0;
+    long int lastRead = 0, totalRead = 0, readSize = __KANKI_BUFSIZE_MAX;
 
-    char *buffer = (char*)std::malloc(readSize), *buffer2 = (char*)std::malloc(readSize);
     std::thread *writer = nullptr;
+    char *buffer = nullptr, *buffer2 = nullptr;
 
+    if ((buffer = (char*)std::malloc(readSize)) == nullptr || 
+	(buffer2 = (char*)std::malloc(readSize)) == nullptr)
+    {
+	return (SYS_MALLOC_ERR);
+    }
+    
     // take namespaces and types
     namespace chrono = std::chrono;
     using clock = chrono::high_resolution_clock;
@@ -262,7 +275,7 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istr
 
     while (inStream && outStream)
     {
-	inStream.read(buffer, __KANKI_BUFSIZE_MAX);
+	inStream.read(buffer, readSize);
 	lastRead = inStream.gcount();
 
 	// time diff after block transfer
@@ -293,8 +306,8 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istr
         writer = new std::thread([&outStream, buffer, &lastRead] { 
 		outStream.write(buffer, lastRead);
 	    }); 
-	
-        // XOR swap buffer pointers for double buffering
+
+        // swap buffer pointers for double buffering (XOR swap)
         buffer = (char*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
         buffer2 = (char*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
         buffer = (char*)((uintptr_t)buffer ^ (uintptr_t)buffer2);
