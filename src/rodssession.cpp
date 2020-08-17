@@ -31,10 +31,6 @@ RodsSession::RodsSession(RodsSession *sessPtr)
     // initialize iRODS 4.2 API tables new-age style
     load_client_api_plugins();
 
-    // irods::api_entry_table &api_table = irods::get_client_api_table();
-    // irods::pack_entry_table &pack_table = irods::get_pack_table();
-    // init_api_table(api_table, pack_table);
-
     // if we have a 'parent' connection pointer
     if (sessPtr)
     {
@@ -201,90 +197,6 @@ int RodsSession::disconnect(bool force)
 
     // return rods api status
     return (status);
-}
-
-bool RodsSession::isReady() const
-{
-    // connection is ready if there is a connection pointer and login was successful
-    if (this->rodsCommPtr)
-        if (this->rodsCommPtr->loggedIn)
-            return (true);
-
-    // otherwise connection is not ready
-    return (false);
-}
-
-bool RodsSession::isSSL() const
-{
-    // if we have a ready connection, get SSL status
-    if (this->isReady())
-    {
-        // if an OpenSSL handle exists
-        if (this->rodsCommPtr->ssl)
-            return (true);
-    }
-
-    // if OpenSSL handle is not available, return false
-    return (false);
-}
-
-const SSL_CIPHER *RodsSession::cipherInfo() const
-{
-    // if we have a valid OpenSSL handle
-    if (this->isSSL())
-    {
-        // return pointer to OpenSSL cipher in use
-        return (SSL_get_current_cipher(this->rodsCommPtr->ssl));
-    }
-
-    // if no SSL, just return NULL
-    return (NULL);
-}
-
-rcComm_t* RodsSession::commPtr() const
-{
-    // return rods api connection pointer
-    return (this->rodsCommPtr);
-}
-
-std::string RodsSession::rodsUser() const
-{
-    return std::string(this->rodsUserEnv.rodsUserName);
-}
-
-std::string RodsSession::rodsHost() const
-{
-    return std::string(this->rodsUserEnv.rodsHost);
-}
-
-std::string RodsSession::rodsHome() const
-{
-    return std::string(this->rodsUserEnv.rodsHome);
-}
-
-std::string RodsSession::rodsZone() const
-{
-    return std::string(this->rodsUserEnv.rodsZone);
-}
-
-std::string RodsSession::rodsDefResc() const
-{
-    return std::string(this->rodsUserEnv.rodsDefResource);
-}
-
-std::string RodsSession::rodsAuthScheme() const
-{
-    return std::string(this->rodsUserEnv.rodsAuthScheme);
-}
-
-std::string RodsSession::lastErrorMsg() const
-{
-    return std::string(this->lastErrMsg.msg);
-}
-
-int RodsSession::lastError() const
-{
-    return (this->lastErrMsg.status);
 }
 
 int RodsSession::makeColl(const std::string &collPath, bool makeRecursive)

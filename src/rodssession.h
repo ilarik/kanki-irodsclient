@@ -84,48 +84,108 @@ public:
 
     // Interface for querying whether the connection object is fully ready to be used, i.e.
     // connection was successful and user authentication is complete.
-    bool isReady() const;
+    bool isReady() const
+    {
+	// connection is ready if there is a connection pointer and login was successful
+	if (this->rodsCommPtr)
+	    if (this->rodsCommPtr->loggedIn)
+		return (true);
+	
+	// otherwise connection is not ready
+	return (false);
+    }
 
     // Interface for querying whether the iRODS connection is an SSL secured connection.
-    bool isSSL() const;
+    bool isSSL() const
+    {
+	// if we have a ready connection, get SSL status
+	if (this->isReady())
+	{
+	    // if an OpenSSL handle exists
+	    if (this->rodsCommPtr->ssl)
+		return (true);
+	}
+	
+	// if OpenSSL handle is not available, return false
+	return (false);
+    }
 
     // Interface for accessing the iRODS comm pointer, for bypassing the Kanki RodsSession
     // object interfaces - necessary for now.
-    rcComm_t* commPtr() const;
+    rcComm_t* commPtr() const
+    {
+	// return rods api connection pointer
+	return (this->rodsCommPtr);
+    }
 
     // Interface for accessing the SSL cipher info structure, provides a const pointer.
-    const SSL_CIPHER* cipherInfo() const;
+    const SSL_CIPHER* cipherInfo() const
+    {
+	// if we have a valid OpenSSL handle
+	if (this->isSSL())
+	{
+	    // return pointer to OpenSSL cipher in use
+	    return (SSL_get_current_cipher(this->rodsCommPtr->ssl));
+	}
+	
+	// if no SSL, just return NULL
+	return (nullptr);
+    }
 
     // Interface for querying the iRODS username for the connection, provides a C++ std string
     // copy of the rods api provided C string.
-    std::string rodsUser() const;
+    std::string rodsUser() const
+    {
+	return std::string(this->rodsUserEnv.rodsUserName);
+    }
 
     // Interface for querying the iRODS server hostname of the connection, provides a C++ std string
     // copy of the rods api provided C string.
-    std::string rodsHost() const;
+    std::string rodsHost() const
+    {
+	return std::string(this->rodsUserEnv.rodsHost);
+    }
 
     // Interface for querying the iRODS home collection of the session, provides a C++ std string
     // copy of the rods api provided C string.
-    std::string rodsHome() const;
-
+    std::string rodsHome() const
+    {
+	return std::string(this->rodsUserEnv.rodsHome);
+    }
+    
     // Interface for querying the iRODS home zone of the iRODS server, provides a C++ std string
     // copy of the rods api provided C string.
-    std::string rodsZone() const;
+    std::string rodsZone() const
+    {
+	return std::string(this->rodsUserEnv.rodsZone);
+    }
 
     // Interface for querying the iRODS default resource of the user, provides a C++ std string
     // copy of the rods api provided C string.
-    std::string rodsDefResc() const;
+    std::string rodsDefResc() const
+    {
+	return std::string(this->rodsUserEnv.rodsDefResource);
+    }
 
     // Interface for querying the iRODS authentication scheme used, provides a C++ std string copy
     // of the rods api provided C string.
-    std::string rodsAuthScheme() const;
+    std::string rodsAuthScheme() const
+    {
+	return std::string(this->rodsUserEnv.rodsAuthScheme);
+    }
 
     // Interface for querying the last rods api provided error message, provides a C++ std string
     // copy of the rods api provided C string.
-    std::string lastErrorMsg() const;
+    std::string lastErrorMsg() const
+    {
+	return std::string(this->lastErrMsg.msg);
+    }
 
     // Interface for querying the last rods api provided error code.
-    int lastError() const;
+    int lastError() const
+    {
+	return (this->lastErrMsg.status);
+    }
 
     // Locks the connection specific mutex lock to prevent simultaneous use of the same iRODS
     // connection by two different threads.
