@@ -27,7 +27,7 @@
 #include <QPushButton>
 
 // Kanki iRODS C++ class library headers
-#include <rodsconnection.h>
+#include <rodssession.h>
 #include <_rodsgenquery.h>
 
 

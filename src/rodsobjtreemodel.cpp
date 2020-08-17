@@ -17,11 +17,11 @@
 // application class RodsObjTreeModel header
 #include "rodsobjtreemodel.h"
 
-RodsObjTreeModel::RodsObjTreeModel(Kanki::RodsConnection *conn, const std::string &path, QObject *parent)
+RodsObjTreeModel::RodsObjTreeModel(Kanki::RodsSession *_session, const std::string &path, QObject *parent)
     : QAbstractItemModel(parent)
 {
     // set iRODS connection object pointer
-    rodsConn = conn;
+    session = _session;
 
     // create new root item (with null parent pointer)
     rootItem = new RodsObjTreeItem(NULL);
@@ -98,7 +98,7 @@ bool RodsObjTreeModel::setData(const QModelIndex &index, const QVariant &value, 
             int status = 0;
 
             // try to rename rods object
-            if ((status = this->rodsConn->renameObj(objEntry, value.toString().toStdString())) >= 0)
+            if ((status = this->session->renameObj(objEntry, value.toString().toStdString())) >= 0)
             {
                 // in success we signal model data change
                 this->dataChanged(index, index);
@@ -410,7 +410,7 @@ void RodsObjTreeModel::refreshAtIndex(QModelIndex parent)
     std::vector<Kanki::RodsObjEntryPtr> *rodsColl = new std::vector<Kanki::RodsObjEntryPtr>;
 
     // try to read from rods, if it fails this is unrecoverable
-    if ((status = rodsConn->readColl(collPath, rodsColl)) < 0)
+    if ((status = this->session->readColl(collPath, rodsColl)) < 0)
     {
         // report error via a message box
         QMessageBox errMsg;
@@ -576,7 +576,7 @@ bool RodsObjTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action
                         // if we have a valid object to move
                         if (sourceEntryPtr)
                         {
-                            if (int status = this->rodsConn->moveObjToColl(sourceEntryPtr, destColl); status)
+                            if (int status = this->session->moveObjToColl(sourceEntryPtr, destColl); status)
                             {
                                 // report error
                             }

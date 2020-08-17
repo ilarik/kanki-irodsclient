@@ -27,7 +27,7 @@
 #include <QIcon>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "_rodsgenquery.h"
 
 // application headers
@@ -53,7 +53,7 @@ public:
                             DataObjChksum, CollName, CollCreated, CollModified, CollMetadata };
 
     //
-    explicit RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent = 0);
+    explicit RodsFindWindow(Kanki::RodsSession *_session, QWidget *parent = 0);
 
     //
     ~RodsFindWindow();
@@ -100,7 +100,7 @@ private:
     QIcon dataIcon, collIcon;
 
     // our connection object
-    Kanki::RodsConnection *conn;
+    Kanki::RodsSession *session;
 
     // our schema instance
     RodsMetadataSchema *schema;

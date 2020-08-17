@@ -27,7 +27,7 @@
 #include <QTimer>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "_rodsgenquery.h"
 
 class RodsQueueModel : public QAbstractTableModel
@@ -38,7 +38,7 @@ public:
 
     // Constructor requires a rods connection object pointer as an arument
     // and optionally a Qt parent object pointer.
-    explicit RodsQueueModel(Kanki::RodsConnection *rodsConn, QObject *parent = 0);
+    explicit RodsQueueModel(Kanki::RodsSession *theSession, QObject *parent = 0);
 
     ~RodsQueueModel();
 
@@ -73,7 +73,7 @@ private:
     QTimer *timer;
 
     // pointer to rods connection object for communications
-    Kanki::RodsConnection *conn;
+    Kanki::RodsSession *session;
 
     // simple STL instantiated container for model data
     std::vector< std::vector< std::string> > queueData;

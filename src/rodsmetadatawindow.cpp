@@ -20,16 +20,16 @@
 // generated UI class Ui::RodsMetadataWindow header
 #include "ui_rodsmetadatawindow.h"
 
-RodsMetadataWindow::RodsMetadataWindow(Kanki::RodsConnection *theConn, Kanki::RodsObjEntryPtr theObjEntry, QWidget *parent) :
+RodsMetadataWindow::RodsMetadataWindow(Kanki::RodsSession *theSession, Kanki::RodsObjEntryPtr theObjEntry, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::RodsMetadataWindow),
-    conn(theConn),
+    session(theSession),
     objEntry(theObjEntry)
 {
     ui->setupUi(this);
 
     // create metadata and schema objects for rods object metadata
-    this->metadata = new Kanki::RodsObjMetadata(this->conn, this->objEntry);
+    this->metadata = new Kanki::RodsObjMetadata(this->session, this->objEntry);
     this->schema = new RodsMetadataSchema();
 
     // set window title to specify object

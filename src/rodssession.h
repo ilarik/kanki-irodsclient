@@ -1,11 +1,11 @@
 /**
- * @file rodsconnection.h
- * @brief Definition of Kanki library class RodsConnection
+ * @file rodssession.h
+ * @brief Definition of Kanki library class RodsSession
  *
- * The RodsConnection class in Kanki provides an interface to the
- * to an iRODS protocol connection and iRODS protocol operations.
+ * The RodsSession class in Kanki provides an interface to the
+ * to an iRODS protocol session and iRODS protocol operations.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -14,8 +14,8 @@
  * @author Ilari Korhonen
  */
 
-#ifndef RODSCONNECTION_H
-#define RODSCONNECTION_H
+#ifndef RODSSESSION_H
+#define RODSSESSION_H
 
 // C++ standard library headers
 #include <string>
@@ -58,17 +58,17 @@
 
 namespace Kanki {
 
-class RodsConnection
+class RodsSession
 {
 
 public:
 
-    // Constructor for instantiating a new connection object, optionally identical with
+    // Constructor for instantiating a new session object, optionally identical with
     // respect to the parameters of the conn object pointed by argument connPtr.
-    RodsConnection(RodsConnection *connPtr = NULL);
+    RodsSession(RodsSession *sessPtr = NULL);
 
     // Destructor to disconnect and clean up.
-    ~RodsConnection();
+    ~RodsSession();
 
     // Establishes an iRODS protocol connection to an iRODS server. Also configures the
     // connection object for connection parameters from the iRODS user environment if
@@ -89,7 +89,7 @@ public:
     // Interface for querying whether the iRODS connection is an SSL secured connection.
     bool isSSL() const;
 
-    // Interface for accessing the iRODS comm pointer, for bypassing the Kanki RodsConnection
+    // Interface for accessing the iRODS comm pointer, for bypassing the Kanki RodsSession
     // object interfaces - necessary for now.
     rcComm_t* commPtr() const;
 
@@ -176,15 +176,15 @@ public:
 
     //
     static const uint64_t xferBlkSize = 16777216;
-    
+
+    // we deny assignments, moving and copying of the object
+    RodsSession(RodsSession &) = delete;
+    RodsSession& operator=(RodsSession &) = delete;
+
 private:
 
     // Authenticates the user against the iRODS server in a new connection.
     int authenticate(const std::string &authScheme = "", const std::string &userName = "", const std::string &password = "");
-
-    // we deny assignments and copying of the object
-    RodsConnection(RodsConnection &);
-    RodsConnection& operator=(RodsConnection &);
 
     // a mutex to provide locking for the TCP connection data stream
     std::mutex commMutex;
@@ -201,4 +201,4 @@ private:
 
 } // namespace Kanki
 
-#endif // RODSCONNECTION_H
+#endif // RODSSESSION_H

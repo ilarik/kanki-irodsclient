@@ -20,11 +20,11 @@
 // generated UI class Ui::RodsFindWindow header
 #include "ui_rodsfindwindow.h"
 
-RodsFindWindow::RodsFindWindow(Kanki::RodsConnection *rodsConn, QWidget *parent) :
+RodsFindWindow::RodsFindWindow(Kanki::RodsSession *_session, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::RodsFindWindow)
 {
-    this->conn = rodsConn;
+    this->session = _session;
     this->schema = new RodsMetadataSchema();
 
     this->ui->setupUi(this);
@@ -138,7 +138,7 @@ void RodsFindWindow::addCondition()
 void RodsFindWindow::executeSearch()
 {
     int status = 0;
-    Kanki::RodsGenQuery query(this->conn);
+    Kanki::RodsGenQuery query(this->session);
     query.addQueryAttribute(COL_DATA_NAME);
     query.addQueryAttribute(COL_COLL_NAME);
 
@@ -150,7 +150,7 @@ void RodsFindWindow::executeSearch()
         widget->evaluateConds(&query);
     }
 
-    if (this->conn->isReady())
+    if (this->session->isReady())
     {
         // execute a timed query
         std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
@@ -212,7 +212,7 @@ void RodsFindWindow::resetConditions()
 void RodsFindWindow::refreshMetadataAttrs()
 {
     int status = 0;
-    Kanki::RodsGenQuery query(this->conn);
+    Kanki::RodsGenQuery query(this->session);
     query.addQueryAttribute(COL_META_DATA_ATTR_NAME);
 
     if ((status = query.execute()) < 0)

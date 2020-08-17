@@ -34,7 +34,7 @@
 #include "fmt/format.h"
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "rodsobjentry.h"
 #include "_rodsgenquery.h"
 
@@ -47,7 +47,7 @@ public:
 
     // Constructor requires pointers to a Kanki rods connection object and to
     // and Kanki rods object entry.
-    RodsObjMetadata(RodsConnection *theConn, RodsObjEntryPtr theObjEntry);
+    RodsObjMetadata(RodsSession *theSession, RodsObjEntryPtr theObjEntry);
 
     // Class local type for a Key Value struct with multiple values per key.
     typedef std::map< std::string, std::vector< std::string > > KeyVals;
@@ -89,7 +89,7 @@ private:
     void removeFromKeyVals(RodsObjMetadata::KeyVals *keyValsPtr, std::string key, std::string value);
 
     // pointer to Kanki rods connection object
-    Kanki::RodsConnection *conn;
+    Kanki::RodsSession *session;
 
     // pointer to Kanki rods object entry object
     Kanki::RodsObjEntryPtr objEntry;

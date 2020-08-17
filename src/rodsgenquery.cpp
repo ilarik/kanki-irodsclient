@@ -19,10 +19,10 @@
 
 namespace Kanki {
 
-RodsGenQuery::RodsGenQuery(Kanki::RodsConnection *theConn)
+RodsGenQuery::RodsGenQuery(Kanki::RodsSession *theSession)
 {
     // set connection object pointer
-    this->conn = theConn;
+    this->session = theSession;
 }
 
 void RodsGenQuery::addQueryAttribute(int rodsAttr)
@@ -108,10 +108,10 @@ int RodsGenQuery::execute()
     }
 
     // lock rods connection mutex
-    this->conn->mutexLock();
+    this->session->mutexLock();
 
     // try to execute a generic query
-    if (!(status = rcGenQuery(this->conn->commPtr(), &queryInput, &queryOutput)))
+    if (!(status = rcGenQuery(this->session->commPtr(), &queryInput, &queryOutput)))
     {
         // on success, initialize result buffer vectors
         for (unsigned int i = 0; i < this->queryAttrs.size(); i++)
@@ -140,12 +140,12 @@ int RodsGenQuery::execute()
             queryInput.continueInx = queryOutput->continueInx;
             prevStatus = status;
 
-            status = rcGenQuery(this->conn->commPtr(), &queryInput, &queryOutput);
+            status = rcGenQuery(this->session->commPtr(), &queryInput, &queryOutput);
         } while (!status);
     }
 
     // release rods connection mutex
-    this->conn->mutexUnlock();
+    this->session->mutexUnlock();
 
     // free rods api allocated resources
     delete queryInput.selectInp.inx;

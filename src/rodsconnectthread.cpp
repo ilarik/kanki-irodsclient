@@ -20,22 +20,22 @@
 
 void RodsConnectThread::run()
 {
-    Kanki::RodsConnection *newConn = NULL;
+    Kanki::RodsSession *newSession = nullptr;
     int status = 0;
 
     progressUpdate("Connecting to iRODS...", 1);
-    newConn = new Kanki::RodsConnection();
+    newSession = new Kanki::RodsSession();
 
     // try to connect to the iRODS server
-    if ((status = newConn->connect()) < 0)
+    if ((status = newSession->connect()) < 0)
     {
-        reportError("iRODS connection error", newConn->lastErrorMsg().c_str(),
-                    newConn->lastError());
+        reportError("iRODS connection error", newSession->lastErrorMsg().c_str(),
+                    newSession->lastError());
 
-        delete(newConn);
+        delete(newSession);
 
         // signal connection attempt failure
-        setConnection(NULL);
+        setConnection(nullptr);
         failure();
     }
 
@@ -44,17 +44,17 @@ void RodsConnectThread::run()
         progressUpdate("Authenticating...", 2);
 
         // try to authenticate while reporting error trough ui
-        if ((status = newConn->login()) < 0)
+        if ((status = newSession->login()) < 0)
         {
-            delete(newConn);
+            delete(newSession);
 
-            setConnection(NULL);
+            setConnection(nullptr);
             authFailure();
         }
 
         // on success, signal out the newly created connection object
         else {
-            setConnection(newConn);
+            setConnection(newSession);
             success();
         }
     }

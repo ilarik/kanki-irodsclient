@@ -1,8 +1,8 @@
 /**
- * @file rodsconnection.cpp
- * @brief Implementation of Kanki library class RodsConnection
+ * @file rodssession.cpp
+ * @brief Implementation of Kanki library class RodsSession
  *
- * The RodsConnection class in Kanki provides an interface to the
+ * The RodsSession class in Kanki provides an interface to the
  * to an iRODS protocol connection and iRODS protocol operations.
  *
  * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
@@ -14,12 +14,12 @@
  * @author Ilari Korhonen
  */
 
-// Kanki library class RodsConnection header
-#include "rodsconnection.h"
+// Kanki library class RodsSession header
+#include "rodssession.h"
 
 namespace Kanki {
 
-RodsConnection::RodsConnection(RodsConnection *connPtr)
+RodsSession::RodsSession(RodsSession *sessPtr)
 {
     // initially we have no comm ptr
     this->rodsCommPtr = NULL;
@@ -36,20 +36,20 @@ RodsConnection::RodsConnection(RodsConnection *connPtr)
     // init_api_table(api_table, pack_table);
 
     // if we have a 'parent' connection pointer
-    if (connPtr)
+    if (sessPtr)
     {
         // TODO: copy connection parameters
     }
 }
 
-RodsConnection::~RodsConnection()
+RodsSession::~RodsSession()
 {
     // forcefully disconnect if we are connected to rods
     if (this->rodsCommPtr)
         this->disconnect(true);
 }
 
-int RodsConnection::connect()
+int RodsSession::connect()
 {
     int status = 0;
 
@@ -74,7 +74,7 @@ int RodsConnection::connect()
     return (status);
 }
 
-int RodsConnection::login(const std::string &authScheme, const std::string &userName, const std::string &password)
+int RodsSession::login(const std::string &authScheme, const std::string &userName, const std::string &password)
 {
     int status = 0;
 
@@ -98,7 +98,7 @@ int RodsConnection::login(const std::string &authScheme, const std::string &user
     return (status);
 }
 
-int RodsConnection::authenticate(const std::string &authScheme, const std::string &userName, const std::string &password)
+int RodsSession::authenticate(const std::string &authScheme, const std::string &userName, const std::string &password)
 {
     std::string scheme;
     irods::error status;
@@ -176,7 +176,7 @@ int RodsConnection::authenticate(const std::string &authScheme, const std::strin
     //return (clientLogin(this->rodsCommPtr));
 }
 
-int RodsConnection::disconnect(bool force)
+int RodsSession::disconnect(bool force)
 {
     int status = 0;
 
@@ -203,7 +203,7 @@ int RodsConnection::disconnect(bool force)
     return (status);
 }
 
-bool RodsConnection::isReady() const
+bool RodsSession::isReady() const
 {
     // connection is ready if there is a connection pointer and login was successful
     if (this->rodsCommPtr)
@@ -214,7 +214,7 @@ bool RodsConnection::isReady() const
     return (false);
 }
 
-bool RodsConnection::isSSL() const
+bool RodsSession::isSSL() const
 {
     // if we have a ready connection, get SSL status
     if (this->isReady())
@@ -228,7 +228,7 @@ bool RodsConnection::isSSL() const
     return (false);
 }
 
-const SSL_CIPHER *RodsConnection::cipherInfo() const
+const SSL_CIPHER *RodsSession::cipherInfo() const
 {
     // if we have a valid OpenSSL handle
     if (this->isSSL())
@@ -241,53 +241,53 @@ const SSL_CIPHER *RodsConnection::cipherInfo() const
     return (NULL);
 }
 
-rcComm_t* RodsConnection::commPtr() const
+rcComm_t* RodsSession::commPtr() const
 {
     // return rods api connection pointer
     return (this->rodsCommPtr);
 }
 
-std::string RodsConnection::rodsUser() const
+std::string RodsSession::rodsUser() const
 {
     return std::string(this->rodsUserEnv.rodsUserName);
 }
 
-std::string RodsConnection::rodsHost() const
+std::string RodsSession::rodsHost() const
 {
     return std::string(this->rodsUserEnv.rodsHost);
 }
 
-std::string RodsConnection::rodsHome() const
+std::string RodsSession::rodsHome() const
 {
     return std::string(this->rodsUserEnv.rodsHome);
 }
 
-std::string RodsConnection::rodsZone() const
+std::string RodsSession::rodsZone() const
 {
     return std::string(this->rodsUserEnv.rodsZone);
 }
 
-std::string RodsConnection::rodsDefResc() const
+std::string RodsSession::rodsDefResc() const
 {
     return std::string(this->rodsUserEnv.rodsDefResource);
 }
 
-std::string RodsConnection::rodsAuthScheme() const
+std::string RodsSession::rodsAuthScheme() const
 {
     return std::string(this->rodsUserEnv.rodsAuthScheme);
 }
 
-std::string RodsConnection::lastErrorMsg() const
+std::string RodsSession::lastErrorMsg() const
 {
     return std::string(this->lastErrMsg.msg);
 }
 
-int RodsConnection::lastError() const
+int RodsSession::lastError() const
 {
     return (this->lastErrMsg.status);
 }
 
-int RodsConnection::makeColl(const std::string &collPath, bool makeRecursive)
+int RodsSession::makeColl(const std::string &collPath, bool makeRecursive)
 {
     int status = 0;
 
@@ -310,7 +310,7 @@ int RodsConnection::makeColl(const std::string &collPath, bool makeRecursive)
     return (status);
 }
 
-int RodsConnection::readColl(const std::string &collPath, std::vector<RodsObjEntryPtr> *collObjs)
+int RodsSession::readColl(const std::string &collPath, std::vector<RodsObjEntryPtr> *collObjs)
 {
     int status = 0;
 
@@ -346,7 +346,7 @@ int RodsConnection::readColl(const std::string &collPath, std::vector<RodsObjEnt
     return (status);
 }
 
-int RodsConnection::removeColl(const std::string &collPath)
+int RodsSession::removeColl(const std::string &collPath)
 {
     //collInp_t theColl;
     int status = 0;
@@ -382,7 +382,7 @@ int RodsConnection::removeColl(const std::string &collPath)
     return (status);
 }
 
-int RodsConnection::putFile(const std::string &localPath, const std::string &objPath, const std::string &rodsResc,
+int RodsSession::putFile(const std::string &localPath, const std::string &objPath, const std::string &rodsResc,
                             bool verifyChecksum, bool allowOverwrite, unsigned int numThreads)
 {
     dataObjInp_t putParam;
@@ -432,7 +432,7 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
     return (status);
 }
 
-int RodsConnection::putFile(const std::string &localPath, const std::string &objPath, bool verifyChecksum,
+int RodsSession::putFile(const std::string &localPath, const std::string &objPath, bool verifyChecksum,
                             bool allowOverwrite, unsigned int numThreads)
 {
     // do put file to user default resource
@@ -440,7 +440,7 @@ int RodsConnection::putFile(const std::string &localPath, const std::string &obj
     return (this->putFile(localPath, objPath, defResc, verifyChecksum, allowOverwrite, numThreads));
 }
 
-int RodsConnection::removeObj(const std::string &objPath)
+int RodsSession::removeObj(const std::string &objPath)
 {
 //    dataObjInp_t theObj;
     int status = 0;
@@ -480,7 +480,7 @@ int RodsConnection::removeObj(const std::string &objPath)
     return (status);
 }
 
-int RodsConnection::getFile(const std::string &localPath, const std::string &objPath, bool verifyChecksum,
+int RodsSession::getFile(const std::string &localPath, const std::string &objPath, bool verifyChecksum,
                             bool allowOverwrite, unsigned int numThreads)
 {
     int status = 0;
@@ -515,7 +515,7 @@ int RodsConnection::getFile(const std::string &localPath, const std::string &obj
     return (status);
 }
 
-int RodsConnection::moveObjToColl(RodsObjEntryPtr objEntry, const std::string &collPath)
+int RodsSession::moveObjToColl(RodsObjEntryPtr objEntry, const std::string &collPath)
 {
     int status = 0;
     dataObjCopyInp_t objMoveInp;
@@ -558,14 +558,14 @@ int RodsConnection::moveObjToColl(RodsObjEntryPtr objEntry, const std::string &c
     return (status);
 }
 
-int RodsConnection::moveObjToColl(const std::string &objPath, objType_t objType, const std::string &collPath)
+int RodsSession::moveObjToColl(const std::string &objPath, objType_t objType, const std::string &collPath)
 {
     int status = 0;
 
     return (status);
 }
 
-int RodsConnection::renameObj(RodsObjEntryPtr objEntry, const std::string &newName)
+int RodsSession::renameObj(RodsObjEntryPtr objEntry, const std::string &newName)
 {
     int status = 0;
     dataObjCopyInp_t objRenameInp;
@@ -612,12 +612,12 @@ int RodsConnection::renameObj(RodsObjEntryPtr objEntry, const std::string &newNa
     return (status);
 }
 
-void RodsConnection::mutexLock()
+void RodsSession::mutexLock()
 {
     this->commMutex.lock();
 }
 
-void RodsConnection::mutexUnlock()
+void RodsSession::mutexUnlock()
 {
     this->commMutex.unlock();
 }

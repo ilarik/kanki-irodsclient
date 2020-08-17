@@ -17,12 +17,12 @@
 // application class RodsUploadThread header
 #include "rodsuploadthread.h"
 
-RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths,
+RodsUploadThread::RodsUploadThread(Kanki::RodsSession *theSession, QStringList filePaths,
                                    std::string destColl, std::string rodsResc,
                                    bool verifyChecksum, bool allowOverwrite)
     : QThread()
 {
-    this->conn = new Kanki::RodsConnection(theConn);
+    this->session = new Kanki::RodsSession(theSession);
 
     this->filePathList = filePaths;
     this->destCollPath = destColl;
@@ -32,12 +32,12 @@ RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, QStringList f
     this->overwrite = allowOverwrite;
 }
 
-RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath,
+RodsUploadThread::RodsUploadThread(Kanki::RodsSession *theSession, std::string baseDirPath,
                                    std::string destColl, std::string rodsResc,
                                    bool verifyChecksum, bool allowOverwrite)
     : QThread()
 {
-    this->conn = new Kanki::RodsConnection(theConn);
+    this->session = new Kanki::RodsSession(theSession);
 
     this->basePath = baseDirPath;
     this->destCollPath = destColl;
@@ -49,7 +49,7 @@ RodsUploadThread::RodsUploadThread(Kanki::RodsConnection *theConn, std::string b
 
 RodsUploadThread::~RodsUploadThread()
 {
-    delete(this->conn);
+    delete(this->session);
 }
 
 void RodsUploadThread::finalize()
@@ -68,13 +68,13 @@ void RodsUploadThread::run()
     progressMarquee(statusStr);
 
     // open a parallel connection for the transfer and authenticate
-    if ((status = this->conn->connect()) < 0)
+    if ((status = this->session->connect()) < 0)
     {
         reportError("Upload failed", "Open parallel connection failed", status);
         return;
     }
 
-    else if ((status = this->conn->login()) < 0)
+    else if ((status = this->session->login()) < 0)
     {
         reportError("Upload failed", "Authentication failed", status);
         return;
@@ -88,7 +88,7 @@ void RodsUploadThread::run()
 
         // make dest collection
         std::string destColl = this->destCollPath + this->basePath.substr(this->basePath.find_last_of('/'));
-        if ((status = this->conn->makeColl(destColl, false)) < 0)
+        if ((status = this->session->makeColl(destColl, false)) < 0)
         {
             // we don't complain about existing dest when overwrite
             if (!this->overwrite || status != -809000)
@@ -133,7 +133,7 @@ void RodsUploadThread::run()
             progressUpdate(statusStr, c);
 
             // we don't complain about existing dest when overwrite
-            if ((status = this->conn->makeColl(objPath, false)) < 0)
+            if ((status = this->session->makeColl(objPath, false)) < 0)
                 if (!this->overwrite || status != -809000)
                     reportError("iRODS make collection error", "Put failed", status);
         }
@@ -145,7 +145,7 @@ void RodsUploadThread::run()
             progressUpdate(statusStr.c_str(), c);
 
             // try to put file and report possible error to user
-            if ((status = this->conn->putFile(fileName.toStdString(), objPath, this->targetResc,
+            if ((status = this->session->putFile(fileName.toStdString(), objPath, this->targetResc,
                                               this->verify, this->overwrite)) < 0)
                 reportError("iRODS put file error", objPath.c_str(), status);
         }

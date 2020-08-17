@@ -21,7 +21,7 @@
 #include <cstdlib>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 
 // initial I/O request/buffer size
 #define __KANKI_BUFSIZE_INIT    262144
@@ -39,7 +39,7 @@ class RodsDataStream
 
 public:
 
-    RodsDataStream(Kanki::RodsConnection *theConn);
+    RodsDataStream(Kanki::RodsSession *theSession);
 
     ~RodsDataStream();
 
@@ -60,7 +60,7 @@ protected:
     size_t growBuffer(size_t newSize);
 
     // rods connection object pointer
-    RodsConnection *connPtr;
+    RodsSession *session;
 
     // internal memory buffer for I/O
     void *memBuffer;

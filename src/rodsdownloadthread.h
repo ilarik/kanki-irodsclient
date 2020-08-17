@@ -40,7 +40,7 @@
 #include "connection_pool.hpp"
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "rodsobjentry.h"
 #include "rodsdatainstream.h"
 
@@ -51,7 +51,7 @@ class RodsDownloadThread : public QThread
 public:
 
     // Constructor initializes the download worker thread and sets its parameters for execution.
-    RodsDownloadThread(Kanki::RodsConnection *theConn, Kanki::RodsObjEntryPtr theObj, const std::string &theDestPath,
+    RodsDownloadThread(Kanki::RodsSession *theSession, Kanki::RodsObjEntryPtr theObj, const std::string &theDestPath,
                        bool verifyChecksum = true, bool allowOverwrite = false);
 
 signals:
@@ -111,7 +111,7 @@ private:
     int transferFileParallel(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream);
 
     // pointer to the rods connection object
-    Kanki::RodsConnection *conn;
+    Kanki::RodsSession *session;
 
     // pointer to the rods object entry to be downloaded
     Kanki::RodsObjEntryPtr objEntry;

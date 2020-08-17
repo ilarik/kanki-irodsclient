@@ -19,8 +19,8 @@
 
 namespace Kanki {
 
-RodsDataOutStream::RodsDataOutStream(RodsConnection *theConn)
-    : RodsDataStream(theConn)
+RodsDataOutStream::RodsDataOutStream(RodsSession *theSession)
+    : RodsDataStream(theSession)
 {
 
 }

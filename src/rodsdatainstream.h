@@ -21,7 +21,7 @@
 #include <chrono>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "rodsobjentry.h"
 #include "rodsdatastream.h"
 
@@ -35,7 +35,7 @@ class RodsDataInStream : public RodsDataStream
 
 public:
 
-    RodsDataInStream(RodsConnection *theConn, RodsObjEntryPtr theObjEntry);
+    RodsDataInStream(RodsSession *theSession, RodsObjEntryPtr theObjEntry);
 
     ~RodsDataInStream();
 

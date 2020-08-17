@@ -42,7 +42,7 @@
 #include <QPalette>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "rodsobjentry.h"
 #include "_rodsgenquery.h"
 
@@ -104,7 +104,7 @@ public slots:
     void reportError(QString msgStr, QString errorStr, int errorCode);
 
     // Qt slot for setting the Kanki rods connection object for the grid browser window.
-    void setConnection(Kanki::RodsConnection *newConn);
+    void setConnection(Kanki::RodsSession *newConn);
 
     // Qt slot for unregistering a metadata editor window from the grid browser window.
     void unregisterMetadataWindow(std::string objPath);
@@ -268,8 +268,8 @@ private:
     // our object tree model instance
     RodsObjTreeModel *model;
 
-    // pointer to rods connection object
-    Kanki::RodsConnection *conn;
+    // pointer to rods session object
+    Kanki::RodsSession *session;
 
     // settings from the gui
     bool verifyChecksum, allowOverwrite;

@@ -20,13 +20,13 @@
 // generated UI class Ui::RodsQueueWindow header
 #include "ui_rodsqueuewindow.h"
 
-RodsQueueWindow::RodsQueueWindow(Kanki::RodsConnection *rodsConn, QWidget *parent) :
+RodsQueueWindow::RodsQueueWindow(Kanki::RodsSession *theSession, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RodsQueueWindow)
 {
-    // set conn pointer and create new queue model
-    this->conn = rodsConn;
-    this->queue = new RodsQueueModel(conn);
+    // set session pointer and create new queue model
+    this->session = theSession;
+    this->queue = new RodsQueueModel(session);
 
     // setup qt ui, instantiate and confgure ui objects
     this->ui->setupUi(this);

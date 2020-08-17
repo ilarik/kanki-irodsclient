@@ -19,9 +19,9 @@
 
 namespace Kanki {
 
-RodsDataStream::RodsDataStream(Kanki::RodsConnection *theConn)
+RodsDataStream::RodsDataStream(Kanki::RodsSession *theSession)
 {
-    this->connPtr = theConn;
+    this->session = theSession;
 
     this->memBuffer = std::malloc(__KANKI_BUFSIZE_INIT);
     this->bufSize = __KANKI_BUFSIZE_INIT;
@@ -36,7 +36,7 @@ RodsDataStream::~RodsDataStream()
 int RodsDataStream::seek(size_t offset, int whence)
 {
     openedDataObjInp_t seekParam;
-    fileLseekOut_t *seekResult = NULL;
+    fileLseekOut_t *seekResult = nullptr;
 
     // zero param and results structs
     memset(&seekParam, 0, sizeof (seekParam));
@@ -47,7 +47,7 @@ int RodsDataStream::seek(size_t offset, int whence)
     seekParam.whence = whence;
 
     // try to seek and return status
-    return (rcDataObjLseek(this->connPtr->commPtr(), &seekParam, &seekResult));
+    return (rcDataObjLseek(this->session->commPtr(), &seekParam, &seekResult));
 }
 
 int RodsDataStream::closeDataObj()
@@ -60,7 +60,7 @@ int RodsDataStream::closeDataObj()
     closeParam.l1descInx = this->rodsL1Inx;
 
     // try to close, on success reset index
-    if ((status = rcDataObjClose(this->connPtr->commPtr(), &closeParam)) >= 0)
+    if ((status = rcDataObjClose(this->session->commPtr(), &closeParam)) >= 0)
         this->rodsL1Inx = 0;
 
     return (status);

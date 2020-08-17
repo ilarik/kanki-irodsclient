@@ -19,11 +19,11 @@
 
 namespace Kanki {
 
-RodsDataInStream::RodsDataInStream(RodsConnection *theConn, RodsObjEntryPtr theObjEntry)
-    : RodsDataStream(theConn)
+RodsDataInStream::RodsDataInStream(RodsSession *theSession, RodsObjEntryPtr theObjEntry)
+    : RodsDataStream(theSession)
 {
     this->entPtr = theObjEntry;
-    this->portalParams = NULL;
+    this->portalParams = nullptr;
 }
 
 RodsDataInStream::~RodsDataInStream()
@@ -46,7 +46,7 @@ int RodsDataInStream::openDataObj()
     rstrcpy(openParam.objPath, this->entPtr->getObjectFullPath().c_str(), MAX_NAME_LEN);
 
     // try to execute rods api call
-    if ((openResult = rcDataObjOpen(this->connPtr->commPtr(), &openParam)) < 0)
+    if ((openResult = rcDataObjOpen(this->session->commPtr(), &openParam)) < 0)
         return (openResult);
 
     // on success we have a first class object index
@@ -80,7 +80,7 @@ int RodsDataInStream::getOprInit()
 #endif
 
     // try to initiate a get api request
-    if ((status = procApiRequest(this->connPtr->commPtr(), DATA_OBJ_GET_AN, &getParam,
+    if ((status = procApiRequest(this->session->commPtr(), DATA_OBJ_GET_AN, &getParam,
                                  NULL, (void**)&portalOpr, &getBuffer)) < 0)
         return (status);
 
@@ -115,7 +115,7 @@ int RodsDataInStream::read(void *bufPtr, size_t len)
     std::memset(&readBuf, 0, sizeof (readBuf));
 
     // try to read from the rods data object
-    if ((readResult = rcDataObjRead(this->connPtr->commPtr(), &readParam, &readBuf)))
+    if ((readResult = rcDataObjRead(this->session->commPtr(), &readParam, &readBuf)))
     {
         std::memcpy(bufPtr, readBuf.buf, readResult);
         std::free(readBuf.buf);
@@ -202,7 +202,7 @@ int RodsDataInStream::readAdaptive(void *bufPtr, size_t maxLen)
 void RodsDataInStream::getOprEnd()
 {
     // complete client rods api get request
-    rcOprComplete(this->connPtr->commPtr(), this->rodsL1Inx);
+    rcOprComplete(this->session->commPtr(), this->rodsL1Inx);
 }
 
 const std::string& RodsDataInStream::checksumStr() const

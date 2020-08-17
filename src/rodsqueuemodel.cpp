@@ -26,11 +26,11 @@ const char *RodsQueueModel::columnNames[numColumns] = { "ID", "Name", "Rule Exec
                                                         "Priority", "Estimated Exec Time", "Notification Address",
                                                         "Last Exec Time", "Status" };
 
-RodsQueueModel::RodsQueueModel(Kanki::RodsConnection *rodsConn, QObject *parent) :
+RodsQueueModel::RodsQueueModel(Kanki::RodsSession *theSession, QObject *parent) :
     QAbstractTableModel(parent)
 {
-    // set conn pointer
-    conn = rodsConn;
+    // set session pointer
+    session = theSession;
 
     // initialize queue model with a refresh
     refreshQueue();
@@ -125,7 +125,7 @@ void RodsQueueModel::refreshQueue()
     int status = 0;
 
     // initialize new rods gen query object
-    Kanki::RodsGenQuery query(this->conn);
+    Kanki::RodsGenQuery query(this->session);
 
     // set gen query attributes
     query.addQueryAttribute(COL_RULE_EXEC_ID);
@@ -142,7 +142,7 @@ void RodsQueueModel::refreshQueue()
     query.addQueryAttribute(COL_RULE_EXEC_STATUS);
 
     // set query condition, user name
-    query.addQueryCondition(COL_RULE_EXEC_USER_NAME, Kanki::RodsGenQuery::isEqual, conn->rodsUser());
+    query.addQueryCondition(COL_RULE_EXEC_USER_NAME, Kanki::RodsGenQuery::isEqual, session->rodsUser());
 
     // try to execute rods gen query
     if ((status = query.execute()) < 0)

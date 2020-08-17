@@ -18,7 +18,7 @@
 #define RODSDATAOUTSTREAM_H
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "rodsdatastream.h"
 
 namespace Kanki {
@@ -28,7 +28,7 @@ class RodsDataOutStream : public RodsDataStream
 
 public:
 
-    RodsDataOutStream(Kanki::RodsConnection *theConn);
+    RodsDataOutStream(Kanki::RodsSession *theSession);
 
     // Overrides superclass pure virtual function, opens the iRODS data
     // object for writing.

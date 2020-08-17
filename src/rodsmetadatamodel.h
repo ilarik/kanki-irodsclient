@@ -31,7 +31,7 @@
 #include <QMessageBox>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "rodsobjentry.h"
 #include "_rodsgenquery.h"
 
@@ -97,8 +97,8 @@ private:
     // qt icon objects used in the model
     QIcon nsIcon, attrIcon;
 
-    // rods conn pointer
-    Kanki::RodsConnection *conn;
+    // rods session pointer
+//    Kanki::RodsSession *session;
 
     // managed pointer to a rods object entry
     Kanki::RodsObjEntryPtr objEntry;

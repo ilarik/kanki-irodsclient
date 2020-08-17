@@ -26,7 +26,7 @@
 #include <QDir>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 
 // application headers
 #include "rodsmainwindow.h"
@@ -40,13 +40,13 @@ public:
 
     // Constructor initializes the upload worker thread and sets its parameters for execution,
     // requires a rods conn pointer, file paths list and dest coll path.
-    RodsUploadThread(Kanki::RodsConnection *theConn, QStringList filePaths,
+    RodsUploadThread(Kanki::RodsSession *theSession, QStringList filePaths,
                      std::string destColl, std::string rodsResc,
                      bool verifyChecksum = false, bool allowOverwrite = false);
 
     // Constructor initializes the upload worker thread and sets its parameters for execution,
     // requires a rods conn pointer, base path for recursive upload and dest coll path.
-    RodsUploadThread(Kanki::RodsConnection *theConn, std::string baseDirPath,
+    RodsUploadThread(Kanki::RodsSession *theSession, std::string baseDirPath,
                      std::string destColl, std::string rodsResc,
                      bool verifyChecksum = false, bool allowOverwrite = false);
 
@@ -91,8 +91,8 @@ private:
     // the local directory for files and directories paths.
     void makeBillOfMaterials(const QString &dirPath, QStringList *filePaths);
 
-    // pointer to the rods connection object
-    Kanki::RodsConnection *conn;
+    // pointer to the rods session object
+    Kanki::RodsSession *session;
 
     // bill of materials for the upload
     QStringList filePathList;

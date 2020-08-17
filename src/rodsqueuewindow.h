@@ -21,7 +21,7 @@
 #include <QWidget>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 
 // application headers
 #include "rodsqueuemodel.h"
@@ -39,7 +39,7 @@ public:
 
     // Constructor requires a rods connection object pointer as an argument
     // and optionally a parent widget pointer.
-    explicit RodsQueueWindow(Kanki::RodsConnection *rodsConn, QWidget *parent = 0);
+    explicit RodsQueueWindow(Kanki::RodsSession *theSession, QWidget *parent = 0);
 
     ~RodsQueueWindow();
 
@@ -58,8 +58,8 @@ private:
     // instance of Qt UI compiler generated UI
     Ui::RodsQueueWindow *ui;
 
-    // pointer to rods connection object
-    Kanki::RodsConnection *conn;
+    // pointer to rods session object
+    Kanki::RodsSession *session;
 
     // our queue model object pointer
     RodsQueueModel *queue;

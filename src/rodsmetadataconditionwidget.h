@@ -30,7 +30,7 @@
 #include <QLineEdit>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "rodsobjentry.h"
 #include "_rodsgenquery.h"
 

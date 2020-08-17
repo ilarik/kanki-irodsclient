@@ -33,7 +33,7 @@
 #include <QUrl>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "rodsobjentry.h"
 
 // application headers
@@ -45,8 +45,8 @@ class RodsObjTreeModel : public QAbstractItemModel
 
 public:
 
-    // Constructor requires a Kanki rods conn pointer and an initial rods path.
-    RodsObjTreeModel(Kanki::RodsConnection *conn, const std::string &path, QObject *parent = 0);
+    // Constructor requires a Kanki rods session pointer and an initial rods path.
+    RodsObjTreeModel(Kanki::RodsSession *_session, const std::string &path, QObject *parent = 0);
 
     ~RodsObjTreeModel();
 
@@ -135,7 +135,7 @@ private:
     QIcon mountIcon, collIcon, dataIcon;
 
     // rods conn pointer
-    Kanki::RodsConnection *rodsConn;
+    Kanki::RodsSession *session;
 
     // root item pointer for the object tree
     RodsObjTreeItem *rootItem;

@@ -28,7 +28,7 @@
 #include "rodsPath.h"
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 
 namespace Kanki {
 
@@ -39,8 +39,8 @@ public:
     // Class local public enumerated type for query condition operators.
     enum CondOpr { isEqual, isNotEqual, isLess, isLessOrEqual, isGreater, isGreaterOrEqual, isLike };
 
-    // Constructor receives only a pointer to a Kanki connection object for GenQuery execution.
-    RodsGenQuery(Kanki::RodsConnection *theConn);
+    // Constructor receives only a pointer to a Kanki session object for GenQuery execution.
+    RodsGenQuery(Kanki::RodsSession *theSession);
 
     // Adds a rods attribute into the GenQuery object for querying.
     void addQueryAttribute(int rodsAttr);
@@ -94,8 +94,8 @@ private:
         std::string valStr;
     };
 
-    // pointer to Kanki rods connection object
-    Kanki::RodsConnection *conn;
+    // pointer to Kanki rods session object
+    Kanki::RodsSession *session;
 
     // container for rods query attribute codes
     std::vector<int> queryAttrs;

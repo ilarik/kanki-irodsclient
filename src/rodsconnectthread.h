@@ -23,7 +23,7 @@
 #include <QString>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 
 class RodsConnectThread : public QThread
 {
@@ -48,9 +48,9 @@ signals:
     // Qt signal for signaling out an authentication failure.
     void authFailure();
 
-    // Qt signal for signaling out a connection object pointer for
+    // Qt signal for signaling out a session object pointer for
     // a successful iRODS connection.
-    void setConnection(Kanki::RodsConnection *conn);
+    void setConnection(Kanki::RodsSession *session);
 
     // Qt signal for reporting errors in the connection process,
     // signals out strings for a message, error message and error code.

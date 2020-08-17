@@ -33,7 +33,7 @@
 #include <QInputDialog>
 
 // Kanki iRODS C++ class library headers
-#include "rodsconnection.h"
+#include "rodssession.h"
 #include "rodsobjentry.h"
 #include "rodsobjmetadata.h"
 
@@ -54,7 +54,7 @@ class RodsMetadataWindow : public QMainWindow
 public:
 
     // Constructor requires the conn pointer and a managed pointer to a rods object entry.
-    explicit RodsMetadataWindow(Kanki::RodsConnection *theConn, Kanki::RodsObjEntryPtr theObjEntry, QWidget *parent = 0);
+    explicit RodsMetadataWindow(Kanki::RodsSession *theSession, Kanki::RodsObjEntryPtr theObjEntry, QWidget *parent = 0);
 
     ~RodsMetadataWindow();
 
@@ -110,7 +110,7 @@ private:
     RodsMetadataSchema *schema;
 
     // pointer to rods connection object
-    Kanki::RodsConnection *conn;
+    Kanki::RodsSession *session;
 
     // managed pointer to a rods object entry
     Kanki::RodsObjEntryPtr objEntry;

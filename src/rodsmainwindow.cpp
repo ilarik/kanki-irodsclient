@@ -24,10 +24,10 @@ RodsMainWindow::RodsMainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::RodsMainWindow)
 {
-    this->conn = NULL;
-    this->queueWindow = NULL;
-    this->findWindow = NULL;
-    this->model = NULL;
+    this->session = nullptr;
+    this->queueWindow = nullptr;
+    this->findWindow = nullptr;
+    this->model = nullptr;
 
     // instantiate and configure Qt UI
     this->ui->setupUi(this);
@@ -56,12 +56,12 @@ RodsMainWindow::RodsMainWindow(QWidget *parent) :
 RodsMainWindow::~RodsMainWindow()
 {
     // if there is a connection object
-    if (this->conn)
+    if (this->session)
     {
         // disconnect from iRODS server
-        this->conn->disconnect();
+        this->session->disconnect();
 
-        delete (this->conn);
+        delete (this->session);
     }
 
     // delete object tree model if exists
@@ -110,24 +110,24 @@ void RodsMainWindow::closeEvent(QCloseEvent *event)
     qApp->quit();
 }
 
-void RodsMainWindow::setConnection(Kanki::RodsConnection *newConn)
+void RodsMainWindow::setConnection(Kanki::RodsSession *newSession)
 {
     // set connection pointer to new connection
-    this->conn = newConn;
+    this->session = newSession;
 }
 
 void RodsMainWindow::enterConnectedState()
 {
     std::string statusMsg = "Connected to iRODS server ";
-    statusMsg += this->conn->rodsHost();
+    statusMsg += this->session->rodsHost();
 
     // display authentication scheme used
-    statusMsg += " - authentication scheme: " + this->conn->rodsAuthScheme();
+    statusMsg += " - authentication scheme: " + this->session->rodsAuthScheme();
 
     // if the connection is SSL enabled, get info
-    if (conn->isSSL())
+    if (session->isSSL())
     {
-        const SSL_CIPHER *cipher = this->conn->cipherInfo();
+        const SSL_CIPHER *cipher = this->session->cipherInfo();
 
         statusMsg += " - SSL security enabled - ";
 
@@ -150,14 +150,14 @@ void RodsMainWindow::enterConnectedState()
     }
 
     this->ui->statusBar->showMessage(statusMsg.c_str(), 30000);
-    this->setWindowTitle(this->windowTitle() + " (Zone: " + QString(this->conn->rodsZone().c_str()) + ")");
+    this->setWindowTitle(this->windowTitle() + " (Zone: " + QString(this->session->rodsZone().c_str()) + ")");
 
     // if there exists a previous model, delete it
     if (this->model)
         delete (this->model);
 
     // instantiate new model for new connection
-    this->model = new RodsObjTreeModel(this->conn, this->conn->rodsHome());
+    this->model = new RodsObjTreeModel(this->session, this->session->rodsHome());
 
     // connect to model refresh interface slot
     connect(this, &RodsMainWindow::refreshObjectModelAtIndex, this->model,
@@ -263,7 +263,7 @@ void RodsMainWindow::mountPath()
         int status = 0;
 
         // try to read collection to see that it's readable (by the user)
-        if ((status = this->conn->readColl(path.toStdString(), &tmp)) >= 0)
+        if ((status = this->session->readColl(path.toStdString(), &tmp)) >= 0)
         {
                 // get the model in use and add the mount point to the model
                 RodsObjTreeModel *model = static_cast<RodsObjTreeModel*>(this->ui->rodsObjTree->model());
@@ -309,7 +309,7 @@ void RodsMainWindow::doQueueStatOpen()
     // if not yet instantiated, do it
     if (!this->queueWindow)
     {
-        this->queueWindow = new RodsQueueWindow(this->conn);
+        this->queueWindow = new RodsQueueWindow(this->session);
 
         connect(this->queueWindow, &RodsQueueWindow::unregister, this,
                 &RodsMainWindow::unregisterQueueWindow);
@@ -340,14 +340,14 @@ void RodsMainWindow::doMetadataEditorOpen()
             // if we are talking about a proper item
             if (objEntry)
             {
-                RodsMetadataWindow *metaWindow = NULL;
+                RodsMetadataWindow *metaWindow = nullptr;
 
                 // if we already don't have an editor window, make one
                 if (this->metaEditors.find(objEntry->getObjectFullPath()) != this->metaEditors.end())
                     metaWindow = this->metaEditors.at(objEntry->getObjectFullPath());
 
                 else {
-                    metaWindow = new RodsMetadataWindow(conn, selection->getObjEntryPtr());
+                    metaWindow = new RodsMetadataWindow(this->session, selection->getObjEntryPtr());
 
                     connect(metaWindow, &RodsMetadataWindow::unregister, this,
                             &RodsMainWindow::unregisterMetadataWindow);
@@ -391,7 +391,7 @@ void RodsMainWindow::doDownload()
                 return;
 
             // create worker thread for downloading
-            RodsDownloadThread *downloadWorker = new RodsDownloadThread(this->conn,
+            RodsDownloadThread *downloadWorker = new RodsDownloadThread(this->session,
                                                                         objEntry,
                                                                         destPathSelection.at(0).toStdString(),
                                                                         this->verifyChecksum,
@@ -471,14 +471,14 @@ void RodsMainWindow::doUpload(bool uploadDirectory)
         return;
 
     // create a worker thread for the upload
-    RodsUploadThread *uploadWorker = NULL;
+    RodsUploadThread *uploadWorker = nullptr;
 
     if (uploadDirectory)
-        uploadWorker = new RodsUploadThread(this->conn, fileNames.at(0).toStdString(),
+        uploadWorker = new RodsUploadThread(this->session, fileNames.at(0).toStdString(),
                                             destCollPath, this->currentResc,
                                             this->verifyChecksum, this->allowOverwrite);
     else
-        uploadWorker = new RodsUploadThread(this->conn, fileNames, destCollPath, this->currentResc,
+        uploadWorker = new RodsUploadThread(this->session, fileNames, destCollPath, this->currentResc,
                                             this->verifyChecksum, this->allowOverwrite);
 
     QString title = QString("Uploading to '") + destCollPath.c_str() + "'";
@@ -600,15 +600,15 @@ void RodsMainWindow::doRodsConnect()
 
 void RodsMainWindow::doRodsDisconnect()
 {
-    // sanity check that there is a connection object
-    if (this->conn)
+    // sanity check that there is a session object
+    if (this->session)
     {
         // disconnect from iRODS
-        this->conn->disconnect();
+        this->session->disconnect();
 
         // delete connection object
-        delete(this->conn);
-        this->conn = NULL;
+        delete(this->session);
+        this->session = nullptr;
 
         // enter disconnected state
         this->enterDisconnectedState();
@@ -638,7 +638,7 @@ void RodsMainWindow::doCreateCollection()
         std::string collPath = curCollPath + "/" + collName.toStdString();
 
         // make new collection into path
-        if ((status = this->conn->makeColl(collPath, false)) < 0)
+        if ((status = this->session->makeColl(collPath, false)) < 0)
             this->reportError("Create collection error", "Create collection failed", status);
 
         // refresh tree view on success
@@ -696,7 +696,7 @@ void RodsMainWindow::doDelete()
                     return;
 
                 // try to delete collection
-                if ((status = this->conn->removeColl(itemData->objName)) < 0)
+                if ((status = this->session->removeColl(itemData->objName)) < 0)
                     this->reportError("Delete collection error", "iRODS API error", status);
 
                 // on success refresh view
@@ -725,7 +725,7 @@ void RodsMainWindow::doDelete()
                     std::string objPath = itemData->getObjectFullPath();
 
                     // try to remove data object
-                    if ((status = this->conn->removeObj(objPath)) < 0)
+                    if ((status = this->session->removeObj(objPath)) < 0)
                         this->reportError("Delete object error", "iRODS API error", status);
 
                     // on success refresh
@@ -763,7 +763,7 @@ std::string RodsMainWindow::getCurrentRodsCollPath()
 
     // if no index, current collection is irods home
     if (!curIndex.isValid())
-        currentCollPath = this->conn->rodsHome();
+        currentCollPath = this->session->rodsHome();
 
     else {
         // get selected item and its parent item
@@ -814,15 +814,15 @@ void RodsMainWindow::refreshResources()
 {
     int status = 0;
 
-    // sanity checks for a ready connection
-    if (!this->conn || !this->conn->isReady())
+    // sanity checks for a ready session
+    if (!this->session || !this->session->isReady())
         return;
 
-    std::string defResc = this->conn->rodsDefResc();
+    std::string defResc = this->session->rodsDefResc();
     this->currentResc = defResc;
 
     // setup a genquery for resource names and comments
-    Kanki::RodsGenQuery rescQuery(this->conn);
+    Kanki::RodsGenQuery rescQuery(this->session);
     rescQuery.addQueryAttribute(COL_R_RESC_NAME);
     rescQuery.addQueryAttribute(COL_R_RESC_COMMENT);
     rescQuery.addQueryAttribute(COL_R_RESC_PARENT);
@@ -912,7 +912,7 @@ void RodsMainWindow::openFindWindow()
     // create and setup new instance if necessary
     if (!this->findWindow)
     {
-        this->findWindow = new RodsFindWindow(this->conn);
+        this->findWindow = new RodsFindWindow(this->session);
 
         connect(this->findWindow, &RodsFindWindow::unregister,
                 this, &RodsMainWindow::unregisterFindWindow);

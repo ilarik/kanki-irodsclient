@@ -23,9 +23,9 @@ const char *RodsObjMetadata::AddOperation = "add";
 const char *RodsObjMetadata::ModOperation = "mod";
 const char *RodsObjMetadata::RmOperation = "rm";
 
-RodsObjMetadata::RodsObjMetadata(Kanki::RodsConnection *theConn, RodsObjEntryPtr theObjEntry)
+RodsObjMetadata::RodsObjMetadata(Kanki::RodsSession *theSession, RodsObjEntryPtr theObjEntry)
 {
-    this->conn = theConn;
+    this->session = theSession;
     this->objEntry = theObjEntry;
 }
 
@@ -57,7 +57,7 @@ int RodsObjMetadata::refresh()
 
 	using row_type = irods::query<rcComm_t>::value_type;
 
-	for (const row_type &row : qb().build(*(this->conn->commPtr()), queryString))
+	for (const row_type &row : qb().build(*(this->session->commPtr()), queryString))
 	    this->addToStore(row.at(0), row.at(1), row.at(2));
     } catch (const irods::exception &e) {
 	status = e.code();
@@ -140,7 +140,7 @@ int RodsObjMetadata::addAttribute(std::string attrName, std::string attrValue, s
     mod.arg9 = (char*)"";
 
     // execute metadata add thru rods api
-    if ((status = rcModAVUMetadata(this->conn->commPtr(), &mod)) < 0)
+    if ((status = rcModAVUMetadata(this->session->commPtr(), &mod)) < 0)
     {
         // return error code to caller
         return (status);
@@ -201,7 +201,7 @@ int RodsObjMetadata::modifyAttribute(std::string attrName, std::string valueStr,
     }
 
     // execute metadata update thru rods api
-    if ((status = rcModAVUMetadata(this->conn->commPtr(), &mod)) < 0)
+    if ((status = rcModAVUMetadata(this->session->commPtr(), &mod)) < 0)
     {
         // in the case of failure, return error code
         return (status);
@@ -259,7 +259,7 @@ int RodsObjMetadata::removeAttribute(std::string attrName, std::string valueStr,
     remove.arg9 = (char*)"";
 
     // execute metadata removal thru rods api
-    if ((status = rcModAVUMetadata(this->conn->commPtr(), &remove)) < 0)
+    if ((status = rcModAVUMetadata(this->session->commPtr(), &remove)) < 0)
     {
         return (status);
     }
