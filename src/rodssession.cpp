@@ -217,6 +217,40 @@ int RodsSession::disconnect(bool force)
     return (status);
 }
 
+int RodsSession::refreshResourceTable()
+{
+    int status = 0;
+
+    std::string queryStr = "SELECT RESC_ID, RESC_PARENT, RESC_NAME, RESC_LOC, RESC_COMMENT";
+	
+    try {
+	using query_builder = irods::experimental::query_builder;
+	using row_type = irods::query<rcComm_t>::value_type;
+	
+	for (const row_type &row : query_builder().build(*(this->rodsCommPtr), queryStr))
+	{
+	    unsigned long id = row.at(0).size() ? std::stoul(row.at(0)) : 0;
+	    unsigned long parent_id = row.at(1).size() ? std::stoul(row.at(1)) : 0;
+	    
+	    rescTable[id] = Kanki::RodsSession::Resource{id,
+							 parent_id,
+							 row.at(2),
+							 row.at(3),
+							 row.at(4)};
+	}
+    }
+    catch (const irods::exception &e) 
+    {
+	status = e.code();
+    }
+    catch (const std::exception &e)
+    {
+	status = SYS_INTERNAL_ERR;
+    }
+
+    return (status);
+}
+
 int RodsSession::makeColl(const std::string &collPath, bool makeRecursive)
 {
     int status = 0;

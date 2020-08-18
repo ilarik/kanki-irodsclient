@@ -811,70 +811,28 @@ void RodsMainWindow::showAbout()
 
 void RodsMainWindow::refreshResources()
 {
-    int status = 0;
+    // sanity checks
+    if (this->session && this->session->isReady())
+    {
+	int status = 0;
+	
+	std::string defResc = this->session->rodsDefResc();
+	this->currentResc = defResc;
+	
+	if ((status = this->session->refreshResourceTable()) < 0)
+	{
+	    this->reportError("Error while refreshing available iRODS storage resources",
+			      "iRODS query error", status);
+	    return;
+	}
 
-    // sanity checks for a ready session
-    if (!this->session || !this->session->isReady())
-        return;
+	for (auto&& [id, resc] : this->session->resourceTable())
+	{
+	    if (id && !resc.parent_id && resc.name != "bundleResc")
+		this->ui->storageResc->addItem(resc.name.c_str(), resc.name.c_str());
+	}
 
-    std::string defResc = this->session->rodsDefResc();
-    this->currentResc = defResc;
-
-    // setup a genquery for resource names and comments
-    Kanki::RodsGenQuery rescQuery(this->session);
-    rescQuery.addQueryAttribute(COL_R_RESC_NAME);
-    rescQuery.addQueryAttribute(COL_R_RESC_COMMENT);
-    rescQuery.addQueryAttribute(COL_R_RESC_PARENT);
-
-    // we omit bundleResc
-    rescQuery.addQueryCondition(COL_R_RESC_NAME, Kanki::RodsGenQuery::isNotEqual,
-                                "bundleResc");
-
-    // try to execute genquery
-    if ((status = rescQuery.execute()) < 0)
-        this->reportError("Error while refreshing available iRODS storage resources",
-                         "iRODS GenQuery error", status);
-
-    // on success, add found resources with their comments to the combo box
-    else {
-        std::vector<std::string> resources = rescQuery.getResultSetForAttr(COL_R_RESC_NAME);
-        std::vector<std::string> comments = rescQuery.getResultSetForAttr(COL_R_RESC_COMMENT);
-        std::vector<std::string> parents = rescQuery.getResultSetForAttr(COL_R_RESC_PARENT);
-
-        for (unsigned int i = 0; i < resources.size() && i < comments.size() && i < parents.size(); i ++)
-        {
-            QString parentStr = parents.at(i).c_str();
-
-            if (!parentStr.length())
-            {
-                QString rescStr = resources.at(i).c_str();
-                QString rescDesc = rescStr;
-
-                // add comment if there is one and truncate long ones
-                if (comments.at(i).length())
-                {
-                    rescDesc += " (";
-
-                    if (comments.at(i).length() > 32)
-                        rescDesc += comments.at(i).substr(0,31).c_str() + QString("...");
-
-                    else
-                        rescDesc += comments.at(i).c_str();
-
-                    rescDesc += QString(")");
-                }
-
-                // add new item and select it if it's the user default
-                this->ui->storageResc->addItem(rescDesc, rescStr);
-
-                // select (first by default) or user-defined default resource
-                if ((i == 0) || (!defResc.compare(resources.at(i))))
-                {
-                    this->ui->storageResc->setCurrentIndex(i);
-                    this->currentResc = rescStr.toStdString();
-                }
-            }
-        }
+	this->ui->storageResc->setCurrentText(defResc.c_str());  
     }
 }
 

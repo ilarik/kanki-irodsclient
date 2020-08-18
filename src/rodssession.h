@@ -51,45 +51,50 @@
 #include "authPluginRequest.h"
 #include "irods_kvp_string_parser.hpp"
 
+// fmt library
+#include "fmt/format.h"
+
 // new-age iRODS headers
 #include "filesystem.hpp"
 #include "transport/default_transport.hpp"
 #include "thread_pool.hpp"
 #include "connection_pool.hpp"
+#include "query_builder.hpp"
 
 // Kanki iRODS C++ class library headers
 #include "rodsobjentry.h"
 
 namespace Kanki {
-    
+
 class RodsSession
 {
 
 public:
-
+    
     // import types for connection pool
     using connection_pool_ptr = std::shared_ptr<irods::connection_pool>;
     using connection_proxy = irods::connection_pool::connection_proxy;
-
+    
     // import types for thread pool
     using thread_pool_ptr = std::unique_ptr<irods::thread_pool>;
-
+    
     // local type for a resource
     struct Resource
     {
+	unsigned long id;
+	unsigned long parent_id;
 	std::string name;
-	std::string parent;
 	std::string host;
 	std::string comment;
     };
-
+    
     // local type for a resource table
-    using ResourceTable = std::map<std::string, Kanki::RodsSession::Resource>;
-
+    using ResourceTable = std::map<unsigned long, Kanki::RodsSession::Resource>;
+    
     // Constructor for instantiating a new session object, optionally identical with
     // respect to the parameters of the session object pointed by argument sessPtr.
     RodsSession(const RodsSession *sessPtr = nullptr);
-
+    
     // Destructor to disconnect and clean up.
     ~RodsSession();
 
@@ -97,16 +102,16 @@ public:
     // session object for session parameters from the iRODS user environment if
     // no session parameters have been provided.
     int connect();
-
+    
     // For an established connection, executes iRODS protocol user authentication procedure
     // according to provided credentials. By default uses iRODS user environment.
     int login(const std::string &authScheme = "",
 	      const std::string &userName = "",
 	      const std::string &password = "");
-
+    
     // Disconnects from the iRODS server.
     int disconnect(bool force = false);
-
+    
     // Interface for querying whether the connection object is fully ready to be used, i.e.
     // connection was successful and user authentication is complete.
     bool isReady() const
@@ -191,7 +196,7 @@ public:
     {
 	return std::string(this->rodsUserEnv.rodsDefResource);
     }
-
+    
     // Interface for querying the iRODS authentication scheme used, provides a C++ std string copy
     // of the rods api provided C string.
     std::string rodsAuthScheme() const
@@ -262,22 +267,31 @@ public:
     // Renames an iRODS object to newName.
     int renameObj(Kanki::RodsObjEntryPtr objEntry, const std::string &newName);
 
-    // Schedules a task to the thread pool
+    // Refreshes the resource table from the catalog.
+    int refreshResourceTable();
+
+    // Schedules a task to the thread pool.
     void scheduleTask(std::function<void()> callback)
     {
 	irods::thread_pool::post(*(this->thread_pool), callback);
     }
 
-    // Returns a proxy object to an available iRODS connection from the pool
+    // Returns a proxy object to an available iRODS connection from the pool.
     connection_proxy getConnection()
     {
 	return (this->conn_pool->get_connection());
+    }
+    
+    // Gets a const reference to the resource table.
+    const ResourceTable& resourceTable() const
+    {
+	return (this->rescTable);
     }
 
     // We deny assignments, moving and copying of the object
     RodsSession(RodsSession &) = delete;
     RodsSession& operator=(RodsSession &) = delete;
-
+    
     // Default values for some tunables
     static constexpr uint32_t numThreads = 16;
     static constexpr uint32_t refreshTime = 600;
@@ -302,6 +316,9 @@ private:
 
     // a connection pool for iRODS connections
     connection_pool_ptr conn_pool;
+
+    // hash table for storage resources
+    ResourceTable rescTable;
 
     // rods api communications pointer
     rcComm_t *rodsCommPtr;
