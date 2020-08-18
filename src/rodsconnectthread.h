@@ -3,10 +3,10 @@
  * @brief Definition of class RodsConnectThread
  *
  * The RodsConnectThread class extends the Qt thread management class
- * QThread and implements a worker thread for establishing a
- * connection to an iRODS server.
+ * QThread and implements a worker thread for establishing a set of
+ * connections to an iRODS service.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -50,7 +50,7 @@ signals:
 
     // Qt signal for signaling out a session object pointer for
     // a successful iRODS connection.
-    void setConnection(Kanki::RodsSession *session);
+    void setSession(Kanki::RodsSession *session);
 
     // Qt signal for reporting errors in the connection process,
     // signals out strings for a message, error message and error code.

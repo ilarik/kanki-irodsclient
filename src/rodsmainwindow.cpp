@@ -5,7 +5,7 @@
  * The RodsMainWindow class extends the Qt window class QMainWindow
  * and implements an iRODS Grid Browser window.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -110,9 +110,9 @@ void RodsMainWindow::closeEvent(QCloseEvent *event)
     qApp->quit();
 }
 
-void RodsMainWindow::setConnection(Kanki::RodsSession *newSession)
+void RodsMainWindow::setSession(Kanki::RodsSession *newSession)
 {
-    // set connection pointer to new connection
+    // simply (re)set session pointer
     this->session = newSession;
 }
 
@@ -563,8 +563,8 @@ void RodsMainWindow::doRodsConnect()
             &RodsMainWindow::setProgress);
     connect(connThread, &RodsConnectThread::reportError, this,
             &RodsMainWindow::reportError);
-    connect(connThread, &RodsConnectThread::setConnection, this,
-            &RodsMainWindow::setConnection);
+    connect(connThread, &RodsConnectThread::setSession, this,
+            &RodsMainWindow::setSession);
 
     // when failure is reported enter disconnected state
     connect(connThread, &RodsConnectThread::failure, this,

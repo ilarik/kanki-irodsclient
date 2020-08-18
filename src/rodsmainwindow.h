@@ -5,7 +5,7 @@
  * The RodsMainWindow class extends the Qt window class QMainWindow
  * and implements an iRODS Grid Browser window.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -103,8 +103,8 @@ public slots:
     // Qt slot for reporting an error with a message string, error string and error code.
     void reportError(QString msgStr, QString errorStr, int errorCode);
 
-    // Qt slot for setting the Kanki rods connection object for the grid browser window.
-    void setConnection(Kanki::RodsSession *newConn);
+    // Qt slot for setting the Kanki session object for the grid browser window.
+    void setSession(Kanki::RodsSession *newSession);
 
     // Qt slot for unregistering a metadata editor window from the grid browser window.
     void unregisterMetadataWindow(std::string objPath);
