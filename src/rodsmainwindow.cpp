@@ -118,10 +118,10 @@ void RodsMainWindow::setSession(Kanki::RodsSession *newSession)
 
 void RodsMainWindow::enterConnectedState()
 {
-    std::string statusMsg = "Connected to iRODS server ";
+    std::string statusMsg = "Connected to iRODS endpoint: ";
     statusMsg += this->session->rodsHost();
 
-    // display authentication scheme used
+    statusMsg += " - connection pool size: " + std::to_string(Kanki::RodsSession::numThreads);
     statusMsg += " - authentication scheme: " + this->session->rodsAuthScheme();
 
     // if the connection is SSL enabled, get info
