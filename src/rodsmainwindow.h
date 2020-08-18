@@ -265,12 +265,12 @@ private:
     // a container of metadata window object pointers
     std::map<std::string, RodsMetadataWindow*> metaEditors;
 
-    // our object tree model instance
-    RodsObjTreeModel *model;
-
     // pointer to rods session object
     Kanki::RodsSession *session;
 
+    // our object tree model instance
+    RodsObjTreeModel *model;
+ 
     // settings from the gui
     bool verifyChecksum, allowOverwrite;
 

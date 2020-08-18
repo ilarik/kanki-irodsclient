@@ -22,14 +22,13 @@
 
 RodsMainWindow::RodsMainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::RodsMainWindow)
+    ui(new Ui::RodsMainWindow),
+    queueWindow(nullptr),
+    findWindow(nullptr),
+    session(nullptr),
+    model(nullptr)
 {
-    this->session = nullptr;
-    this->queueWindow = nullptr;
-    this->findWindow = nullptr;
-    this->model = nullptr;
-
-    // instantiate and configure Qt UI
+    // instantiate and configure generated UI
     this->ui->setupUi(this);
 
     // set initial settings
