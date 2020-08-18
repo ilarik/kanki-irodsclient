@@ -23,7 +23,7 @@ void RodsConnectThread::run()
     Kanki::RodsSession *newSession = nullptr;
     int status = 0;
 
-    progressUpdate("Establishing iRODS connection pool...", 1);
+    progressMarquee("Establishing iRODS connection pool...");
     newSession = new Kanki::RodsSession();
 
     // try to connect to the iRODS server
@@ -41,7 +41,7 @@ void RodsConnectThread::run()
 
     // second phase - user authentication
     else {
-        progressUpdate("Authenticating...", 2);
+        progressMarquee("Authenticating...");
 
         // try to authenticate while reporting error trough ui
         if ((status = newSession->login()) < 0)

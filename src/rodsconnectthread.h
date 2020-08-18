@@ -39,6 +39,9 @@ signals:
     // current text message and current progress value.
     void progressUpdate(QString text, int progress);
 
+    // Qt signal for switching the progres bar display into marquee mode.
+    void progressMarquee(QString text);
+
     // Qt signal for signaling out a successful connection process.
     void success();
 

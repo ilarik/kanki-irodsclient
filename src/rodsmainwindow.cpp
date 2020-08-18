@@ -559,8 +559,8 @@ void RodsMainWindow::doRodsConnect()
     RodsConnectThread *connThread = new RodsConnectThread();
 
     // connect connect thread signals to main window slots
-    connect(connThread, &RodsConnectThread::progressUpdate, this,
-            &RodsMainWindow::setProgress);
+    connect(connThread, &RodsConnectThread::progressMarquee, this,
+	    &RodsMainWindow::setProgressMarquee);
     connect(connThread, &RodsConnectThread::reportError, this,
             &RodsMainWindow::reportError);
     connect(connThread, &RodsConnectThread::setSession, this,
