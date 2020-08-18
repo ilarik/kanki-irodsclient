@@ -594,7 +594,7 @@ void RodsMainWindow::doRodsConnect()
             &QThread::terminate);
 
     // enter into a modal state and start worker thread
-    this->startModalProgressDialog("Preparing to Connect...", 1, 3);
+    this->startModalProgressDialog("Preparing to Connect...", 0, 0);
     connThread->start();
 }
 
