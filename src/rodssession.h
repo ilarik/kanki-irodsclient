@@ -66,12 +66,25 @@ class RodsSession
 {
 
 public:
+
     // import types for connection pool
     using connection_pool_ptr = std::shared_ptr<irods::connection_pool>;
     using connection_proxy = irods::connection_pool::connection_proxy;
 
     // import types for thread pool
     using thread_pool_ptr = std::unique_ptr<irods::thread_pool>;
+
+    // local type for a resource
+    struct Resource
+    {
+	std::string name;
+	std::string parent;
+	std::string host;
+	std::string comment;
+    };
+
+    // local type for a resource table
+    using ResourceTable = std::map<std::string, Kanki::RodsSession::Resource>;
 
     // Constructor for instantiating a new session object, optionally identical with
     // respect to the parameters of the session object pointed by argument sessPtr.
@@ -87,7 +100,9 @@ public:
 
     // For an established connection, executes iRODS protocol user authentication procedure
     // according to provided credentials. By default uses iRODS user environment.
-    int login(const std::string &authScheme = "", const std::string &userName = "", const std::string &password = "");
+    int login(const std::string &authScheme = "",
+	      const std::string &userName = "",
+	      const std::string &password = "");
 
     // Disconnects from the iRODS server.
     int disconnect(bool force = false);
@@ -273,9 +288,11 @@ public:
     static constexpr char *signatureStr = "kanki";
 
 private:
-    
+
     // Authenticates the user against the iRODS server in a new connection.
-    int authenticate(const std::string &authScheme = "", const std::string &userName = "", const std::string &password = "");
+    int authenticate(const std::string &authScheme = "",
+		     const std::string &userName = "", 
+		     const std::string &password = "");
 
     // a mutex to provide locking for the TCP connection data stream
     std::mutex commMutex;
