@@ -23,7 +23,7 @@ void RodsConnectThread::run()
     Kanki::RodsSession *newSession = nullptr;
     int status = 0;
 
-    progressUpdate("Establishing an iRODS connection pool...", 1);
+    progressUpdate("Establishing iRODS connection pool...", 1);
     newSession = new Kanki::RodsSession();
 
     // try to connect to the iRODS server
