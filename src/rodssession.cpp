@@ -70,7 +70,7 @@ int RodsSession::connect()
 								   this->rodsUserEnv.rodsUserName,
 								   this->rodsUserEnv.rodsZone,
 								   Kanki::RodsSession::refreshTime);
-    } 
+    }
     catch (const std::runtime_error &e) 
     {
 	// TODO: FIXME!
@@ -107,7 +107,7 @@ int RodsSession::login(const std::string &authScheme, const std::string &userNam
       if ((status = this->authenticate(authScheme, userName, password)) != 0)
         {
 	  rcDisconnect(this->rodsCommPtr);
-	  this->rodsCommPtr = NULL;
+	  this->rodsCommPtr = nullptr;
         }
     }
 
@@ -116,11 +116,12 @@ int RodsSession::login(const std::string &authScheme, const std::string &userNam
 
 int RodsSession::authenticate(const std::string &authScheme, const std::string &userName, const std::string &password)
 {
-    std::string scheme;
     irods::error status;
+
+    std::string scheme;
     std::string context;
 
-    if (this->commPtr() == NULL)
+    if (this->commPtr() == nullptr)
         return (-1);
 
     if (this->commPtr()->loggedIn)
@@ -164,32 +165,29 @@ int RodsSession::authenticate(const std::string &authScheme, const std::string &
     //    //irods::pam_auth_object_ptr pamPtr = boost::dynamic_pointer_cast<
     // }
 
-    status = authPlugin->call<rcComm_t*, const char*>(NULL, irods::AUTH_CLIENT_START, authObj, this->rodsCommPtr, context.c_str());
+    status = authPlugin->call<rcComm_t*, const char*>(nullptr, irods::AUTH_CLIENT_START, authObj, this->rodsCommPtr, context.c_str());
 
     if (!status.ok())
         return (status.code());
 
-    status = authPlugin->call<rcComm_t*>(NULL, irods::AUTH_CLIENT_AUTH_REQUEST, authObj, this->rodsCommPtr);
+    status = authPlugin->call<rcComm_t*>(nullptr, irods::AUTH_CLIENT_AUTH_REQUEST, authObj, this->rodsCommPtr);
 
     if (!status.ok())
         return (status.code());
 
-    status = authPlugin->call(NULL, irods::AUTH_ESTABLISH_CONTEXT, authObj);
+    status = authPlugin->call(nullptr, irods::AUTH_ESTABLISH_CONTEXT, authObj);
 
     if (!status.ok())
         return (status.code());
 
-    status = authPlugin->call<rcComm_t*>(NULL, irods::AUTH_CLIENT_AUTH_RESPONSE, authObj, this->rodsCommPtr);
+    status = authPlugin->call<rcComm_t*>(nullptr, irods::AUTH_CLIENT_AUTH_RESPONSE, authObj, this->rodsCommPtr);
 
     if (!status.ok())
         return (status.code());
-
 
     // if we got here, success
     this->rodsCommPtr->loggedIn = 1;
     return (0);
-
-    //return (clientLogin(this->rodsCommPtr));
 }
 
 int RodsSession::disconnect(bool force)
