@@ -271,7 +271,7 @@ public:
     // Schedules a task to the thread pool.
     void scheduleTask(std::function<void()> callback)
     {
-	irods::thread_pool::post(*(this->thread_pool), callback);
+	irods::thread_pool::post(*(this->tank), callback);
     }
 
     // Returns a proxy object to an available iRODS connection from the pool.
@@ -310,7 +310,7 @@ private:
     std::mutex commMutex;
 
     // a thread pool for worker threads
-    thread_pool_ptr thread_pool;
+    thread_pool_ptr tank;
 
     // a connection pool for iRODS connections
     connection_pool_ptr connPool;

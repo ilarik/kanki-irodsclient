@@ -38,8 +38,8 @@ RodsSession::RodsSession(const RodsSession *sessPtr)
     // set client signature oldskool
     mySetenvStr(SP_OPTION, Kanki::RodsSession::signatureStr);
 
-    // acquire thread pool
-    thread_pool = std::make_unique<irods::thread_pool>(Kanki::RodsSession::numThreads);
+    // acquire session-wide thread pool
+    tank = std::make_unique<irods::thread_pool>(Kanki::RodsSession::numThreads);
 }
 
 RodsSession::~RodsSession()
