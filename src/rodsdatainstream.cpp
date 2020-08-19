@@ -20,10 +20,10 @@
 namespace Kanki {
 
 RodsDataInStream::RodsDataInStream(RodsSession *theSession, RodsObjEntryPtr theObjEntry)
-    : RodsDataStream(theSession)
+    : RodsDataStream(theSession),
+      entPtr(theObjEntry),
+      portalParams(nullptr)
 {
-    this->entPtr = theObjEntry;
-    this->portalParams = nullptr;
 }
 
 RodsDataInStream::~RodsDataInStream()
@@ -217,7 +217,7 @@ const char* RodsDataInStream::checksum() const
 
 bool RodsDataInStream::parallelXferPortalAvail() const
 {
-    // return ((this->portalParams->numThreads > 0));
+    // we don't support the old parallel transfer
     return (false);
 }
 

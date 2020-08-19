@@ -5,7 +5,7 @@
  * The RodsDataOutStream class in Kanki provides an interface to the
  * iRODS protocol streaming write operations.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -34,11 +34,12 @@ public:
     // object for writing.
     int openDataObj();
 
+    // we deny copying and substitution
+    RodsDataOutStream(RodsDataOutStream &) = delete;
+    RodsDataOutStream& operator=(RodsDataOutStream &) = delete;
+
 private:
 
-    // we deny copying and substitution
-    RodsDataOutStream(RodsDataOutStream &);
-    RodsDataOutStream& operator=(RodsDataOutStream &);
 };
 
 } // namespace Kanki

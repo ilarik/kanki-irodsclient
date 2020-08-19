@@ -5,7 +5,7 @@
  * The RodsDataInStream class in Kanki provides an interface to the
  * iRODS protocol streaming read operations.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -36,7 +36,6 @@ class RodsDataInStream : public RodsDataStream
 public:
 
     RodsDataInStream(RodsSession *theSession, RodsObjEntryPtr theObjEntry);
-
     ~RodsDataInStream();
 
     // Overrides superclass virtual function, open the iRODS data object
@@ -68,11 +67,11 @@ public:
     // Interface for accessing the bare C string of the checksum string data.
     const char* checksum() const;
 
-private:
-
     // we deny copying and the substitution operation
-    RodsDataInStream(RodsDataInStream &);
-    RodsDataInStream& operator=(RodsDataInStream &);
+    RodsDataInStream(RodsDataInStream &) = delete;
+    RodsDataInStream& operator=(RodsDataInStream &) = delete;
+
+private:
 
     // read only to internal buffer
     int read(size_t len);
