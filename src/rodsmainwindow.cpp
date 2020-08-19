@@ -54,32 +54,27 @@ RodsMainWindow::RodsMainWindow(QWidget *parent) :
 
 RodsMainWindow::~RodsMainWindow()
 {
-    // if there is a connection object
-    if (this->session)
-    {
-        // disconnect from iRODS server
-        this->session->disconnect();
-
-        delete (this->session);
-    }
-
-    // delete object tree model if exists
+    // destroy queue window if exists
+    if (this->queueWindow)
+        delete (this->queueWindow);
+    
+    // destroy all metadata editors
+    for (auto&& [idx, window] : this->metaEditors)
+	delete (window);
+    
+    // destroy object tree model if exists
     if (this->model)
         delete (this->model);
 
-    // delete queue window if exists
-    if (this->queueWindow)
-        delete (this->queueWindow);
+    // destroy find findow if exists
+    if (this->findWindow)
+	delete (this->findWindow);
 
-    // delete all metadata editors
-    for (std::map<std::string, RodsMetadataWindow*>::iterator i = this->metaEditors.begin();
-         i != this->metaEditors.end(); i++)
-    {
-        RodsMetadataWindow *window = i->second;
-        delete (window);
-    }
+    // destroy session if there is one
+    if (this->session)
+        delete (this->session);
 
-    // tear down ui
+    // destroy ui
     delete (this->ui);
 }
 
