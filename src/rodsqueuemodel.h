@@ -5,7 +5,7 @@
  * The RodsQueueModel class extends the Qt model class QAbstractTableModel
  * and implements a model for the iRODS rule exec queue. Quick and dirty.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -26,9 +26,11 @@
 #include <QMessageBox>
 #include <QTimer>
 
+// new-age iRODS headers
+#include "query_builder.hpp"
+
 // Kanki iRODS C++ class library headers
 #include "rodssession.h"
-#include "_rodsgenquery.h"
 
 class RodsQueueModel : public QAbstractTableModel
 {
@@ -66,21 +68,26 @@ public slots:
 
     // Refreshes model data from iRODS via a GenQuery and resets model.
     void refreshQueue();
-
+    
 private:
-
+    
     // Qt timer object pointer for periodical refreshing of model data
     QTimer *timer;
-
+    
     // pointer to rods connection object for communications
     Kanki::RodsSession *session;
-
+    
     // simple STL instantiated container for model data
     std::vector< std::vector< std::string> > queueData;
 
-    // static class data for model column configuration
-    static const char *columnNames[];
-    static const int numColumns;
+    // set model column count to static value
+    static constexpr int numColumns = 12;
+
+    // set model column names to static values
+    static constexpr char *columnNames[] = { "ID", "Name", "Rule Exec Info File Path",
+					     "User Name", "Address", "Time", "Frequency",
+					     "Priority", "Estimated Exec Time", "Notification Address",
+					     "Last Exec Time", "Status" };
 };
 
 #endif // RODSQUEUEMODEL_H

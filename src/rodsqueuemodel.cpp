@@ -5,7 +5,7 @@
  * The RodsQueueModel class extends the Qt model class QAbstractTableModel
  * and implements a model for the iRODS rule exec queue. Quick and dirty.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -17,25 +17,13 @@
 // application class RodsQueueModel header
 #include "rodsqueuemodel.h"
 
-// set model column count to static value
-const int RodsQueueModel::numColumns = 12;
-
-// set model column names to static values
-const char *RodsQueueModel::columnNames[numColumns] = { "ID", "Name", "Rule Exec Info File Path",
-                                                        "User Name", "Address", "Time", "Frequency",
-                                                        "Priority", "Estimated Exec Time", "Notification Address",
-                                                        "Last Exec Time", "Status" };
-
 RodsQueueModel::RodsQueueModel(Kanki::RodsSession *theSession, QObject *parent) :
     QAbstractTableModel(parent)
 {
     // set session pointer
     session = theSession;
 
-    // initialize queue model with a refresh
-    refreshQueue();
-
-    // create a timer object to refresh every second
+    // create a timer object to refresh in every two seconds
     timer = new QTimer(this);
     timer->setInterval(1000);
 
@@ -78,12 +66,12 @@ QVariant RodsQueueModel::data(const QModelIndex &index, int role) const
         if (role == Qt::DisplayRole)
         {
             // check boundaries for index row and column
-            if (index.column() < (int)queueData.size())
+            if (index.row() < (int)queueData.size())
             {
-                if (index.row() < (int)queueData.at(index.column()).size())
+                if (index.column() < (int)queueData.at(index.row()).size())
                 {
                     // simply return raw data, TODO: return formatted data
-                    return (QVariant(queueData.at(index.column()).at(index.row()).c_str()));
+                    return (QVariant(queueData.at(index.row()).at(index.column()).c_str()));
                 }
             }
         }
@@ -123,47 +111,51 @@ Qt::ItemFlags RodsQueueModel::flags(const QModelIndex &index) const
 void RodsQueueModel::refreshQueue()
 {
     int status = 0;
+    QString errStr;
 
-    // initialize new rods gen query object
-    Kanki::RodsGenQuery query(this->session);
+    // we get all the rule exec queue attrs
+    std::string queryStr = "SELECT RULE_EXEC_ID, RULE_EXEC_NAME, RULE_EXEC_REI_FILE_PATH, RULE_EXEC_USER_NAME, "
+	"RULE_EXEC_ADDRESS, RULE_EXEC_TIME, RULE_EXEC_FREQUENCY, RULE_EXEC_PRIORITY, RULE_EXEC_ESTIMATED_EXE_TIME, "
+	"RULE_EXEC_NOTIFICATION_ADDR, RULE_EXEC_LAST_EXE_TIME, RULE_EXEC_STATUS";
 
-    // set gen query attributes
-    query.addQueryAttribute(COL_RULE_EXEC_ID);
-    query.addQueryAttribute(COL_RULE_EXEC_NAME);
-    query.addQueryAttribute(COL_RULE_EXEC_REI_FILE_PATH);
-    query.addQueryAttribute(COL_RULE_EXEC_USER_NAME);
-    query.addQueryAttribute(COL_RULE_EXEC_ADDRESS);
-    query.addQueryAttribute(COL_RULE_EXEC_TIME);
-    query.addQueryAttribute(COL_RULE_EXEC_FREQUENCY);
-    query.addQueryAttribute(COL_RULE_EXEC_PRIORITY);
-    query.addQueryAttribute(COL_RULE_EXEC_ESTIMATED_EXE_TIME);
-    query.addQueryAttribute(COL_RULE_EXEC_NOTIFICATION_ADDR);
-    query.addQueryAttribute(COL_RULE_EXEC_LAST_EXE_TIME);
-    query.addQueryAttribute(COL_RULE_EXEC_STATUS);
+    // query into temp storage
+    std::vector<std::vector<std::string>> tempData;
 
-    // set query condition, user name
-    query.addQueryCondition(COL_RULE_EXEC_USER_NAME, Kanki::RodsGenQuery::isEqual, session->rodsUser());
+    try {
+	using query_builder = irods::experimental::query_builder;
+	using row_type = irods::query<rcComm_t>::value_type;
+	
+	for (const row_type &row : query_builder().build(*(this->session->commPtr()), queryStr))
+	    tempData.push_back(row);
 
-    // try to execute rods gen query
-    if ((status = query.execute()) < 0)
+    }
+    catch (const irods::exception &e)
     {
-        // when query fails, stop timer if it exists
+	status = e.code();
+	errStr = "iRODS API error in rule exec queue refresh" + QVariant(status).toString();
+    }
+    catch (const std::exception &e)
+    {
+	status = SYS_INTERNAL_ERR;
+	errStr = "Client-side internal error in rule exec queue refresh" + QVariant(status).toString();
+    }
+    
+    // report errors to UI
+    if (status < 0)
+    {
+	// if query fails, stop timer! 
         if (this->timer)
             this->timer->stop();
-
-        // report error via a message box
+	
+	// report error via a message box
         QMessageBox errMsg;
-        QString errStr = "iRODS api error in queue model refresh " + QVariant(status).toString();
-
         errMsg.setText(errStr);
         errMsg.setIcon(QMessageBox::Critical);
         errMsg.exec();
     }
-
-    // on success, get results and signal for data change (all data)
-    else {
-        beginResetModel();
-        queueData = query.getResultSet();
-        endResetModel();
-    }
+    
+    // make data live
+    beginResetModel();
+    this->queueData = tempData;
+    endResetModel();
 }
