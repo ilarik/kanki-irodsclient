@@ -293,10 +293,10 @@ public:
     RodsSession& operator=(RodsSession &) = delete;
     
     // Default values for some tunables
-    static constexpr uint32_t numThreads = 16;
-    static constexpr uint32_t refreshTime = 600;
-    static constexpr uint32_t minBlkSize = 262144;
-    static constexpr uint64_t xferBlkSize = 16777216;
+    static constexpr unsigned numThreads = 16;
+    static constexpr unsigned refreshTime = 600;
+    static constexpr unsigned minBlkSize = 262144;
+    static constexpr unsigned long xferBlkSize = 16777216;
     
     // Client signature string passed via the iRODS RPC API
     static constexpr char *signatureStr = "kanki";
