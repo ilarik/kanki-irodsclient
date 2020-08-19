@@ -20,6 +20,7 @@
 // C++ standard library headers
 #include <vector>
 #include <string>
+#include <mutex>
 
 // Qt framework headers
 #include <QAbstractTableModel>
@@ -78,6 +79,9 @@ private:
     
     // pointer to rods connection object for communications
     Kanki::RodsSession *session;
+    
+    // lock for updating the data
+    std::mutex updateMutex;
     
     // simple container for model data
     std::vector<row_type> queueData;

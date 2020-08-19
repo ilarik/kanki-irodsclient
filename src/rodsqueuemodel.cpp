@@ -151,7 +151,10 @@ void RodsQueueModel::refreshQueue()
         errMsg.setIcon(QMessageBox::Critical);
         errMsg.exec();
     }
-    
+
+    // threads will be held off here
+    std::lock_guard mutexGuard(this->updateMutex);
+   
     // make data live
     beginResetModel();
     this->queueData = tempData;
