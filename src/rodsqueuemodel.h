@@ -38,10 +38,7 @@ class RodsQueueModel : public QAbstractTableModel
 
 public:
 
-    // Constructor requires a rods connection object pointer as an arument
-    // and optionally a Qt parent object pointer.
-    explicit RodsQueueModel(Kanki::RodsSession *theSession, QObject *parent = 0);
-
+    explicit RodsQueueModel(Kanki::RodsSession *theSession, QObject *parent = nullptr);
     ~RodsQueueModel();
 
     // Overrides superclass virtual function for querying model data with
@@ -66,10 +63,12 @@ public:
 
 public slots:
 
-    // Refreshes model data from iRODS via a GenQuery and resets model.
-    void refreshQueue();
-    
+    void invokeRefresh();
+
 private:
+
+    // Refreshes model data from iRODS via an iRODS query and resets model.
+    void refreshQueue();
     
     // Qt timer object pointer for periodical refreshing of model data
     QTimer *timer;

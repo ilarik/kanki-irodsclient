@@ -5,7 +5,7 @@
  * The RodsQueueWindow class extends Qt widget class QWidget and implements
  * a simple window for iRODS rule exec queue viewing.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -22,16 +22,16 @@
 
 RodsQueueWindow::RodsQueueWindow(Kanki::RodsSession *theSession, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::RodsQueueWindow)
+    ui(new Ui::RodsQueueWindow),
+    session(theSession),
+    queue(new RodsQueueModel(session))
 {
-    // set session pointer and create new queue model
-    this->session = theSession;
-    this->queue = new RodsQueueModel(session);
-
-    // setup qt ui, instantiate and confgure ui objects
+    // setup all the UI
     this->ui->setupUi(this);
+   
     this->ui->queueTable->setModel(queue);
     this->ui->queueTable->resizeColumnsToContents();
+    this->ui->queueTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 RodsQueueWindow::~RodsQueueWindow()
