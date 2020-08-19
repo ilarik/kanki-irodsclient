@@ -19,6 +19,7 @@
 
 // Qt framework headers
 #include <QWidget>
+#include <QCloseEvent>
 
 // Kanki iRODS C++ class library headers
 #include "rodssession.h"
@@ -37,10 +38,7 @@ class RodsQueueWindow : public QWidget
 
 public:
 
-    // Constructor requires a rods connection object pointer as an argument
-    // and optionally a parent widget pointer.
-    explicit RodsQueueWindow(Kanki::RodsSession *theSession, QWidget *parent = 0);
-
+    explicit RodsQueueWindow(Kanki::RodsSession *theSession, QWidget *parent = nullptr);
     ~RodsQueueWindow();
 
 signals:

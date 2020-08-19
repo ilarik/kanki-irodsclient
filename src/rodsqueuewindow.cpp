@@ -42,7 +42,7 @@ RodsQueueWindow::~RodsQueueWindow()
 
 void RodsQueueWindow::closeEvent(QCloseEvent *event)
 {
-    (void)event;
+    event->accept();
 
     // signal out unregistering
     this->unregister();
