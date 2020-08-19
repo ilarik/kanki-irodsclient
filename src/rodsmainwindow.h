@@ -44,7 +44,6 @@
 // Kanki iRODS C++ class library headers
 #include "rodssession.h"
 #include "rodsobjentry.h"
-#include "_rodsgenquery.h"
 
 // application headers
 #include "rodsmetadatawindow.h"
@@ -70,7 +69,7 @@ class RodsMainWindow : public QMainWindow
 public:
 
     // Constructor has only the parent Qt widget pointer as argument.
-    explicit RodsMainWindow(QWidget *parent = 0);
+    explicit RodsMainWindow(QWidget *parent = nullptr);
 
     ~RodsMainWindow();
 
@@ -247,7 +246,7 @@ private:
     // gets the current rods object tree model index
     QModelIndex getCurrentRodsObjIndex();
 
-    // instance of Qt UI compiler generated UI
+    // instance of compiler-generated UI
     Ui::RodsMainWindow *ui;
 
     // our modal progress dialog
@@ -265,16 +264,16 @@ private:
     // a container of metadata window object pointers
     std::map<std::string, RodsMetadataWindow*> metaEditors;
 
-    // pointer to rods session object
+    // pointer to the session object
     Kanki::RodsSession *session;
 
     // our object tree model instance
     RodsObjTreeModel *model;
  
-    // settings from the gui
+    // flags set from the UI
     bool verifyChecksum, allowOverwrite;
 
-    // current selected resource
+    // current UI resource selection
     std::string currentResc;
 };
 
