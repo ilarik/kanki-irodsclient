@@ -64,12 +64,12 @@ int RodsSession::connect()
         return (status);
 
     try {
-	this->conn_pool = std::make_unique<irods::connection_pool>(Kanki::RodsSession::numThreads,
-								   this->rodsUserEnv.rodsHost,
-								   this->rodsUserEnv.rodsPort,
-								   this->rodsUserEnv.rodsUserName,
-								   this->rodsUserEnv.rodsZone,
-								   Kanki::RodsSession::refreshTime);
+	this->connPool = std::make_unique<irods::connection_pool>(Kanki::RodsSession::numThreads,
+								  this->rodsUserEnv.rodsHost,
+								  this->rodsUserEnv.rodsPort,
+								  this->rodsUserEnv.rodsUserName,
+								  this->rodsUserEnv.rodsZone,
+								  Kanki::RodsSession::refreshTime);
     }
     catch (const std::runtime_error &e) 
     {
@@ -78,13 +78,13 @@ int RodsSession::connect()
     }
 
     // take out legacy "default" connection
-    this->rodsCommPtr = this->conn_pool->get_connection().release();
+    this->rodsCommPtr = this->connPool->get_connection().release();
 
     // workaround for refreshing the connection pool
     {
 	std::vector<connection_proxy> temp;
 	for (int i = 0; i < (int)Kanki::RodsSession::numThreads; i++)
-	    temp.push_back(this->conn_pool->get_connection());
+	    temp.push_back(this->connPool->get_connection());
     }
     
     return (status);

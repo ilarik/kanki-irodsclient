@@ -71,11 +71,9 @@ class RodsSession
 
 public:
     
-    // import types for connection pool
+    // import types from irods
     using connection_pool_ptr = std::shared_ptr<irods::connection_pool>;
     using connection_proxy = irods::connection_pool::connection_proxy;
-    
-    // import types for thread pool
     using thread_pool_ptr = std::unique_ptr<irods::thread_pool>;
     
     // local type for a resource
@@ -279,7 +277,7 @@ public:
     // Returns a proxy object to an available iRODS connection from the pool.
     connection_proxy getConnection()
     {
-	return (this->conn_pool->get_connection());
+	return (this->connPool->get_connection());
     }
     
     // Gets a const reference to the resource table.
@@ -315,7 +313,7 @@ private:
     thread_pool_ptr thread_pool;
 
     // a connection pool for iRODS connections
-    connection_pool_ptr conn_pool;
+    connection_pool_ptr connPool;
 
     // hash table for storage resources
     ResourceTable rescTable;
