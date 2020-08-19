@@ -105,8 +105,7 @@ void RodsQueueModel::refreshQueue()
 {
     int status = 0;
     QString errStr;
-
-    std::vector<std::vector<std::string>> tempData;
+    std::vector<row_type> tempData;
 
     // we get all the rule exec queue attrs
     std::string queryStr = "SELECT RULE_EXEC_ID, RULE_EXEC_NAME, RULE_EXEC_REI_FILE_PATH, RULE_EXEC_USER_NAME, "
@@ -123,7 +122,6 @@ void RodsQueueModel::refreshQueue()
 	// query into temp storage
 	try {
 	    using query_builder = irods::experimental::query_builder;
-	    using row_type = irods::query<rcComm_t>::value_type;
 	    
 	    for (const row_type &row : query_builder().build(*comm, queryStr))
 		tempData.push_back(row);

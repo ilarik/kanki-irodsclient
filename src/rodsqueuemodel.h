@@ -3,7 +3,7 @@
  * @brief Definition of class RodsQueueModel
  *
  * The RodsQueueModel class extends the Qt model class QAbstractTableModel
- * and implements a model for the iRODS rule exec queue. Quick and dirty.
+ * and implements a model for the iRODS rule exec queue.
  *
  * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
@@ -67,6 +67,9 @@ public slots:
 
 private:
 
+    // we take up types from irods
+    using row_type = irods::query<rcComm_t>::value_type;
+
     // Refreshes model data from iRODS via an iRODS query and resets model.
     void refreshQueue();
     
@@ -76,8 +79,8 @@ private:
     // pointer to rods connection object for communications
     Kanki::RodsSession *session;
     
-    // simple STL instantiated container for model data
-    std::vector< std::vector< std::string> > queueData;
+    // simple container for model data
+    std::vector<row_type> queueData;
 
     // set model column count to static value
     static constexpr int numColumns = 12;
