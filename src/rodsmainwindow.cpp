@@ -98,9 +98,9 @@ void RodsMainWindow::dropEvent(QDropEvent *event)
 
 void RodsMainWindow::closeEvent(QCloseEvent *event)
 {
-    (void)event;
+    event->accept();
 
-    // call Qt to quit application (exit event loop)
+    // quit application (exit event loop)
     qApp->quit();
 }
 
@@ -213,7 +213,7 @@ void RodsMainWindow::enterDisconnectedState()
     this->ui->storageResc->setDisabled(true);
 
     // display disconnected message
-    this->ui->statusBar->showMessage("Disconnected", 5000);
+    this->ui->statusBar->showMessage("Disconnected", 0);
     this->setWindowTitle("iRODS Grid Browser");
 }
 
@@ -519,25 +519,25 @@ void RodsMainWindow::doRefreshTreeView(QModelIndex atIndex)
     // first process pending Qt events
     qApp->processEvents();
 
-    // get current index and pointer to model object
+    // get current selection index
     if (!curIndex.isValid())
         curIndex = this->ui->rodsObjTree->currentIndex();
 
-    // if no valid index (no selection), assume initial mount point
+    // if no valid index (no selection), take first item
     if (!curIndex.isValid())
         curIndex = this->model->index(0, 0, QModelIndex());
 
-    // get object pointers for selected item and tree view model
+    // get pointer to the item via index
     RodsObjTreeItem *selection = static_cast<RodsObjTreeItem*>(curIndex.internalPointer());
 
-    // if item is a proper item
+    // if item is a proper iRODS object
     if (selection->getObjEntryPtr())
     {
-        // if a collection was selected, refresh it
+        // if its a collection, refresh it
         if (selection->getObjEntryPtr()->objType == COLL_OBJ_T)
             this->refreshObjectModelAtIndex(curIndex);
 
-        // if a data object was selected, refresh parent collection
+        // if its a data object, refresh parent collection
         else if (selection->getObjEntryPtr()->objType == DATA_OBJ_T)
             this->refreshObjectModelAtIndex(this->model->parent(curIndex));
     }
@@ -593,13 +593,10 @@ void RodsMainWindow::doRodsConnect()
 
 void RodsMainWindow::doRodsDisconnect()
 {
-    // sanity check that there is a session object
+    // sanity check
     if (this->session)
     {
-        // disconnect from iRODS
-        this->session->disconnect();
-
-        // delete connection object
+        // destroy session
         delete(this->session);
         this->session = nullptr;
 
@@ -617,30 +614,30 @@ void RodsMainWindow::doCreateCollection()
     QString collName = QInputDialog::getText(this, "New Collection", "Collection name:",
                                              QLineEdit::Normal, "New Collection", &ok);
 
-    // if user pressed cancel, do nothing
-    if (!ok)
-        return;
-
-    // if we have a valid collection name
-    if (!collName.isEmpty())
+    // user wants to go ahead
+    if (ok)
     {
-        // get current collection path from selection
-        std::string curCollPath = this->getCurrentRodsCollPath();
+	// if we have a valid collection name
+	if (!collName.isEmpty())
+	{
+	    // get current collection path from selection
+	    std::string curCollPath = this->getCurrentRodsCollPath();
+	    
+	    // construct collection path (TODO: sanitize string)
+	    std::string collPath = curCollPath + "/" + collName.toStdString();
+	    
+	    // make new collection into path
+	    if ((status = this->session->makeColl(collPath, false)) < 0)
+		this->reportError("Create collection error", "Create collection failed", status);
+	    
+	    // refresh tree view on success
+	    else
+		this->doRefreshTreeView();
+	}
 
-        // construct collection path (TODO: sanitize string)
-        std::string collPath = curCollPath + "/" + collName.toStdString();
-
-        // make new collection into path
-        if ((status = this->session->makeColl(collPath, false)) < 0)
-            this->reportError("Create collection error", "Create collection failed", status);
-
-        // refresh tree view on success
-        else
-            this->doRefreshTreeView();
+	else
+	    this->reportError("Emtpy collection name entered!", QString(), 0);
     }
-
-    else
-        this->reportError("Emtpy collection name entered!", QString(), 0);
 }
 
 void RodsMainWindow::doDelete()
@@ -897,7 +894,8 @@ void RodsMainWindow::selectRodsObject(QString objPath)
 void RodsMainWindow::handleAuthFailure()
 {
     bool ok = false;
-    QString password = QInputDialog::getText(this, "Enter iRODS Password", "Authentication failed. Enter iRODS password: ",
+    QString password = QInputDialog::getText(this, "Enter iRODS Password",
+					     "Authentication failed. Enter iRODS password: ",
                                              QLineEdit::Password, QString(""), &ok);
 
     // if user didn't cancel
