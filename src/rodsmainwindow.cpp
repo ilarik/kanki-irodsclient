@@ -217,7 +217,6 @@ void RodsMainWindow::enterDisconnectedState()
     this->setWindowTitle("iRODS Grid Browser");
 }
 
-
 void RodsMainWindow::unregisterMetadataWindow(std::string objPath)
 {
     // try to find metadata editor instance
@@ -238,7 +237,7 @@ void RodsMainWindow::unregisterQueueWindow()
     {
         // delete and unregister queue window object
         delete (this->queueWindow);
-        this->queueWindow = NULL;
+        this->queueWindow = nullptr;
     }
 }
 
@@ -886,7 +885,7 @@ void RodsMainWindow::unregisterFindWindow()
     {
         // delete object and clear pointer
         delete (this->findWindow);
-        this->findWindow = NULL;
+        this->findWindow = nullptr;
     }
 }
 
