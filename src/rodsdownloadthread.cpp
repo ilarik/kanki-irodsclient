@@ -33,7 +33,7 @@ void RodsDownloadThread::run()
     int status = 0;
 
     // instantiate a worker thread pool for this task
-    irods::thread_pool thr_tank(Kanki::RodsSession::numThreads);
+    irods::thread_pool tank(Kanki::RodsSession::numThreads);
 
     // setup progress display for the task
     QString statusStr = "Initializing...";
@@ -44,17 +44,19 @@ void RodsDownloadThread::run()
     {
         std::vector<Kanki::RodsObjEntryPtr> collObjs;
         std::string basePath = this->objEntry->collPath;
-
+	
+	Kanki::RodsSession::connection_proxy conn = this->session->getConnection();
+	rcComm_t *comm = static_cast<rcComm_t*>(conn);
+	
         // first item to the download object list
         collObjs.push_back(this->objEntry);
-
-        if ((status = makeCollObjList(this->objEntry, &collObjs)) < 0)
-        {
+	
+        if ((status = makeCollObjList(this->objEntry, &collObjs, comm)) < 0)
 	    reportError("Download failed", this->objEntry->getObjectFullPath().c_str(), status);
-	}
 	
 	else {
-            // notify ui of progress bar state (object count)
+            // notify ui of progress state (object count)
+	    statusStr = "Downloading";
             setupMainProgress(statusStr, 0, collObjs.size());
 
             // iterate thru object list
@@ -75,10 +77,10 @@ void RodsDownloadThread::run()
                     statusStr += curObj->getObjectName().c_str();
 
                     // notify ui of current operation and progress
-                    mainProgressUpdate(statusStr, i+1);
+                    //mainProgressUpdate(statusStr, i+1);
 
                     // get a connection and a thread to execute a lambda
-		    irods::thread_pool::post(thr_tank, [=, &status] {
+		    irods::thread_pool::post(tank, [=, &status] {
 			    Kanki::RodsSession::connection_proxy conn = this->session->getConnection();
 			    if (!conn)
 			    	reportError("iRODS connection failure", curObj->getObjectFullPath().c_str(), 
@@ -91,19 +93,13 @@ void RodsDownloadThread::run()
                 // for collection objects we create the corresponding directory
                 else if (curObj->objType == COLL_OBJ_T)
                 {
-                    // get directory name for ui
-                    std::string dirName = dstPath.substr(dstPath.find_last_of('/') + 1);
-
-                    // notify ui
-                    statusStr = "Creating directory ";
-                    statusStr += dirName.c_str();
-                    mainProgressUpdate(statusStr, i+1);
-
                     // check if directory exists and if not, make it
                     QDir dstDir(dstPath.c_str());
 
                     if (!dstDir.exists())
                         dstDir.mkpath(dstPath.c_str());
+
+		    increaseMainProgress();
                 }
             }
         }	    
@@ -132,10 +128,10 @@ void RodsDownloadThread::run()
     }
 
     // wait for all workers to finish
-    thr_tank.join();
+    tank.join();
 }
 
-int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs)
+int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs, rcComm_t *comm)
 {
     int status = 0;
 
@@ -145,7 +141,7 @@ int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<
         std::vector<Kanki::RodsObjEntryPtr> curCollObjs;
 
         // try to read collection
-        if ((status = this->session->readColl(obj->collPath, &curCollObjs)) < 0)
+        if ((status = this->session->readColl(obj->collPath, &curCollObjs, comm)) < 0)
 	{
 	    return (status);
 	}
@@ -165,7 +161,7 @@ int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<
                 // recurse on collection objects
                 if (curObj->objType == COLL_OBJ_T)
                 {
-                    status = makeCollObjList(curObj, objs);
+                    status = makeCollObjList(curObj, objs, comm);
 
                     // on error, back off recursion
                     if (status < 0)
@@ -226,20 +222,22 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
 	{
 	    fs::checksum &first_chksum = chksums.front();
 	    
-	    subProgressMarquee(obj->getObjectFullPath().c_str(), "Verifying Checksum...");
+//	    subProgressMarquee(obj->getObjectFullPath().c_str(), "Verifying Checksum...");
 	    status = verifyChksumLocFile((char*)localPath.c_str(), first_chksum.value.c_str(), NULL);
 	}
     }
 
-    subProgressFinalize(obj->getObjectFullPath().c_str());
+    //subProgressFinalize(obj->getObjectFullPath().c_str());
+    increaseMainProgress();
 
     // TODO: FIXME?
     //inStream.getOprEnd();
 
     return (status);
- }
+}
 
-int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream)
+int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istream &inStream,
+					   std::ofstream &outStream)
 {
     int status = 0;
     long int lastRead = 0, totalRead = 0, readSize = Kanki::RodsSession::xferBlkSize;
@@ -326,7 +324,8 @@ int RodsDownloadThread::transferFileStream(Kanki::RodsObjEntryPtr obj, std::istr
     return (status);
 }
 
-int RodsDownloadThread::transferFileParallel(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream)
+int RodsDownloadThread::transferFileParallel(Kanki::RodsObjEntryPtr obj, std::istream &inStream,
+					     std::ofstream &outStream)
 {
     // TODO: FIXME!
     return (SYS_NOT_SUPPORTED);

@@ -64,6 +64,8 @@ signals:
     // the current message text and current progress value.
     void mainProgressUpdate(QString text, int progress);
 
+    void increaseMainProgress();
+
     // Qt signal for setting the progress bar display in marquee mode,
     // it signals out the current text message.
     void mainProgressMarquee(QString text);
@@ -95,7 +97,7 @@ private:
     void run() Q_DECL_OVERRIDE;
 
     // Constructs the list of objects to be downloaded in a recursive manner.
-    int makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs);
+    int makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs, rcComm_t *comm);
 
     // Get (download) one rods data object, launching parallel transfer if necessary
     int getObject(irods::connection_pool::connection_proxy &conn,
