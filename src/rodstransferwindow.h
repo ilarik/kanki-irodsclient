@@ -53,6 +53,8 @@ public slots:
     // Qt slot for updating the transfer window main progress bar
     // for current message and current value.
     void updateMainProgress(QString currentMsg, int value);
+    
+    void increaseMainProgress();
 
     // Qt slot for setting the main progress bar into marquee mode
     void setMainProgressMarquee(QString text);
@@ -76,6 +78,8 @@ private:
 
     // progress window progress mar maxima
     unsigned int progressMax, subProgressMax;
+
+    QString mainText;
 
     // Qt UI layout instance
     QVBoxLayout *layout;
