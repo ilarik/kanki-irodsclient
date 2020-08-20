@@ -44,23 +44,23 @@ public:
 
     // Overrides superclass virtual function for querying model data with
     // respect to a model index reference for a given Qt role.
-    QVariant data(const QModelIndex &index, int role) const;
+    QVariant data(const QModelIndex &index, int role) const override;
 
     // Overrides superclass virtual function for querying header data for
     // view display purposes, for a given section and orientation and Qt role.
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     // Overrides superclass virtual function for querying current model
     // data row count given a model index reference (which is ignored here).
-    int rowCount(const QModelIndex &parent) const;
+    int rowCount(const QModelIndex &parent) const override;
 
     // Overrides superclass virtual function for querying current model
     // column count given a model index reference (ignored), returns a constant.
-    int columnCount(const QModelIndex &parent) const;
+    int columnCount(const QModelIndex &parent) const override;
 
     // Overrides superclass virtual function for querying flags
     // given a model index reference, constant flags are given however here.
-    Qt::ItemFlags flags(const QModelIndex &index) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 public slots:
 
