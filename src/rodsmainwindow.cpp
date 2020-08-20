@@ -398,6 +398,8 @@ void RodsMainWindow::doDownload()
                     &RodsTransferWindow::setupMainProgressBar);
             connect(downloadWorker, &RodsDownloadThread::mainProgressUpdate, transferWindow,
                     &RodsTransferWindow::updateMainProgress);
+	    connect(downloadWorker, &RodsDownloadThread::increaseMainProgress, transferWindow,
+		    &RodsTransferWindow::increaseMainProgress);
 	    connect(downloadWorker, &RodsDownloadThread::mainProgressMarquee, transferWindow,
 		    &RodsTransferWindow::setMainProgressMarquee);
             connect(downloadWorker, &RodsDownloadThread::setupSubProgress, transferWindow,
