@@ -5,7 +5,7 @@
  * The RodsSession class in Kanki provides an interface to the
  * to an iRODS protocol connection and iRODS protocol operations.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -278,24 +278,29 @@ int RodsSession::makeColl(const std::string &collPath, bool makeRecursive)
     return (status);
 }
 
-int RodsSession::readColl(const std::string &collPath, std::vector<RodsObjEntryPtr> *collObjs)
+int RodsSession::readColl(const std::string &collPath, std::vector<RodsObjEntryPtr> *collObjs, rcComm_t *comm)
 {
+    std::unique_lock<std::mutex> mutexGuard(this->commMutex, std::defer_lock);
     int status = 0;
 
     // sanity checks for arguments
     if (!collObjs || collPath.empty())
         return (-1);
 
-    std::lock_guard mutexGuard(this->commMutex);
-    
-    namespace fs = irods::experimental::filesystem;
-
-    using ObjEntry = Kanki::RodsObjEntry;
-    using ObjEntryPtr = Kanki::RodsObjEntryPtr;
-
-    try 
+    if (comm == nullptr)
     {
-	for (fs::collection_entry const &entry : fs::client::collection_iterator(*(this->commPtr()), collPath))
+	comm = this->commPtr();
+	mutexGuard.lock();
+    }
+
+    namespace fs = irods::experimental::filesystem;
+    
+    try
+    {
+	using ObjEntry = Kanki::RodsObjEntry;
+	using ObjEntryPtr = Kanki::RodsObjEntryPtr;
+	
+	for (fs::collection_entry const &entry : fs::client::collection_iterator(*comm, collPath))
 	{
 	    ObjEntryPtr newEntry(new ObjEntry(entry.is_data_object() ? entry.path().object_name().c_str() : entry.path().c_str(),
 					      entry.is_data_object() ? entry.path().parent_path().c_str() : entry.path().c_str(),

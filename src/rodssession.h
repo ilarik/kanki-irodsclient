@@ -231,7 +231,8 @@ public:
     
     // Reads an iRODS collection from the iRODS server to memory using the locally cached version
     // of rods api read collection function, parses the collection into a vector of RodsObjEntry objs.
-    int readColl(const std::string &collPath, std::vector<Kanki::RodsObjEntryPtr> *collObjs);
+    int readColl(const std::string &collPath, std::vector<Kanki::RodsObjEntryPtr> *collObjs,
+		 rcComm_t *comm = nullptr);
 
     // Makes an iRODS collection at specified path, optionally recursively.
     int makeColl(const std::string &collPath, bool makeRecursive);
