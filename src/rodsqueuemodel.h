@@ -64,7 +64,13 @@ public:
 
 public slots:
 
-    void invokeRefresh();
+    void launchRefresh();
+
+    void stopRefreshTimer();
+
+signals:
+
+    void reportError(QString errStr, int status);
 
 private:
 

@@ -20,16 +20,13 @@
 RodsQueueModel::RodsQueueModel(Kanki::RodsSession *theSession, QObject *parent) :
     QAbstractTableModel(parent),
     session(theSession)
-{
+{    
     // create a timer to invoke refresh
     timer = new QTimer(this);
     timer->setInterval(1000);
-
-    // refresh once
-    this->invokeRefresh();
-
+    
     // connect timer to handler and start
-    connect(timer, SIGNAL(timeout()) , this, SLOT(invokeRefresh()));
+    connect(timer, &QTimer::timeout, this, &RodsQueueModel::launchRefresh);
     timer->start();
 }
 
@@ -96,9 +93,15 @@ Qt::ItemFlags RodsQueueModel::flags(const QModelIndex &index) const
     return (0);
 }
 
-void RodsQueueModel::invokeRefresh()
+void RodsQueueModel::launchRefresh()
 {
     this->session->scheduleTask([&] { this->refreshQueue(); });
+}
+
+void RodsQueueModel::stopRefreshTimer()
+{
+    if (this->timer)
+	this->timer->stop();
 }
 
 void RodsQueueModel::refreshQueue()
@@ -108,7 +111,7 @@ void RodsQueueModel::refreshQueue()
     std::vector<row_type> tempData;
 
     // we get all the rule exec queue attrs
-    std::string queryStr = "SELECT RULE_EXEC_ID, RULE_EXEC_NAME, RULE_EXEC_REI_FILE_PATH, RULE_EXEC_USER_NAME, "
+    std::string queryStr = "SELECT RULE_EXECI_ID, RULE_EXEC_NAME, RULE_EXEC_REI_FILE_PATH, RULE_EXEC_USER_NAME, "
 	"RULE_EXEC_ADDRESS, RULE_EXEC_TIME, RULE_EXEC_FREQUENCY, RULE_EXEC_PRIORITY, RULE_EXEC_ESTIMATED_EXE_TIME, "
 	"RULE_EXEC_NOTIFICATION_ADDR, RULE_EXEC_LAST_EXE_TIME, RULE_EXEC_STATUS";
 
@@ -129,34 +132,36 @@ void RodsQueueModel::refreshQueue()
 	catch (const irods::exception &e)
 	{
 	    status = e.code();
-	    errStr = "iRODS API error in rule exec queue refresh, status: " + QVariant(status).toString();
+	    errStr = "iRODS API error in rule exec queue refresh";
 	}
 	catch (const std::exception &e)
 	{
 	    status = SYS_INTERNAL_ERR;
-	    errStr = "Client-side internal error in rule exec queue refresh, status: " + QVariant(status).toString();
+	    errStr = "Client-side internal error in rule exec queue refresh, status: ";
+	}
+	
+	// handle errors
+       	if (status < 0)
+	{
+	    this->stopRefreshTimer();
+
+	    // signal UI
+	    this->reportError(errStr, status);
+	}
+
+	// make data live
+	else {
+	    // threads will be held off here
+	    //std::lock_guard mutexGuard(this->updateMutex);
+
+	    beginResetModel();
+	    this->queueData = tempData;
+	    endResetModel();
 	}
     }
-    
-    // report errors to UI
-    if (status < 0)
-    {
-	// if query fails, stop timer! 
-        if (this->timer)
-            this->timer->stop();
-	
-	// report error via a message box
-        QMessageBox errMsg;
-        errMsg.setText(errStr);
-        errMsg.setIcon(QMessageBox::Critical);
-        errMsg.exec();
-    }
 
-    // threads will be held off here
-    std::lock_guard mutexGuard(this->updateMutex);
-   
-    // make data live
-    beginResetModel();
-    this->queueData = tempData;
-    endResetModel();
+    // somehow report no avail
+    else {
+	// TODO: FIXME!
+    }
 }

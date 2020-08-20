@@ -28,6 +28,8 @@ RodsQueueWindow::RodsQueueWindow(Kanki::RodsSession *theSession, QWidget *parent
 {
     // setup all the UI
     this->ui->setupUi(this);
+
+    connect(this->queue, &RodsQueueModel::reportError, this, &RodsQueueWindow::reportError);
    
     this->ui->queueTable->setModel(queue);
     this->ui->queueTable->resizeColumnsToContents();
@@ -44,6 +46,17 @@ void RodsQueueWindow::closeEvent(QCloseEvent *event)
 {
     event->accept();
 
-    // signal out unregistering
+    // signal to take this down
     this->unregister();
+}
+
+void RodsQueueWindow::reportError(QString errStr, int status)
+{
+    QString fullStr = errStr + ", status: " + QVariant(status).toString();
+
+    // report error via a message box
+    QMessageBox errMsg;
+    errMsg.setText(fullStr);
+    errMsg.setIcon(QMessageBox::Critical);
+    errMsg.exec();
 }

@@ -41,6 +41,10 @@ public:
     explicit RodsQueueWindow(Kanki::RodsSession *theSession, QWidget *parent = nullptr);
     ~RodsQueueWindow();
 
+public slots:
+
+    void reportError(QString errStr, int status);
+
 signals:
 
     // Qt signal for unregistering the queue window for deletion of the object.
