@@ -19,8 +19,9 @@
 
 RodsQueueModel::RodsQueueModel(Kanki::RodsSession *theSession, QObject *parent) :
     QAbstractTableModel(parent),
-    session(theSession)
-{    
+    session(theSession),
+    tank(thread_pool(1))
+{
     // create a timer to invoke refresh
     timer = new QTimer(this);
     timer->setInterval(1000);
@@ -32,6 +33,8 @@ RodsQueueModel::RodsQueueModel(Kanki::RodsSession *theSession, QObject *parent) 
 
 RodsQueueModel::~RodsQueueModel()
 {
+    this->tank.join();
+
     delete (timer);
 }
 
@@ -95,7 +98,7 @@ Qt::ItemFlags RodsQueueModel::flags(const QModelIndex &index) const
 
 void RodsQueueModel::launchRefresh()
 {
-    this->session->scheduleTask([&] { this->refreshQueue(); });
+    thread_pool::post(tank, [&] { this->refreshQueue(); });
 }
 
 void RodsQueueModel::stopRefreshTimer()
@@ -151,9 +154,6 @@ void RodsQueueModel::refreshQueue()
 
 	// make data live
 	else {
-	    // threads will be held off here
-	    //std::lock_guard mutexGuard(this->updateMutex);
-
 	    beginResetModel();
 	    this->queueData = tempData;
 	    endResetModel();

@@ -76,16 +76,19 @@ private:
 
     // we take up types from irods
     using row_type = irods::query<rcComm_t>::value_type;
+    using thread_pool = irods::thread_pool;
 
     // Refreshes model data from iRODS via an iRODS query and resets model.
     void refreshQueue();
-    
+        
     // Qt timer object pointer for periodical refreshing of model data
     QTimer *timer;
     
     // pointer to rods connection object for communications
     Kanki::RodsSession *session;
-    
+
+    thread_pool tank;
+
     // lock for updating the data
     std::mutex updateMutex;
     
