@@ -229,7 +229,8 @@ int RodsSession::refreshResourceTable()
     try {
 	using query_builder = irods::experimental::query_builder;
 	using row_type = irods::query<rcComm_t>::value_type;
-	
+
+	// for this we use the 'primary' connection
 	for (const row_type &row : query_builder().build(*(this->rodsCommPtr), queryStr))
 	{
 	    unsigned long id = row.at(0).size() ? std::stoul(row.at(0)) : 0;
