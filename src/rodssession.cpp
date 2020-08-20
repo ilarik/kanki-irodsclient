@@ -44,6 +44,9 @@ RodsSession::RodsSession(const RodsSession *sessPtr)
 
 RodsSession::~RodsSession()
 {
+    // wait for all remaining threads
+    this->tank->join();
+
     // forcefully disconnect if we are connected to rods
     if (this->rodsCommPtr)
         this->disconnect(true);
