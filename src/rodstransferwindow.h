@@ -5,7 +5,7 @@
  * The RodsTransferWindow class extends the Qt widget base class QWidget
  * and implements a transfer progress display window
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -31,6 +31,86 @@ class RodsTransferWindow : public QWidget
     Q_OBJECT
 
 public:
+
+    class RodsProgressWidget : public QWidget
+    {
+
+    public:
+	
+	explicit RodsProgressWidget(const QString &_id, 
+				    const QString &_text,
+				    const unsigned &_value,
+				    const unsigned &_max,
+				    QWidget *parent = nullptr) :
+	    QWidget(parent),
+	    id(_id),
+	    text(_text),
+	    current(_value),
+	    max(_max),
+	    layout(new QVBoxLayout(this)),
+	    msg(new QLabel(this)),
+	    bar(new QProgressBar(this))
+	{
+	    msg->setText(text);
+	    bar->setMaximum(max);
+	    bar->setValue(current);
+	    
+	    layout->addWidget(msg);
+	    layout->addWidget(bar);
+	}
+
+	void setMsg(const QString &newMsg)
+	{
+	    text = newMsg;
+	    msg->setText(text);
+	}
+
+	void setMax(unsigned newMax)
+	{
+	    max = newMax;
+	    bar->setMaximum(max);
+	}
+
+	void increment()
+	{
+	    current++;
+	    bar->setValue(current);
+	}
+
+	unsigned value() const
+	{
+	    return (current);
+	}
+
+	void setProgress(unsigned newVal)
+	{
+	    current = newVal;
+	    bar->setValue(current);
+	}
+
+	void update(QString newMsg, unsigned newVal)
+        {
+	    setMsg(newMsg);
+	    setProgress(newVal);
+	}
+	
+	~RodsProgressWidget()
+	{
+	    delete (bar);
+	    delete (msg);
+	    delete (layout);
+	}
+
+    private:
+
+	QString id;
+	QString text;
+	unsigned current, max;
+	
+	QVBoxLayout *layout;
+	QLabel *msg;
+	QProgressBar *bar;
+    };
 
     // we take no parents
     explicit RodsTransferWindow(const QString &title);
@@ -74,27 +154,20 @@ public slots:
 
 private:
 
-    // progress window progress mar maxima
-    unsigned int progressMax, subProgressMax;
-
-    QString mainText;
-
     // layouts
-    QVBoxLayout *layout;
+    QVBoxLayout *layout, *boxLayout;
 
-    // Qt group box for progress displays
+    // box for progress displays
     QGroupBox *box;
 
-    // Qt layout for the group box
-    QVBoxLayout *boxLayout;
+    // window state
+    QString mainText;
+    unsigned int progressMax, subProgressMax;
 
-    // Qt labels for displaying progress messages
-    QLabel *mainProgressMsg, *subProgressMsg;
+    // progress bar objects
+    RodsProgressWidget *mainProgress, *subProgress;
 
-    // Qt progress bar objects
-    QProgressBar *mainProgressBar, *subProgressBar;
-
-    // Qt push button for cancel
+    // cancel button
     QPushButton *cancelButton;
 };
 

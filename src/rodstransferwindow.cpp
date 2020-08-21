@@ -5,7 +5,7 @@
  * The RodsTransferWindow class extends the Qt widget base class QWidget
  * and implements a transfer progress display window
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -27,22 +27,17 @@ RodsTransferWindow::RodsTransferWindow(const QString &title) :
     this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
 
     this->layout = new QVBoxLayout(this);
-
     this->box = new QGroupBox(this);
     this->boxLayout = new QVBoxLayout(box);
 
-    this->mainProgressMsg = new QLabel(this);
-    boxLayout->addWidget(this->mainProgressMsg);
+    this->mainProgress = new RodsProgressWidget(QString(), "Initializing...",
+						0, 0, this);
 
-    this->mainProgressBar = new QProgressBar(this);
-    this->mainProgressBar->setMaximum(0);
-    boxLayout->addWidget(this->mainProgressBar);
+    this->subProgress = new RodsProgressWidget(QString(), "Initializing...",
+					       0, 0, this);
 
-    this->subProgressMsg = new QLabel(this);
-    boxLayout->addWidget(this->subProgressMsg);
-    this->subProgressBar = new QProgressBar(this);
-    this->subProgressBar->setMaximum(0);
-    boxLayout->addWidget(this->subProgressBar);
+    this->boxLayout->addWidget(mainProgress);
+    this->boxLayout->addWidget(subProgress);
 
     this->cancelButton = new QPushButton("Cancel", this);
     this->cancelButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -56,11 +51,10 @@ RodsTransferWindow::RodsTransferWindow(const QString &title) :
 
 RodsTransferWindow::~RodsTransferWindow()
 {
+    delete (this->mainProgress);
+    delete (this->subProgress);
+    delete (this->boxLayout);
     delete (this->layout);
-    delete (this->mainProgressMsg);
-    delete (this->mainProgressBar);
-    delete (this->subProgressMsg);
-    delete (this->subProgressBar);
     delete (this->cancelButton);
 }
 
@@ -69,14 +63,13 @@ void RodsTransferWindow::setupMainProgressBar(QString initialMsg, int value, int
     this->progressMax = maxValue;
     this->mainText = initialMsg;
 
-    this->mainProgressBar->setMaximum(maxValue);
-    this->updateMainProgress(initialMsg, value);
+    this->mainProgress->setMax(maxValue);
+    this->mainProgress->update(initialMsg, value);
 }
 
 void RodsTransferWindow::setMainProgressMarquee(QString text)
 {
-    this->mainProgressBar->setMaximum(0);
-    this->mainProgressMsg->setText(text);
+    this->mainProgress->update(text, 0);
 }
 
 void RodsTransferWindow::updateMainProgress(QString currentMsg, int value)
@@ -86,8 +79,7 @@ void RodsTransferWindow::updateMainProgress(QString currentMsg, int value)
     progMsg += QVariant(this->progressMax).toString() + ": ";
     progMsg += currentMsg;
 
-    this->mainProgressMsg->setText(progMsg);
-    this->mainProgressBar->setValue(value);
+    this->mainProgress->update(currentMsg, value);
 
     // when main is updated, sub is set to marquee
     this->setupSubProgressBar("In Progress...", "In Progress...", 0, 0);
@@ -95,35 +87,30 @@ void RodsTransferWindow::updateMainProgress(QString currentMsg, int value)
 
 void RodsTransferWindow::increaseMainProgress()
 {
-    int value = this->mainProgressBar->value() + 1;
+    int value = this->mainProgress->value() + 1;
     QString str = this->mainText + " (" + QVariant(value).toString() + 
 	" of " + QVariant(this->progressMax).toString() + ")...";
 
-    this->mainProgressBar->setValue(value);
-    this->mainProgressMsg->setText(str);
+    this->mainProgress->increment();
 }
 
 void RodsTransferWindow::setupSubProgressBar(QString itemName, QString initialMsg, int value, int maxValue)
 {
     this->subProgressMax = maxValue;
 
-    this->subProgressBar->setMaximum(maxValue);
+    this->subProgress->setMax(maxValue);
     this->updateSubProgress(itemName, initialMsg, value);
 }
 
 void RodsTransferWindow::updateSubProgress(QString itemName, QString currentMsg, int value)
 {
-    this->subProgressMsg->setText(currentMsg);
-    this->subProgressBar->setValue(value);
+    this->subProgress->update(currentMsg, value);
 }
 
 void RodsTransferWindow::setSubProgressMarquee(QString itemName, QString currentMsg)
 {
-    this->mainProgressBar->setMaximum(0);
-    this->subProgressBar->setMaximum(0);
-
-    this->mainProgressMsg->setText("Initializing...");
-    this->subProgressMsg->setText(currentMsg);
+    this->mainProgress->update("Initializing...", 0);
+    this->subProgress->update(currentMsg, 0);
 }
 
 void RodsTransferWindow::invokeCancel()
