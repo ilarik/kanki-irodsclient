@@ -130,10 +130,7 @@ void RodsTransferWindow::setSubProgressMarquee(QString itemName, QString current
 	RodsProgressWidget *widget = this->progressItems[id];
 	
 	if (widget)
-	{
-	    this->mainProgress->update("Initializing...", 0);
 	    widget->update(currentMsg, 0);
-	}
     }
     catch (const std::exception &e)
     {

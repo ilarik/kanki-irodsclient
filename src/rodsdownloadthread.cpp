@@ -222,7 +222,7 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
 	{
 	    fs::checksum &first_chksum = chksums.front();
 	    
-//	    subProgressMarquee(obj->getObjectFullPath().c_str(), "Verifying Checksum...");
+	    subProgressMarquee(obj->getObjectFullPath().c_str(), "Verifying Checksum...");
 	    status = verifyChksumLocFile((char*)localPath.c_str(), first_chksum.value.c_str(), NULL);
 	}
     }
