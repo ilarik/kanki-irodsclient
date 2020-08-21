@@ -5,7 +5,7 @@
  * The RodsDownloadThread class extends the Qt thread management class
  * QThread and implements a worker thread for a download (get) operation.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -92,6 +92,8 @@ signals:
 
 private:
 
+    static constexpr unsigned defaultJobs = 4;
+
     // Overrides superclass virtual function, executes the download
     // work in a thread instantiated with the thread object.
     void run() Q_DECL_OVERRIDE;
@@ -104,12 +106,10 @@ private:
 		  Kanki::RodsObjEntryPtr obj, std::string localPath,
 		  bool verifyChecksum = false, bool allowOverwrite = true);
 
-    // Implements double-buffered rods object download using Kanki::RodsDataInStream
-    // and its adaptive rods i/o request size scaling for best resposniveness and
-    // connection throughput utilization.
+    // implemented using irods dstream streaming now
     int transferFileStream(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream);
 
-    // Launches parallel transfer for maximum performance and direct I/O to rods resource servers
+    // not yet supported!
     int transferFileParallel(Kanki::RodsObjEntryPtr obj, std::istream &inStream, std::ofstream &outStream);
 
     // pointer to the rods connection object

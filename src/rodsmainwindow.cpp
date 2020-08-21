@@ -408,6 +408,8 @@ void RodsMainWindow::doDownload()
                     &RodsTransferWindow::updateSubProgress);
             connect(downloadWorker, &RodsDownloadThread::subProgressMarquee, transferWindow,
                     &RodsTransferWindow::setSubProgressMarquee);
+	    connect(downloadWorker, &RodsDownloadThread::subProgressFinalize, transferWindow,
+		    &RodsTransferWindow::finalizeSubProgressBar);
 
             // error reporting signal connects to the error log window slot
             connect(downloadWorker, &RodsDownloadThread::reportError, this->errorLogWindow,

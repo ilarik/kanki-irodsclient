@@ -18,26 +18,24 @@
 #include "rodstransferwindow.h"
 
 RodsTransferWindow::RodsTransferWindow(const QString &title) :
-    QWidget(nullptr)
+    QWidget(nullptr),
+    box(new QGroupBox(this)),
+    layout(new QVBoxLayout(this)),
+    boxLayout(new QVBoxLayout(box))
 {
     this->progressMax = this->subProgressMax = 0;
+
     this->setWindowTitle(title);
     this->setMinimumWidth(600);
-    this->setFixedHeight(190);
-    this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
 
-    this->layout = new QVBoxLayout(this);
-    this->box = new QGroupBox(this);
-    this->boxLayout = new QVBoxLayout(box);
+    this->setWindowFlags(Qt::CustomizeWindowHint | 
+			 Qt::WindowTitleHint | 
+			 Qt::WindowMinimizeButtonHint);
 
-    this->mainProgress = new RodsProgressWidget(QString(), "Initializing...",
+    this->mainProgress = new RodsProgressWidget(std::string(), "Initializing...",
 						0, 0, this);
 
-    this->subProgress = new RodsProgressWidget(QString(), "Initializing...",
-					       0, 0, this);
-
     this->boxLayout->addWidget(mainProgress);
-    this->boxLayout->addWidget(subProgress);
 
     this->cancelButton = new QPushButton("Cancel", this);
     this->cancelButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -46,13 +44,16 @@ RodsTransferWindow::RodsTransferWindow(const QString &title) :
     this->layout->addWidget(box);
     this->layout->addWidget(this->cancelButton);
 
-    connect(this->cancelButton, &QPushButton::pressed, this, &RodsTransferWindow::invokeCancel);
+    connect(this->cancelButton, &QPushButton::pressed,
+	    this, &RodsTransferWindow::invokeCancel);
 }
 
 RodsTransferWindow::~RodsTransferWindow()
 {
+    for (auto&& [id, widget] : this->progressItems)
+	delete (widget);
+
     delete (this->mainProgress);
-    delete (this->subProgress);
     delete (this->boxLayout);
     delete (this->layout);
     delete (this->cancelButton);
@@ -80,9 +81,6 @@ void RodsTransferWindow::updateMainProgress(QString currentMsg, int value)
     progMsg += currentMsg;
 
     this->mainProgress->update(currentMsg, value);
-
-    // when main is updated, sub is set to marquee
-    this->setupSubProgressBar("In Progress...", "In Progress...", 0, 0);
 }
 
 void RodsTransferWindow::increaseMainProgress()
@@ -94,23 +92,75 @@ void RodsTransferWindow::increaseMainProgress()
     this->mainProgress->increment();
 }
 
-void RodsTransferWindow::setupSubProgressBar(QString itemName, QString initialMsg, int value, int maxValue)
+void RodsTransferWindow::setupSubProgressBar(QString itemName, QString initialMsg,
+					     int value, int maxValue)
 {
-    this->subProgressMax = maxValue;
+    std::string id = itemName.toStdString();
 
-    this->subProgress->setMax(maxValue);
-    this->updateSubProgress(itemName, initialMsg, value);
+    RodsProgressWidget *widget = new RodsProgressWidget(id, initialMsg,
+							value, maxValue, this);
+
+    this->progressItems[id] = widget;
+    this->boxLayout->addWidget(widget);
 }
 
 void RodsTransferWindow::updateSubProgress(QString itemName, QString currentMsg, int value)
 {
-    this->subProgress->update(currentMsg, value);
+    std::string id = itemName.toStdString();
+
+    try
+    {
+	RodsProgressWidget *widget = this->progressItems[id];
+	
+	if (widget)
+	    widget->update(currentMsg, value);
+    }
+    catch (const std::exception &e)
+    {
+	// handle exception
+    }
 }
 
 void RodsTransferWindow::setSubProgressMarquee(QString itemName, QString currentMsg)
 {
-    this->mainProgress->update("Initializing...", 0);
-    this->subProgress->update(currentMsg, 0);
+    std::string id = itemName.toStdString();
+
+    try 
+    {
+	RodsProgressWidget *widget = this->progressItems[id];
+	
+	if (widget)
+	{
+	    this->mainProgress->update("Initializing...", 0);
+	    widget->update(currentMsg, 0);
+	}
+    }
+    catch (const std::exception &e)
+    {
+	// handle exception
+    }
+}
+
+void RodsTransferWindow::finalizeSubProgressBar(QString itemName)
+{
+    std::string id = itemName.toStdString();
+    
+    try
+    {
+	RodsProgressWidget *widget = this->progressItems[id];
+
+	if (widget)
+	{
+	    this->boxLayout->removeWidget(widget);
+	    delete (widget);
+	}
+
+	this->progressItems.erase(id);
+    }
+    catch (const std::exception &e)
+    {
+	// handle exception
+    }
 }
 
 void RodsTransferWindow::invokeCancel()

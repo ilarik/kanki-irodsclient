@@ -33,7 +33,7 @@ void RodsDownloadThread::run()
     int status = 0;
 
     // instantiate a worker thread pool for this task
-    irods::thread_pool tank(Kanki::RodsSession::numThreads);
+    irods::thread_pool tank(RodsDownloadThread::defaultJobs);
 
     // setup progress display for the task
     QString statusStr = "Initializing...";
@@ -227,7 +227,9 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
 	}
     }
 
-    //subProgressFinalize(obj->getObjectFullPath().c_str());
+    // update status display(s)
+    if (obj->objSize > Kanki::RodsSession::minBlkSize)
+	subProgressFinalize(obj->getObjectFullPath().c_str());
     increaseMainProgress();
 
     // TODO: FIXME?

@@ -17,6 +17,9 @@
 #ifndef RODSTRANSFERWINDOW_H
 #define RODSTRANSFERWINDOW_H
 
+// C++ standard headers
+#include <map>
+
 // Qt framework headers
 #include <QVariant>
 #include <QWidget>
@@ -37,19 +40,19 @@ public:
 
     public:
 	
-	explicit RodsProgressWidget(const QString &_id, 
+	explicit RodsProgressWidget(const std::string &_id, 
 				    const QString &_text,
 				    const unsigned &_value,
 				    const unsigned &_max,
-				    QWidget *parent = nullptr) :
-	    QWidget(parent),
-	    id(_id),
-	    text(_text),
-	    current(_value),
-	    max(_max),
-	    layout(new QVBoxLayout(this)),
-	    msg(new QLabel(this)),
-	    bar(new QProgressBar(this))
+				    QWidget *parent = nullptr)
+	    : QWidget(parent),
+	      id(_id),
+	      text(_text),
+	      current(_value),
+	      max(_max),
+	      layout(new QVBoxLayout(this)),
+	      msg(new QLabel(this)),
+	      bar(new QProgressBar(this))
 	{
 	    msg->setText(text);
 	    bar->setMaximum(max);
@@ -103,7 +106,8 @@ public:
 
     private:
 
-	QString id;
+	std::string id;
+
 	QString text;
 	unsigned current, max;
 	
@@ -111,6 +115,8 @@ public:
 	QLabel *msg;
 	QProgressBar *bar;
     };
+
+    using RodsProgressWidgetTable = std::map<std::string, RodsProgressWidget*>;
 
     // we take no parents
     explicit RodsTransferWindow(const QString &title);
@@ -120,7 +126,6 @@ signals:
 
     // Qt signal for signalling out the users request of cancelling.
     void cancelRequested();
-
 
 public slots:
 
@@ -141,6 +146,8 @@ public slots:
     // for its initial message, initial value and maxValue.
     void setupSubProgressBar(QString itemName, QString initialMsg, int value, int maxValue);
 
+    void finalizeSubProgressBar(QString itemName);
+
     // Qt slot for updating the transfer window main progress bar
     // for current message and current value.
     void updateSubProgress(QString itemName, QString currentMsg, int value);
@@ -154,18 +161,19 @@ public slots:
 
 private:
 
-    // layouts
-    QVBoxLayout *layout, *boxLayout;
-
     // box for progress displays
     QGroupBox *box;
+
+    // layouts
+    QVBoxLayout *layout, *boxLayout;
 
     // window state
     QString mainText;
     unsigned int progressMax, subProgressMax;
 
     // progress bar objects
-    RodsProgressWidget *mainProgress, *subProgress;
+    RodsProgressWidget *mainProgress;
+    RodsProgressWidgetTable progressItems; 
 
     // cancel button
     QPushButton *cancelButton;
