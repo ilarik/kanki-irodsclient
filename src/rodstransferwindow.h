@@ -32,10 +32,8 @@ class RodsTransferWindow : public QWidget
 
 public:
 
-    // Constructor initializes the transfer window object and its ui,
-    // sets window title as the provided title argument.
-    explicit RodsTransferWindow(QString title);
-
+    // we take no parents
+    explicit RodsTransferWindow(const QString &title);
     ~RodsTransferWindow();
 
 signals:
@@ -81,7 +79,7 @@ private:
 
     QString mainText;
 
-    // Qt UI layout instance
+    // layouts
     QVBoxLayout *layout;
 
     // Qt group box for progress displays

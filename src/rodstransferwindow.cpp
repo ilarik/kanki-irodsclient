@@ -17,8 +17,8 @@
 // application class RodsTransferWindow header
 #include "rodstransferwindow.h"
 
-RodsTransferWindow::RodsTransferWindow(QString title) :
-    QWidget(NULL)
+RodsTransferWindow::RodsTransferWindow(const QString &title) :
+    QWidget(nullptr)
 {
     this->progressMax = this->subProgressMax = 0;
     this->setWindowTitle(title);
