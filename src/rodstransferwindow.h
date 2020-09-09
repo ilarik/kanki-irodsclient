@@ -23,11 +23,13 @@
 // Qt framework headers
 #include <QVariant>
 #include <QWidget>
+#include <QFrame>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QGroupBox>
+#include <QScrollArea>
 
 class RodsTransferWindow : public QWidget
 {
@@ -35,7 +37,7 @@ class RodsTransferWindow : public QWidget
 
 public:
 
-    class RodsProgressWidget : public QWidget
+    class RodsProgressWidget : public QFrame
     {
 
     public:
@@ -45,7 +47,7 @@ public:
 				    const unsigned &_value,
 				    const unsigned &_max,
 				    QWidget *parent = nullptr)
-	    : QWidget(parent),
+	    : QFrame(parent),
 	      id(_id),
 	      text(_text),
 	      current(_value),
@@ -54,6 +56,10 @@ public:
 	      msg(new QLabel(this)),
 	      bar(new QProgressBar(this))
 	{
+	    this->setFrameStyle(QFrame::Panel | QFrame::Raised);
+	    this->setMinimumHeight(64);
+	    this->setMaximumHeight(64);
+
 	    msg->setText(text);
 	    bar->setMaximum(max);
 	    bar->setValue(current);
@@ -83,6 +89,12 @@ public:
 	unsigned value() const
 	{
 	    return (current);
+	}
+
+	void setMarquee(QString newMsg)
+	{
+	    setMax(0);
+	    setMsg(newMsg);
 	}
 
 	void setProgress(unsigned newVal)
@@ -161,11 +173,14 @@ public slots:
 
 private:
 
-    // box for progress displays
-    QGroupBox *box;
-
     // layouts
-    QVBoxLayout *layout, *boxLayout;
+    QVBoxLayout *layout;
+
+    // box for progress displays
+//    QGroupBox *box;
+    QScrollArea *scroll;
+    QWidget *scrollWidget;
+    QVBoxLayout *scrollLayout;
 
     // window state
     QString mainText;

@@ -56,7 +56,7 @@ void RodsDownloadThread::run()
 	
 	else {
             // notify ui of progress state (object count)
-	    statusStr = "Downloading";
+	    statusStr = "Downloading (" + QVariant((int)collObjs.size()).toString() + " objects)...";
             setupMainProgress(statusStr, 0, collObjs.size());
 
             // iterate thru object list
@@ -73,12 +73,6 @@ void RodsDownloadThread::run()
                 // in the case of a data object, we do a get operation
                 if (curObj->objType == DATA_OBJ_T)
                 {
-                    statusStr = "Downloading ";
-                    statusStr += curObj->getObjectName().c_str();
-
-                    // notify ui of current operation and progress
-                    //mainProgressUpdate(statusStr, i+1);
-
                     // get a connection and a thread to execute a lambda
 		    irods::thread_pool::post(tank, [=, &status] {
 			    Kanki::RodsSession::connection_proxy conn = this->session->getConnection();
@@ -112,12 +106,11 @@ void RodsDownloadThread::run()
         statusStr += this->objEntry->getObjectName().c_str();
 
         std::string dstPath = this->destPath + "/" + this->objEntry->getObjectName();
-        setupMainProgress(statusStr, 1, 1);
+        setupMainProgress(statusStr, 0, 0);
 
-	// acquire a free connection from the pool
+	// try to acquire a free connection from the pool
 	Kanki::RodsSession::connection_proxy conn = this->session->getConnection();
-	
-	// we check the connection
+
 	if (!conn)
 	    reportError("iRODS connection failure", this->objEntry->getObjectFullPath().c_str(),
 			SYS_SOCK_CONNECT_ERR);
@@ -131,7 +124,9 @@ void RodsDownloadThread::run()
     tank.join();
 }
 
-int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<Kanki::RodsObjEntryPtr> *objs, rcComm_t *comm)
+int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, 
+					std::vector<Kanki::RodsObjEntryPtr> *objs, 
+					rcComm_t *comm)
 {
     int status = 0;
 
@@ -142,10 +137,8 @@ int RodsDownloadThread::makeCollObjList(Kanki::RodsObjEntryPtr obj, std::vector<
 
         // try to read collection
         if ((status = this->session->readColl(obj->collPath, &curCollObjs, comm)) < 0)
-	{
 	    return (status);
-	}
-        
+
 	else {
             // iterate thru current collection
             for (std::vector<Kanki::RodsObjEntryPtr>::iterator i = curCollObjs.begin(); i != curCollObjs.end(); i++)
@@ -222,8 +215,11 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
 	{
 	    fs::checksum &first_chksum = chksums.front();
 	    
-	    subProgressMarquee(obj->getObjectFullPath().c_str(), "Verifying Checksum...");
-	    status = verifyChksumLocFile((char*)localPath.c_str(), first_chksum.value.c_str(), NULL);
+	    if (first_chksum.value.size())
+	    {
+		subProgressMarquee(obj->getObjectFullPath().c_str(), "Verifying Checksum...");
+		status = verifyChksumLocFile((char*)localPath.c_str(), first_chksum.value.c_str(), nullptr);
+	    }
 	}
     }
 

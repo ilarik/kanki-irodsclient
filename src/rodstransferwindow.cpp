@@ -19,15 +19,17 @@
 
 RodsTransferWindow::RodsTransferWindow(const QString &title) :
     QWidget(nullptr),
-    box(new QGroupBox(this)),
     layout(new QVBoxLayout(this)),
-    boxLayout(new QVBoxLayout(box))
+    scroll(new QScrollArea(this)),
+    scrollWidget(new QWidget(this)),
+    scrollLayout(new QVBoxLayout(scrollWidget))
 {
     this->progressMax = this->subProgressMax = 0;
 
     this->setWindowTitle(title);
-    this->setMinimumWidth(600);
-
+    this->setMinimumSize(QSize(584, 192));
+    this->setMaximumSize(QSize(584, 1168));
+    
     this->setWindowFlags(Qt::CustomizeWindowHint | 
 			 Qt::WindowTitleHint | 
 			 Qt::WindowMinimizeButtonHint);
@@ -35,13 +37,25 @@ RodsTransferWindow::RodsTransferWindow(const QString &title) :
     this->mainProgress = new RodsProgressWidget(std::string(), "Initializing...",
 						0, 0, this);
 
-    this->boxLayout->addWidget(mainProgress);
+    this->scroll->setSizePolicy(QSizePolicy::MinimumExpanding ,QSizePolicy::MinimumExpanding);
+    this->scroll->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    this->scroll->setWidget(scrollWidget);
+    this->scroll->setAlignment(Qt::AlignTop);
+
+    this->scroll->setWidgetResizable(true);
+    this->scroll->setMinimumSize(QSize(568, 96));
+    this->scroll->setSizeIncrement(QSize(0, 96));
+    this->scroll->setMaximumSize(QSize(568, 1168));
+    
+    this->scrollLayout->insertWidget(0, mainProgress, Qt::AlignTop);
+    this->scrollLayout->insertSpacerItem(1, new QSpacerItem(584, 1168,
+							    QSizePolicy::Maximum, QSizePolicy::Maximum));
 
     this->cancelButton = new QPushButton("Cancel", this);
     this->cancelButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     this->cancelButton->setShortcut(Qt::Key_Escape);
 
-    this->layout->addWidget(box);
+    this->layout->addWidget(scroll);
     this->layout->addWidget(this->cancelButton);
 
     connect(this->cancelButton, &QPushButton::pressed,
@@ -54,7 +68,7 @@ RodsTransferWindow::~RodsTransferWindow()
 	delete (widget);
 
     delete (this->mainProgress);
-    delete (this->boxLayout);
+    delete (this->scrollLayout);
     delete (this->layout);
     delete (this->cancelButton);
 }
@@ -101,7 +115,7 @@ void RodsTransferWindow::setupSubProgressBar(QString itemName, QString initialMs
 							value, maxValue, this);
 
     this->progressItems[id] = widget;
-    this->boxLayout->addWidget(widget);
+    this->scrollLayout->insertWidget(1, widget);
 }
 
 void RodsTransferWindow::updateSubProgress(QString itemName, QString currentMsg, int value)
@@ -130,7 +144,7 @@ void RodsTransferWindow::setSubProgressMarquee(QString itemName, QString current
 	RodsProgressWidget *widget = this->progressItems[id];
 	
 	if (widget)
-	    widget->update(currentMsg, 0);
+	    widget->setMarquee(currentMsg);
     }
     catch (const std::exception &e)
     {
@@ -148,7 +162,7 @@ void RodsTransferWindow::finalizeSubProgressBar(QString itemName)
 
 	if (widget)
 	{
-	    this->boxLayout->removeWidget(widget);
+	    this->scrollLayout->removeWidget(widget);
 	    delete (widget);
 	}
 
