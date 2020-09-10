@@ -18,9 +18,7 @@
 
 // C++ standard library headers
 #include <string>
-
-// boost library headers
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 // iRODS client library headers
 #include "rodsClient.h"
