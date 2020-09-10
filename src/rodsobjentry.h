@@ -4,7 +4,7 @@
  *
  * The Kanki class RodsObjEntry represents an iRODS object entry in iCAT.
  *
- * Copyright (C) 2016 KTH Royal Institute of Technology. All rights reserved.
+ * Copyright (C) 2016-2020 KTH Royal Institute of Technology. All rights reserved.
  * License: The BSD 3-Clause License, see LICENSE file for details.
  *
  * Copyright (C) 2014-2016 University of Jyväskylä. All rights reserved.
@@ -33,21 +33,21 @@ class RodsObjEntry
 
 public:
 
-    // Constructor requires all the object properties as arguments and instantiates a fully defined
-    // iRODS object entry container object.
-    RodsObjEntry(const std::string &theObjName, const std::string &theCollPath, const std::string &theCreateTime,
-                 const std::string &theModifyTime, objType_t theObjType, int theReplNum, int theReplStatus, rodsLong_t theObjSize);
+    // constructor requires all the object properties as arguments and instantiates it fully defined
+    RodsObjEntry(const std::string &theObjName, const std::string &theCollPath,
+		 const std::string &theCreateTime, const std::string &theModifyTime,
+		 objType_t theObjType, int theReplNum, int theReplStatus, rodsLong_t theObjSize);
 
-    // Constructs a fully qualified path for the iRODS object.
+    // constructs a fully qualified path for the iRODS object
     std::string getObjectFullPath();
 
-    // Constructs the base path for the iRODS object (parent collection path).
+    // constructs the base path for the iRODS object (parent collection path)
     std::string getObjectBasePath();
 
-    // Constructs the object name for the iRODS object (collection or data obj name).
+    // constructs the object name for the iRODS object (collection or data obj name)
     std::string getObjectName();
 
-    // Static class constants for iRODS object types (collection and data object).
+    // static class constants for iRODS object types (collection and data object)
     static const char *DataObjType;
     static const char *CollObjType;
 
@@ -63,7 +63,11 @@ public:
     rodsLong_t objSize;                 // object size
 };
 
-typedef boost::shared_ptr<RodsObjEntry> RodsObjEntryPtr;
+// define smart pointer type for object entry
+using RodsObjEntryPtr = std::shared_ptr<RodsObjEntry>;
+
+// define container type for object array
+using RodsObjArray = std::vector<Kanki::RodsObjEntryPtr>;
 
 } // namespace Kanki
 

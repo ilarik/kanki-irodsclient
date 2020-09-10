@@ -71,12 +71,33 @@ class RodsSession
 
 public:
     
-    // import types from irods
-    using connection_pool_ptr = std::shared_ptr<irods::connection_pool>;
-    using connection_proxy = irods::connection_pool::connection_proxy;
-    using thread_pool_ptr = std::unique_ptr<irods::thread_pool>;
+    // === CONSTUCTORS AND DECONSTRUCTORS ===
     
-    // local type for a resource
+    // constructor initializes a new session object, optionally cloning another one
+    explicit RodsSession(const RodsSession *sessPtr = nullptr);
+    explicit RodsSession(RodsSession &) = delete;    
+    
+    // we deny assignments and  moving of the object
+    RodsSession& operator=(RodsSession &) = delete;
+    
+    // destructor cleans up and disconnects
+    ~RodsSession();
+
+    
+    // === CLASS-LOCAL TYPE IMPORTS AND DEFINITIONS ===
+    
+    // import types from irods for connection pool
+    using connection_pool = irods::connection_pool;
+    using connection_pool_ptr = std::shared_ptr<connection_pool>;
+
+    // import type for connection proxy
+    using connection_proxy = connection_pool::connection_proxy;
+
+    // import types for thread pool
+    using thread_pool = irods::thread_pool;
+    using thread_pool_ptr = std::unique_ptr<thread_pool>;
+    
+    // define local type for a storage resource
     struct Resource
     {
 	unsigned long id;
@@ -86,152 +107,115 @@ public:
 	std::string comment;
     };
     
-    // local type for a resource table
+    // define local type for a resource table
     using ResourceTable = std::map<unsigned long, Kanki::RodsSession::Resource>;
     
-    // Constructor for instantiating a new session object, optionally identical with
-    // respect to the parameters of the session object pointed by argument sessPtr.
-    RodsSession(const RodsSession *sessPtr = nullptr);
-    
-    // Destructor to disconnect and clean up.
-    ~RodsSession();
 
-    // Establishes iRODS protocol connections to an iRODS grid. Also configures the
-    // session object for session parameters from the iRODS user environment if
-    // no session parameters have been provided.
-    int connect();
+    // === CLASS-LOCAL STATIC CONSTANTS ===
+
+    // default values for some tunables
+    static constexpr unsigned numThreads = 16;
+    static constexpr unsigned refreshTime = 600;
+    static constexpr unsigned minBlkSize = 262144;
+    static constexpr unsigned long xferBlkSize = 16777216;
     
-    // For an established connection, executes iRODS protocol user authentication procedure
-    // according to provided credentials. By default uses iRODS user environment.
-    int login(const std::string &authScheme = "",
-	      const std::string &userName = "",
-	      const std::string &password = "");
+    // client signature string passed via the iRODS RPC API
+    static constexpr char *signatureStr = "kanki";
+
+
+    // === PUBLIC MEMBER FUNCTIONS ===
+ 
+    // interface for accessing the iRODS comm pointer - necessary for now
+    rcComm_t* commPtr() const { return (this->rodsCommPtr); }
+
+    // locks the default-connection-specific mutex lock to prevent simultaneous use
+    void mutexLock() { this->commMutex.lock(); }
+
+    // frees the default-connection-specific mutex lock
+    void mutexUnlock() { this->commMutex.unlock(); }
+
+    // interface for querying the last rods api provided error code
+    int lastError() const { return (this->lastErrMsg.status); }
+
+    // interface for querying the last rods api provided error message
+    std::string lastErrorMsg() const { return std::string(this->lastErrMsg.msg); }
+
+    // returns a proxy object to an available iRODS connection from the pool
+    connection_proxy getConnection() { return (this->connPool->get_connection()); }
+
+    // schedules a task to the session-wide thread pool
+    void scheduleTask(std::function<void()> callback) { thread_pool::post(*(this->tank), callback); }
     
-    // Disconnects from the iRODS server.
-    int disconnect(bool force = false);
-    
-    // Interface for querying whether the connection object is fully ready to be used, i.e.
-    // connection was successful and user authentication is complete.
+    // gets a const reference to the resource table
+    const ResourceTable& resourceTable() const { return (this->rescTable); }
+
+    // interface for querying whether the session readiness
     bool isReady() const
     {
 	// connection is ready if there is a connection pointer and login was successful
-	if (this->rodsCommPtr)
-	    if (this->rodsCommPtr->loggedIn)
-		return (true);
+	if (this->rodsCommPtr && this->rodsCommPtr->loggedIn)
+	    return (true);
 	
 	// otherwise connection is not ready
 	return (false);
     }
 
-    // Interface for querying whether the iRODS connection is an SSL secured connection.
+    // interface for querying whether the iRODS session is using an SSL/TLS connections
     bool isSSL() const
     {
-	// if we have a ready connection, get SSL status
-	if (this->isReady())
-	{
-	    // if an OpenSSL handle exists
-	    if (this->rodsCommPtr->ssl)
-		return (true);
-	}
+	// if we have a ready connection
+	if (this->isReady() && this->rodsCommPtr->ssl)
+	    return (true);
 	
 	// if OpenSSL handle is not available, return false
 	return (false);
     }
 
-    // Interface for accessing the iRODS comm pointer, for bypassing the Kanki::RodsSession
-    // object interfaces - necessary for now.
-    rcComm_t* commPtr() const
-    {
-	// simply return default connection ptr
-	return (this->rodsCommPtr);
-    }
-
-    // Interface for accessing the SSL cipher info structure, provides a const pointer.
+    // interface for accessing the SSL cipher info structure, provides a const pointer
     const SSL_CIPHER* cipherInfo() const
     {
 	// if we have a valid OpenSSL handle
-	if (this->isSSL())
-	{
-	    // return pointer to OpenSSL cipher in use
+	if (this->isReady() && this->isSSL())
 	    return (SSL_get_current_cipher(this->rodsCommPtr->ssl));
-	}
 	
-	// if no SSL, just return NULL
+	// if no SSL, return null pointer
 	return (nullptr);
     }
 
-    // Interface for querying the iRODS username for the connection, provides a C++ std string
-    // copy of the rods api provided C string.
-    std::string rodsUser() const
-    {
-	return std::string(this->rodsUserEnv.rodsUserName);
-    }
-
-    // Interface for querying the iRODS server hostname of the connection, provides a C++ std string
-    // copy of the rods api provided C string.
-    std::string rodsHost() const
-    {
-	return std::string(this->rodsUserEnv.rodsHost);
-    }
-
-    // Interface for querying the iRODS home collection of the session, provides a C++ std string
-    // copy of the rods api provided C string.
-    std::string rodsHome() const
-    {
-	return std::string(this->rodsUserEnv.rodsHome);
-    }
+    // getter for the iRODS username
+    std::string rodsUser() const { return std::string(this->rodsUserEnv.rodsUserName); }
     
-    // Interface for querying the iRODS home zone of the iRODS server, provides a C++ std string
-    // copy of the rods api provided C string.
-    std::string rodsZone() const
-    {
-	return std::string(this->rodsUserEnv.rodsZone);
-    }
+    // getter for iRODS endpoint hostname
+    std::string rodsHost() const { return std::string(this->rodsUserEnv.rodsHost); }
 
-    // Interface for querying the iRODS default resource of the user, provides a C++ std string
-    // copy of the rods api provided C string.
-    std::string rodsDefResc() const
-    {
-	return std::string(this->rodsUserEnv.rodsDefResource);
-    }
+    // getter for the iRODS home collection
+    std::string rodsHome() const { return std::string(this->rodsUserEnv.rodsHome); }
     
-    // Interface for querying the iRODS authentication scheme used, provides a C++ std string copy
-    // of the rods api provided C string.
-    std::string rodsAuthScheme() const
-    {
-	return std::string(this->rodsUserEnv.rodsAuthScheme);
-    }
+    // getter for the iRODS home zone
+    std::string rodsZone() const { return std::string(this->rodsUserEnv.rodsZone); }
 
-    // Interface for querying the last rods api provided error message, provides a C++ std string
-    // copy of the rods api provided C string.
-    std::string lastErrorMsg() const
-    {
-	return std::string(this->lastErrMsg.msg);
-    }
-
-    // Interface for querying the last rods api provided error code.
-    int lastError() const
-    {
-	return (this->lastErrMsg.status);
-    }
-
-    // Locks the connection specific mutex lock to prevent simultaneous use of the same iRODS
-    // connection by two different threads.
-    void mutexLock()
-    {
-	this->commMutex.lock();
-    }
-
-    // Frees the connection specific mutex lock to make the iRODS TCP connection data stream
-    // available for other threads.
-    void mutexUnlock()
-    {
-	this->commMutex.unlock();
-    }
+    // getter for the iRODS default resource
+    std::string rodsDefResc() const { return std::string(this->rodsUserEnv.rodsDefResource); }
     
-    // Reads an iRODS collection from the iRODS server to memory using the locally cached version
-    // of rods api read collection function, parses the collection into a vector of RodsObjEntry objs.
-    int readColl(const std::string &collPath, std::vector<Kanki::RodsObjEntryPtr> *collObjs,
+    // getter for the iRODS authentication scheme
+    std::string rodsAuthScheme() const { return std::string(this->rodsUserEnv.rodsAuthScheme); }
+
+    // establishes iRODS protocol connections to an iRODS grid and configures session
+    int connect();
+    
+    // executes iRODS protocol user authentication procedure depending on auth scheme
+    int login(const std::string &authScheme = "",
+	      const std::string &userName = "",
+	      const std::string &password = "");
+    
+    // disconnects from the iRODS grid
+    int disconnect(bool force = false);
+  
+    // refreshes the resource table from the catalog
+    int refreshResourceTable();
+    
+    // reads an iRODS collection from the iRODS catalog into memory 
+    int readColl(const std::string &collPath, RodsObjArray *collObjs,
 		 rcComm_t *comm = nullptr);
 
     // Makes an iRODS collection at specified path, optionally recursively.
@@ -265,47 +249,19 @@ public:
 
     // Renames an iRODS object to newName.
     int renameObj(Kanki::RodsObjEntryPtr objEntry, const std::string &newName);
-
-    // Refreshes the resource table from the catalog.
-    int refreshResourceTable();
-
-    // Schedules a task to the thread pool.
-    void scheduleTask(std::function<void()> callback)
-    {
-	irods::thread_pool::post(*(this->tank), callback);
-    }
-
-    // Returns a proxy object to an available iRODS connection from the pool.
-    connection_proxy getConnection()
-    {
-	return (this->connPool->get_connection());
-    }
     
-    // Gets a const reference to the resource table.
-    const ResourceTable& resourceTable() const
-    {
-	return (this->rescTable);
-    }
-
-    // We deny assignments, moving and copying of the object
-    RodsSession(RodsSession &) = delete;
-    RodsSession& operator=(RodsSession &) = delete;
-    
-    // Default values for some tunables
-    static constexpr unsigned numThreads = 16;
-    static constexpr unsigned refreshTime = 600;
-    static constexpr unsigned minBlkSize = 262144;
-    static constexpr unsigned long xferBlkSize = 16777216;
-    
-    // Client signature string passed via the iRODS RPC API
-    static constexpr char *signatureStr = "kanki";
 
 private:
 
-    // Authenticates the user against the iRODS server in a new connection.
+    // === PRIVATE MEMBER FUNCTIONS === 
+
+    // authenticates the user against the iRODS server in a new session
     int authenticate(const std::string &authScheme = "",
 		     const std::string &userName = "", 
 		     const std::string &password = "");
+
+
+    // === PRIVATE CLASS MEMBERS ===
 
     // a mutex to provide locking for the TCP connection data stream
     std::mutex commMutex;
