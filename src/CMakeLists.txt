@@ -1,8 +1,11 @@
-# we require CMake version 2.8.11 (Qt5 recommended)
+# we require CMake version 3.5 (for iRODS)
 cmake_minimum_required(VERSION 3.5)
 
+# set project name
+PROJECT(irodsclient)
+
 # find Qt CMake packages
-find_package(Qt5 5.4.0 CONFIG REQUIRED Widgets Xml Svg)
+find_package(Qt5 CONFIG REQUIRED Widgets Xml Svg)
 
 # find iRODS packages
 find_package(IRODS 4.2.8 EXACT REQUIRED CONFIG)
@@ -11,10 +14,6 @@ set(CMAKE_C_COMPILER ${IRODS_EXTERNALS_FULLPATH_CLANG}/bin/clang)
 set(CMAKE_CXX_COMPILER ${IRODS_EXTERNALS_FULLPATH_CLANG}/bin/clang++)
 
 set(CMAKE_EXE_LINKER_FLAGS_INIT "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
-
-
-# set project name
-PROJECT(irodsclient)
 
 # use auto moc feature to build qt meta objects
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -33,8 +32,6 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++")
 add_compile_options(-nostdinc++ -Wall -Wextra -Werror -Wno-unused-parameter)
 link_libraries(c++abi)
 include_directories(${IRODS_EXTERNALS_FULLPATH_CLANG}/include/c++/v1)
-
-
 
 # Qt UI compiler files
 file(GLOB UI_FILES *.ui)

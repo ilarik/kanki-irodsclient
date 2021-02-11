@@ -48,16 +48,11 @@ That concludes the install procedure, running `iinit` will initialize your iRODS
 Building from source
 --------------------
 
-The following instructions should work on CentOS/RHEL 6 and 7 and probably on Fedora as well.
+The following instructions should work on CentOS/RHEL 7 and probably on Fedora as well.
 
     yum -y groupinstall "Development Tools"
     yum -y install epel-release
     yum -y install openssl-devel libcurl-devel qt5-qtsvg-devel qt5-qtbase-devel
-
-    # for example for CentOS/RHEL 6
-    yum -y install ftp://ftp.renci.org/pub/irods/releases/4.1.6/centos6/irods-runtime-4.1.6-centos6-x86_64.rpm
-    yum -y install ftp://ftp.renci.org/pub/irods/releases/4.1.6/centos6/irods-icommands-4.1.6-centos6-x86_64.rpm
-    yum -y install ftp://ftp.renci.org/pub/irods/releases/4.1.6/centos6/irods-dev-4.1.6-centos6-x86_64.rpm
 
 On Ubuntu 14.04 and up you can install build depedencies with (thanks to Paul van Schayck for this information!)
 
@@ -68,7 +63,8 @@ Building the application is done simply via
 
     git clone https://github.com/ilarik/kanki-irodsclient.git
     cd kanki-irodsclient
-    ./build.sh [ -q /usr/lib/x86_64-linux-gnu/qt5 for Ubuntu! ]
+    mkdir build; cd build
+    CMAKE_PREFIX_PATH=/usr/lib64/cmake/Qt5 CXX=/opt/irods-externals/clang6.0-0/bin/clang++ /opt/irods-externals/cmake3.11.4-0/bin/cmake -Wno-dev ../src
 
 You can install the binary and config into place by running
 
