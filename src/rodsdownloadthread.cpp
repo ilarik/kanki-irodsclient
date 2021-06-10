@@ -79,7 +79,7 @@ void RodsDownloadThread::run()
 			    if (!conn)
 			    	reportError("iRODS connection failure", curObj->getObjectFullPath().c_str(), 
 					    SYS_SOCK_CONNECT_ERR);
-			    if ((status = this->getObject(conn, curObj, dstPath, this->verify, this->overwrite)) < 0)
+			    else if ((status = this->getObject(conn, curObj, dstPath, this->verify, this->overwrite)) < 0)
 				reportError("iRODS data stream error", curObj->getObjectFullPath().c_str(), status);
 			});
                 }
