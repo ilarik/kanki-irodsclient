@@ -309,7 +309,8 @@ int RodsSession::readColl(const std::string &collPath, std::vector<RodsObjEntryP
 					      entry.is_data_object() ? DATA_OBJ_T : COLL_OBJ_T,
 					      0,
 					      1,
-					      entry.is_data_object() ? const_cast<fs::collection_entry&>(entry).data_object_size() : 0));
+					      //entry.is_data_object() ? const_cast<fs::collection_entry&>(entry).data_object_size() : 0));
+					      0));
 
 	    // TODO: fix with emplace_back!
 	    collObjs->push_back(newEntry);
@@ -389,6 +390,13 @@ int RodsSession::putFile(const std::string &localPath, const std::string &objPat
 
     // take copy of the local file path for the rods api
     strcpy(filePath, localPath.c_str());
+
+    // checksum
+    if (verifyChecksum)
+	status = rcChksumLocFile(filePath,
+				 VERIFY_CHKSUM_KW,
+				 &putParam.condInput,
+				 this->rodsUserEnv.rodsDefaultHashScheme);
 
     // call rods api
     status = rcDataObjPut(this->rodsCommPtr, &putParam, filePath);

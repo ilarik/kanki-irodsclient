@@ -8,7 +8,7 @@ PROJECT(irodsclient)
 find_package(Qt5 CONFIG REQUIRED Widgets Xml Svg)
 
 # find iRODS packages
-find_package(IRODS 4.2.8 EXACT REQUIRED CONFIG)
+find_package(IRODS 4.2.10 EXACT REQUIRED CONFIG)
 
 set(CMAKE_C_COMPILER ${IRODS_EXTERNALS_FULLPATH_CLANG}/bin/clang)
 set(CMAKE_CXX_COMPILER ${IRODS_EXTERNALS_FULLPATH_CLANG}/bin/clang++)

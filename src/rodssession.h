@@ -39,7 +39,7 @@
 #include "rodsPath.h"
 #include "irods_client_api_table.hpp"
 #include "irods_pack_table.hpp"
-#include "checksum.hpp"
+#include "checksum.h"
 
 #include "irods_auth_object.hpp"
 #include "irods_auth_factory.hpp"

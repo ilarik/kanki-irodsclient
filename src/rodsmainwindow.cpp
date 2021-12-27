@@ -125,12 +125,19 @@ void RodsMainWindow::enterConnectedState()
 
         statusMsg += " - SSL security enabled - ";
 
-        // if we can get current cipher info from OpenSSL
+        //a if we can get current cipher info from OpenSSL
         if (cipher)
         {
-            statusMsg += "encryption method: " + std::string(cipher->name) + " - ";
-            statusMsg += "cipher strength: " + QVariant(cipher->strength_bits).toString().toStdString();
-            statusMsg += " bits - ";
+            statusMsg += "encryption method: " + std::string(SSL_CIPHER_get_name(cipher)) + " - ";
+
+	    int bits = 0;
+	    int status = SSL_CIPHER_get_bits(cipher, &bits);
+
+	    if (!status)
+	    {
+		statusMsg += "cipher strength: " + QVariant(bits).toString().toStdString();
+		statusMsg += " bits - ";
+	    }
         }
 
         // otherwise alert user that something's funky!

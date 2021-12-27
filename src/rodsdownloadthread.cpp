@@ -209,17 +209,12 @@ int RodsDownloadThread::getObject(irods::connection_pool::connection_proxy &conn
     // verify checksum if needed
     if (verifyChecksum)
     {
-	std::vector<fs::checksum> chksums = fs::client::data_object_checksum(conn, obj->getObjectFullPath(), 
-									     fs::replica_number::all);
-	if (chksums.size())
+	std::string chksum = fs::client::data_object_checksum(conn, obj->getObjectFullPath());
+
+	if (chksum.size())
 	{
-	    fs::checksum &first_chksum = chksums.front();
-	    
-	    if (first_chksum.value.size())
-	    {
-		subProgressMarquee(obj->getObjectFullPath().c_str(), "Verifying Checksum...");
-		status = verifyChksumLocFile((char*)localPath.c_str(), first_chksum.value.c_str(), nullptr);
-	    }
+	    subProgressMarquee(obj->getObjectFullPath().c_str(), "Verifying Checksum...");
+	    status = verifyChksumLocFile((char*)localPath.c_str(), chksum.c_str(), nullptr);
 	}
     }
 
